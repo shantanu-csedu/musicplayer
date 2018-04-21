@@ -11,7 +11,7 @@ interface DataProvider {
     fun getNext() : LiveData<MediaFile>
     fun getPrev() : LiveData<MediaFile>
     fun addNowPlaying(index : Int, file : MediaFile)
-    fun addNowPlaying(files : List<MediaFile>,nowPlayingId : Long) : LiveData<Boolean>
+    fun addNowPlaying(files : List<MediaFile>,clear : Boolean) : LiveData<Boolean>
     fun addMedia(files : List<MediaFile>)
     fun setNowPlaying(mediaId: Long)
     fun getMediaFiles(offset : Int,total : Int) : LiveData<List<MediaFile>>

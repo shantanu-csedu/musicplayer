@@ -53,27 +53,22 @@ class RoomDataProvider(context : Context) : DataProvider{
     }
 
     override fun addMedia(files: List<MediaFile>) {
-        executorService.submit(Runnable {
+        executorService.submit({
             db?.library()?.insert(files)
         })
     }
 
-    override fun addNowPlaying(files: List<MediaFile>, nowPlayingId : Long) : LiveData<Boolean>{
+    override fun addNowPlaying(files: List<MediaFile>,clear : Boolean) : LiveData<Boolean>{
         return QueryExecutor(executorService, object : Callable<Boolean>{
             override fun call(): Boolean{
                 var nowPlayingList  = ArrayList<NowPlayingFile>()
                 var rank = db?.nowPlaying()!!.getMaxRank() + 1
-                var hasNewNowPlayId = false
                 for(file in files){
-                    var nowPlayingFile = NowPlayingFile(file.id,rank,(file.id == nowPlayingId))
-                    if(file.id == nowPlayingId){
-                        hasNewNowPlayId = true
-                    }
+                    var nowPlayingFile = NowPlayingFile(file.id,rank,false)
                     nowPlayingList.add(nowPlayingFile)
                     rank++
                 }
-                //reset any other now play file
-                if(hasNewNowPlayId) db?.nowPlaying()!!.resetNowPlaying()
+                if(clear) db?.nowPlaying()!!.delete()
                 if(nowPlayingList.size > 0) return (db?.nowPlaying()?.insert(nowPlayingList)!![0] > 0)
                 return false
             }
@@ -125,6 +120,7 @@ class RoomDataProvider(context : Context) : DataProvider{
     override fun setNowPlaying(mediaId: Long) {
         QueryExecutor(executorService,object : Callable<Void>{
             override fun call(): Void? {
+                db?.nowPlaying()!!.resetNowPlaying()
                 db?.nowPlaying()!!.setNowPlaying(mediaId)
                 return null
             }

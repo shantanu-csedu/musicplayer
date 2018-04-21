@@ -94,6 +94,14 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
     }
 
     override fun play() {
+//        dataProvider.getNowPlayList2().observe(this@MediaPlayerService, Observer {
+//            list ->
+//            if(list != null){
+//                for(item in list){
+//                    Log.e("now playing"," " + item.media_file_id + " " + item.nowPlaying)
+//                }
+//            }
+//        })
         player.prepare()
         player.start()
     }
@@ -103,14 +111,16 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
     }
 
     override fun next() {
-        dataProvider.getNext().observe(this, Observer {
-            mediaFile ->
-            if(mediaFile != null ){
-                Log.e("Next item",mediaFile.name)
-//                dataProvider.setNowPlaying(mediaFile!!.id)
+        var nextLiveData = dataProvider.getNext();
+        var nextDataObserver = object : Observer<MediaFile> {
+            override fun onChanged(mediaFile: MediaFile?) {
+                nextLiveData.removeObserver(this)
+                if(mediaFile != null) {
+                    dataProvider.setNowPlaying(mediaFile!!.id)
+                }
             }
-//            if(initPlayer(mediaFile)) play()
-        })
+        }
+        nextLiveData.observe(this,nextDataObserver)
     }
 
     override fun duration(): Int {
@@ -118,11 +128,26 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
     }
 
     override fun prev() {
-        dataProvider.getPrev().observe(this, Observer {
-            mediaFile ->
-            dataProvider.setNowPlaying(mediaFile!!.id)
-            if(initPlayer(mediaFile)) play()
-        })
+        var prevLiveData = dataProvider.getPrev();
+        var prevDataObserver = object : Observer<MediaFile> {
+            override fun onChanged(mediaFile: MediaFile?) {
+                prevLiveData.removeObserver(this)
+                if(mediaFile != null) {
+                    dataProvider.setNowPlaying(mediaFile!!.id)
+                }
+//                else{
+//                    dataProvider.getNowPlayList2().observe(this@MediaPlayerService, Observer {
+//                        list ->
+//                        if(list != null){
+//                            for(item in list){
+//                                Log.e("now playing"," " + item.media_file_id + " " + item.nowPlaying)
+//                            }
+//                        }
+//                    })
+//                }
+            }
+        }
+        prevLiveData.observe(this,prevDataObserver)
     }
 
     override fun seek(position: Int) {
