@@ -11,6 +11,7 @@ interface DataProvider {
     fun addNowPlaying(index : Int, file : MediaFile)
     fun addNowPlaying(files : List<MediaFile>,nowPlayingId : Long)
     fun addMedia(files : List<MediaFile>)
+    fun getMediaFiles(offset : Int,total : Int) : LiveData<List<MediaFile>>
     fun remove()
     fun remove(mediaId: Long)
     fun removeNowPlaying()

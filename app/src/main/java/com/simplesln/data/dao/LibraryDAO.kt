@@ -1,5 +1,6 @@
 package com.simplesln.data.dao
 
+import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Delete
 import android.arch.persistence.room.Insert
@@ -16,4 +17,7 @@ interface LibraryDAO {
 
     @Query("delete from media_library where id = :mediaId")
     fun delete(mediaId : Long)
+
+    @Query("select * from media_library LIMIT :offset,:total")
+    fun get(offset : Int, total : Int) : LiveData<List<MediaFile>>
 }
