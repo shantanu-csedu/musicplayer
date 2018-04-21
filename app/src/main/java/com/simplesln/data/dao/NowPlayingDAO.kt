@@ -1,0 +1,46 @@
+package com.simplesln.data.dao
+
+import android.arch.lifecycle.LiveData
+import android.arch.persistence.room.Dao
+import android.arch.persistence.room.Delete
+import android.arch.persistence.room.Insert
+import android.arch.persistence.room.Query
+import com.simplesln.data.entities.MediaFile
+import com.simplesln.data.entities.NowPlayingFile
+
+@Dao
+interface NowPlayingDAO {
+    @Query("select media_library.* from media_library left join media_now_playing on media_now_playing.media_file_id = media_library.id order by media_now_playing.rank, media_now_playing.timestamp limit 1" )
+    fun getFirstItem() : LiveData<MediaFile>
+
+    @Query("select media_library.* from media_library left join media_now_playing on media_now_playing.media_file_id = media_library.id order by media_now_playing.rank desc, media_now_playing.timestamp desc limit 1" )
+    fun getLastItem() : LiveData<MediaFile>
+
+    @Query("select media_library.* from media_library  left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.nowPlaying = 1 limit 1" )
+    fun getNowPlayingItem() : LiveData<MediaFile>
+
+    @Query("select media_library.* from media_library  left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.rank >= (select rank from media_now_playing where nowPlaying = 1 order by timestamp limit 1) order by media_now_playing.rank , media_now_playing.timestamp limit 1")
+    fun getNext() : LiveData<MediaFile>
+
+    @Query("select media_library.* from media_library  left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.rank <= (select rank from media_now_playing where nowPlaying = 1 order by timestamp limit 1) order by media_now_playing.rank desc, media_now_playing.timestamp desc limit 1")
+    fun getPrevious() : LiveData<MediaFile>
+
+    @Query("update media_now_playing set nowPlaying = 0 where nowPlaying = 1")
+    fun resetNowPlaying()
+
+    @Query("update media_now_playing set nowPlaying = 1 where media_file_id = :mediaId")
+    fun setNowPlaying(mediaId : Long)
+
+    @Query("select media_library.* from media_library left join media_now_playing on media_now_playing.media_file_id = media_library.id order by media_now_playing.rank, media_now_playing.timestamp")
+    fun getNowPlayList() : LiveData<List<MediaFile>>
+
+    @Insert
+    fun insert(nowPlayList : List<NowPlayingFile>)
+
+    @Query("delete from media_now_playing")
+    fun delete()
+
+    @Query("delete from media_now_playing where media_file_id = :mediaId")
+    fun delete(mediaId: Long)
+
+}

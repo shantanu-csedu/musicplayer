@@ -1,13 +1,11 @@
 package com.simplesln.services
 
-import android.annotation.SuppressLint
-import android.app.Service
 import android.arch.lifecycle.LifecycleService
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import com.simplesln.data.MediaFile
+import com.simplesln.data.entities.MediaFile
 import com.simplesln.data.RoomDataProvider
 import com.simplesln.interfaces.DataProvider
 import com.simplesln.interfaces.MediaPlayer
