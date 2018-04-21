@@ -28,6 +28,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
     lateinit private var dataProvider : DataProvider
     private val CHANNEL_ID = "com.simplesln.simpler.player.notification"
     private val CHANNEL_NAME = "Simple Music Player"
+    private var mPrepared = false
     init {
         player = android.media.MediaPlayer()
     }
@@ -88,6 +89,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
     private fun initPlayer(mediaFile : MediaFile?) : Boolean{
         if(mediaFile == null) return false
         if(player.isPlaying) player.stop()
+        mPrepared = false
         player.reset()
         player.setDataSource(mediaFile?.link)
         return mediaFile != null
@@ -102,12 +104,15 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
 //                }
 //            }
 //        })
-        player.prepare()
+        if(!mPrepared) {
+            player.prepare()
+            mPrepared = true
+        }
         player.start()
     }
 
     override fun stop() {
-        player.stop()
+        player.pause()
     }
 
     override fun next() {
