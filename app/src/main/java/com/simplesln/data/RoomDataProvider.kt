@@ -1,15 +1,18 @@
 package com.simplesln.data
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MediatorLiveData
+import android.arch.lifecycle.Observer
 import android.content.Context
+import android.util.Log
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.data.entities.NowPlayingFile
 import com.simplesln.interfaces.DataProvider
+import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class RoomDataProvider(context : Context) : DataProvider{
-
     private var db : MyDB?
     private var executorService : ExecutorService
     init {
@@ -18,7 +21,23 @@ class RoomDataProvider(context : Context) : DataProvider{
     }
 
     override fun getNowPlay(): LiveData<MediaFile> {
-        return db?.nowPlaying()!!.getNowPlayingItem()
+        val distinctLiveData = MediatorLiveData<MediaFile>()
+        distinctLiveData.addSource(db?.nowPlaying()!!.getNowPlayingItem(), object : Observer<MediaFile> {
+            private var initialized = false
+            private var lastObj: MediaFile? = null
+            override fun onChanged(obj: MediaFile?) {
+                if(obj == null) return
+                if (!initialized) {
+                    initialized = true
+                    lastObj = obj
+                    distinctLiveData.postValue(lastObj)
+                } else if (obj != lastObj) {
+                    lastObj = obj
+                    distinctLiveData.postValue(lastObj)
+                }
+            }
+        })
+        return distinctLiveData
     }
 
     override fun getNowPlayList(): LiveData<List<MediaFile>> {
@@ -39,36 +58,51 @@ class RoomDataProvider(context : Context) : DataProvider{
         })
     }
 
-    override fun addNowPlaying(files: List<MediaFile>, nowPlayingId : Long) {
-        executorService.submit(Runnable {
-            var nowPlayingList  = ArrayList<NowPlayingFile>()
-            for((rank, file) in files.withIndex()){
-                var nowPlayingFile = NowPlayingFile(file.id,rank,(file.id == nowPlayingId))
-                nowPlayingList.add(nowPlayingFile)
+    override fun addNowPlaying(files: List<MediaFile>, nowPlayingId : Long) : LiveData<Boolean>{
+        return QueryExecutor(executorService, object : Callable<Boolean>{
+            override fun call(): Boolean{
+                var nowPlayingList  = ArrayList<NowPlayingFile>()
+                var rank = db?.nowPlaying()!!.getMaxRank() + 1
+                var hasNewNowPlayId = false
+                for(file in files){
+                    var nowPlayingFile = NowPlayingFile(file.id,rank,(file.id == nowPlayingId))
+                    if(file.id == nowPlayingId){
+                        hasNewNowPlayId = true
+                    }
+                    nowPlayingList.add(nowPlayingFile)
+                    rank++
+                }
+                //reset any other now play file
+                if(hasNewNowPlayId) db?.nowPlaying()!!.resetNowPlaying()
+                if(nowPlayingList.size > 0) return (db?.nowPlaying()?.insert(nowPlayingList)!![0] > 0)
+                return false
             }
-            db?.nowPlaying()?.insert(nowPlayingList)
         })
     }
 
     override fun addNowPlaying(index: Int, file: MediaFile) {
         executorService.submit(Runnable {
             var nowPlayingList  = ArrayList<NowPlayingFile>()
-            var nowPlayingFile = NowPlayingFile(file.id,index,false)
+            var nowPlayingFile = NowPlayingFile(file.id, index.toDouble(),false)
             nowPlayingList.add(nowPlayingFile)
             db?.nowPlaying()?.insert(nowPlayingList)
         })
 
     }
 
-    override fun remove() {
-        executorService.submit(Runnable {
-            db?.library()?.delete()
+    override fun remove() : LiveData<Int>{
+        return QueryExecutor(executorService,object : Callable<Int>{
+            override fun call(): Int {
+                return db?.library()?.delete()!!
+            }
         })
     }
 
-    override fun removeNowPlaying() {
-        executorService.submit(Runnable {
-            db?.nowPlaying()?.delete()
+    override fun removeNowPlaying() : LiveData<Int>{
+        return QueryExecutor(executorService,object : Callable<Int>{
+            override fun call(): Int {
+                return db?.nowPlaying()?.delete()!!
+            }
         })
     }
 
@@ -87,4 +121,19 @@ class RoomDataProvider(context : Context) : DataProvider{
     override fun getMediaFiles(offset: Int, total: Int) : LiveData<List<MediaFile>> {
         return db?.library()!!.get(offset,total)
     }
+
+    override fun setNowPlaying(mediaId: Long) {
+        QueryExecutor(executorService,object : Callable<Void>{
+            override fun call(): Void? {
+                db?.nowPlaying()!!.setNowPlaying(mediaId)
+                return null
+            }
+        })
+    }
+
+    override fun getNowPlayList2() : LiveData<List<NowPlayingFile>>{
+        return db?.nowPlaying()!!.get()
+    }
+
+
 }

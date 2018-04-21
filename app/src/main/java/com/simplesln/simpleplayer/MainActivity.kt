@@ -28,8 +28,11 @@ class MainActivity : BaseActivity() {
                     }
                 }
                 if(nowPlaying.size > 0) {
-                    dataProvider.addNowPlaying(nowPlaying, nowPlayId)
-                    mediaPlayer?.notifyMediaSelectionChanged()
+                    dataProvider.removeNowPlaying().observe(this, Observer {
+                        dataProvider.addNowPlaying(nowPlaying, nowPlayId).observe(this, Observer {
+                            result ->
+                        })
+                    })
                 }
             }
         })

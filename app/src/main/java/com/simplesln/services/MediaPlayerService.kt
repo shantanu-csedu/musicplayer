@@ -17,6 +17,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.support.annotation.RequiresApi
+import android.util.Log
 import com.simplesln.simpleplayer.R
 
 
@@ -40,6 +41,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
             var notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW))
         }
+        observeNowPlaying()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -75,14 +77,16 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
         }
     }
 
-    fun notifyMediaSelectionChanged(){
+    private fun observeNowPlaying(){
         dataProvider.getNowPlay().observe(this, Observer {
             mediaFile ->
+            if(mediaFile != null) Log.e("Now play ", mediaFile?.name)
             if(initPlayer(mediaFile)) play()
         })
     }
 
     private fun initPlayer(mediaFile : MediaFile?) : Boolean{
+        if(mediaFile == null) return false
         if(player.isPlaying) player.stop()
         player.reset()
         player.setDataSource(mediaFile?.link)
@@ -101,7 +105,11 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
     override fun next() {
         dataProvider.getNext().observe(this, Observer {
             mediaFile ->
-            if(initPlayer(mediaFile)) play()
+            if(mediaFile != null ){
+                Log.e("Next item",mediaFile.name)
+//                dataProvider.setNowPlaying(mediaFile!!.id)
+            }
+//            if(initPlayer(mediaFile)) play()
         })
     }
 
@@ -112,6 +120,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
     override fun prev() {
         dataProvider.getPrev().observe(this, Observer {
             mediaFile ->
+            dataProvider.setNowPlaying(mediaFile!!.id)
             if(initPlayer(mediaFile)) play()
         })
     }

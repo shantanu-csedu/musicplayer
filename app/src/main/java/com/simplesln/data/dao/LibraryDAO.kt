@@ -13,7 +13,7 @@ interface LibraryDAO {
     fun insert(mediaFiles : List<MediaFile>)
 
     @Query("delete from media_library")
-    fun delete()
+    fun delete() : Int
 
     @Query("delete from media_library where id = :mediaId")
     fun delete(mediaId : Long)

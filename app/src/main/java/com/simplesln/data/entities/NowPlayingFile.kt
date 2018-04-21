@@ -20,11 +20,11 @@ class NowPlayingFile {
     @PrimaryKey(autoGenerate = true)
     var id : Long = 0
     var media_file_id : Long
-    var rank : Int
+    var rank : Double
     var timestamp : Long
     var nowPlaying : Boolean
 
-    constructor(media_file_id: Long, rank : Int, nowPlaying : Boolean) {
+    constructor(media_file_id: Long, rank : Double, nowPlaying : Boolean) {
         this.media_file_id = media_file_id
         this.rank = rank
         this.timestamp = System.currentTimeMillis()
