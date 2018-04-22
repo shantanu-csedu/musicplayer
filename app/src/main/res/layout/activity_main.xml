@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity"
     android:gravity="center"
-    android:keepScreenOn="true">
+    android:layout_margin="16dp">
 
     <Button
         android:id="@+id/button0"
@@ -40,5 +40,19 @@
         android:text="Next"
         tools:layout_editor_absoluteX="268dp"
         tools:layout_editor_absoluteY="213dp" />
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:id="@+id/text0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:ellipsize="end"
+        />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

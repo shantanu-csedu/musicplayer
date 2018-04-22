@@ -7,7 +7,6 @@ import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.os.PersistableBundle
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
 import com.simplesln.services.MediaPlayerService
@@ -40,7 +39,7 @@ abstract class BaseActivity : AppCompatActivity() {
             val binder = service as MediaPlayerService.MediaPlayerServiceBinder
             mediaPlayer = binder.getMediaService()
             mBound = true
-            onMediaPlayerInitialized()
+            onMediaPlayerConnected()
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
@@ -48,5 +47,5 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    abstract fun onMediaPlayerInitialized()
+    abstract fun onMediaPlayerConnected()
 }

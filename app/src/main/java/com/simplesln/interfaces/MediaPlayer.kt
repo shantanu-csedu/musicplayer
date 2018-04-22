@@ -7,6 +7,7 @@ interface MediaPlayer {
     fun prev()
     fun isPlaying() : Boolean
     fun duration() : Int
+    fun currentPosition() : Int
     fun seek(position : Int)
     fun shortForward();
     fun longForward()

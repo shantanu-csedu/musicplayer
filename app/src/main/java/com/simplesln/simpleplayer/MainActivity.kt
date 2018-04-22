@@ -4,15 +4,21 @@ import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.DragEvent
+import android.view.MotionEvent
 import android.view.View
+import android.widget.SeekBar
 import com.simplesln.data.PrefDataProvider
 import com.simplesln.data.RoomDataProvider
+import com.simplesln.data.STATE_PLAYING
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.services.MediaScanService
 import kotlinx.android.synthetic.main.activity_main.*
+import java.sql.Time
+import java.util.*
 
 class MainActivity : BaseActivity() {
-    override fun onMediaPlayerInitialized() {
+    override fun onMediaPlayerConnected() {
 //        var mediaFileObserver = Observer<List<MediaFile>> {
 //            list ->
 //            if(list != null){
@@ -38,10 +44,30 @@ class MainActivity : BaseActivity() {
 //            }
 //        }
 //        dataProvider.getMediaFiles(0,10).observe(this,mediaFileObserver)
+        if(mediaPlayer != null){
+            mediaPlayer!!.getMediaPlayerState().observe(this, Observer {
+                mediaPlayerState ->
+                if(mediaPlayerState != null) {
+                    if (mediaPlayerState.state == STATE_PLAYING) {
+                        button1.setText("Stop")
+                    } else {
+                        button1.setText("Play")
+                    }
+
+                    if(mediaPlayerState.mediaFile != null){
+                        text0.setText(mediaPlayerState.mediaFile?.name)
+                    }
+                    else{
+                        text0.setText("")
+                    }
+                }
+            })
+        }
     }
 
     private lateinit var pref : PrefDataProvider
     private lateinit var dataProvider: RoomDataProvider
+    private var timer : Timer? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -105,5 +131,48 @@ class MainActivity : BaseActivity() {
             }
             mediaFileLiveData.observe(this,mediaFileObserver)
         })
+
+
+//        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+//            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+//                Log.e("progress","" + progress)
+//            }
+//        })
+        seekBar.setOnTouchListener(object : View.OnTouchListener{
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                if(event?.action == MotionEvent.ACTION_UP){
+                    var progress = seekBar.progress
+                    if(mediaPlayer != null){
+                        var duration = mediaPlayer?.duration()!!
+                        if(duration > 0){
+                            mediaPlayer?.seek((progress * duration / 100))
+                        }
+                    }
+                }
+                return false
+            }
+        })
     }
+
+    override fun onPause() {
+        super.onPause()
+        timer?.cancel()
+        timer = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        timer = Timer()
+        timer?.scheduleAtFixedRate(object : TimerTask(){
+            override fun run() {
+                if(mediaPlayer != null) seekBar.setProgress(getProgress(mediaPlayer!!.currentPosition(),mediaPlayer!!.duration()))
+            }
+
+            fun getProgress(current : Int, duration : Int) : Int {
+                if(duration == 0) return  0
+                return current * 100 / duration
+            }
+        },1000,1000)
+    }
+
 }

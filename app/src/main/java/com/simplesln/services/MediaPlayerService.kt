@@ -7,21 +7,50 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import com.simplesln.data.entities.MediaFile
-import com.simplesln.data.RoomDataProvider
 import com.simplesln.interfaces.DataProvider
 import com.simplesln.interfaces.MediaPlayer
 import android.support.v4.app.NotificationCompat
 import android.app.Notification.MediaStyle
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.os.Build
+import android.os.Handler
 import android.support.annotation.RequiresApi
 import android.util.Log
+import com.simplesln.data.*
 import com.simplesln.simpleplayer.R
 
 
-class MediaPlayerService : LifecycleService(), MediaPlayer{
+class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaPlayer.OnCompletionListener, android.media.MediaPlayer.OnPreparedListener {
+    override fun onPrepared(mp: android.media.MediaPlayer?) {
+        if(mp != null){
+            if(mp.isPlaying){
+                liveMediaPlayerState.update(MediaPlayerState(STATE_PLAYING, mMediaFile))
+            }
+            else{
+                liveMediaPlayerState.update(MediaPlayerState(STATE_IDLE, mMediaFile))
+            }
+        }
+    }
+
+    override fun onCompletion(mp: android.media.MediaPlayer?) {
+        if(mp != null){
+            if(mp.currentPosition == mp.duration){
+                liveMediaPlayerState.update(MediaPlayerState(STATE_END, mMediaFile))
+            }
+            else if(mp.isLooping && mp.isPlaying){
+                liveMediaPlayerState.update(MediaPlayerState(STATE_PLAYING, mMediaFile))
+            }
+            else{
+                liveMediaPlayerState.update(MediaPlayerState(STATE_STOPPED, mMediaFile))
+                handler.postDelayed({
+                    next()
+                },500)
+            }
+        }
+    }
 
     lateinit var instance : MediaPlayerService
     private var player : android.media.MediaPlayer
@@ -29,8 +58,15 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
     private val CHANNEL_ID = "com.simplesln.simpler.player.notification"
     private val CHANNEL_NAME = "Simple Music Player"
     private var mPrepared = false
+    private var liveMediaPlayerState : LiveMediaPlayerState
+    private var mMediaFile : MediaFile? = null
+    private var handler = Handler()
+
     init {
         player = android.media.MediaPlayer()
+        player.setOnCompletionListener(this)
+        player.setOnPreparedListener(this)
+        liveMediaPlayerState = LiveMediaPlayerState()
     }
 
 
@@ -43,6 +79,10 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
             notificationManager.createNotificationChannel(NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW))
         }
         observeNowPlaying()
+    }
+
+    fun getMediaPlayerState() : LiveData<MediaPlayerState>{
+        return liveMediaPlayerState
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -79,10 +119,17 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
     }
 
     private fun observeNowPlaying(){
-        dataProvider.getNowPlay().observe(this, Observer {
-            mediaFile ->
-            if(mediaFile != null) Log.e("Now play ", mediaFile?.name)
-            if(initPlayer(mediaFile)) play()
+        dataProvider.getNowPlay().observe(this,object : Observer<MediaFile>{
+            var mInit = false
+            override fun onChanged(mediaFile: MediaFile?) {
+                if(mediaFile != null) Log.e("Now play ", mediaFile.name)
+                if(initPlayer(mediaFile)){
+                    if(mInit) play()
+                    mInit = true
+                }
+                mMediaFile = mediaFile
+            }
+
         })
     }
 
@@ -91,27 +138,25 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
         if(player.isPlaying) player.stop()
         mPrepared = false
         player.reset()
-        player.setDataSource(mediaFile?.link)
-        return mediaFile != null
+        player.setDataSource(mediaFile.link)
+        return true
     }
 
     override fun play() {
-//        dataProvider.getNowPlayList2().observe(this@MediaPlayerService, Observer {
-//            list ->
-//            if(list != null){
-//                for(item in list){
-//                    Log.e("now playing"," " + item.media_file_id + " " + item.nowPlaying)
-//                }
-//            }
-//        })
-        if(!mPrepared) {
-            player.prepare()
-            mPrepared = true
+        if(mMediaFile != null) {
+            if (!mPrepared) {
+                player.prepare()
+                mPrepared = true
+            }
+            else{
+                liveMediaPlayerState.update(MediaPlayerState(STATE_PLAYING, mMediaFile))
+            }
+            player.start()
         }
-        player.start()
     }
 
     override fun stop() {
+        liveMediaPlayerState.update(MediaPlayerState(STATE_STOPPED, mMediaFile))
         player.pause()
     }
 
@@ -121,7 +166,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
             override fun onChanged(mediaFile: MediaFile?) {
                 nextLiveData.removeObserver(this)
                 if(mediaFile != null) {
-                    dataProvider.setNowPlaying(mediaFile!!.id)
+                    dataProvider.setNowPlaying(mediaFile.id)
                 }
             }
         }
@@ -129,7 +174,9 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
     }
 
     override fun duration(): Int {
-        return player.duration
+        if(mPrepared)
+            return player.duration
+        return 0;
     }
 
     override fun prev() {
@@ -138,32 +185,25 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
             override fun onChanged(mediaFile: MediaFile?) {
                 prevLiveData.removeObserver(this)
                 if(mediaFile != null) {
-                    dataProvider.setNowPlaying(mediaFile!!.id)
+                    dataProvider.setNowPlaying(mediaFile.id)
                 }
-//                else{
-//                    dataProvider.getNowPlayList2().observe(this@MediaPlayerService, Observer {
-//                        list ->
-//                        if(list != null){
-//                            for(item in list){
-//                                Log.e("now playing"," " + item.media_file_id + " " + item.nowPlaying)
-//                            }
-//                        }
-//                    })
-//                }
             }
         }
         prevLiveData.observe(this,prevDataObserver)
     }
 
     override fun seek(position: Int) {
-        player.seekTo(position)
+        if(mPrepared)
+            player.seekTo(position)
     }
 
     override fun shortForward() {
-        var curPosition  = player.currentPosition
-        curPosition += 5*1000
-        if(curPosition > player.duration) curPosition = player.duration
-        player.seekTo(curPosition)
+        if(mPrepared) {
+            var curPosition = player.currentPosition
+            curPosition += 5 * 1000
+            if (curPosition > player.duration) curPosition = player.duration
+            player.seekTo(curPosition)
+        }
     }
 
     override fun longForward() {
@@ -195,5 +235,11 @@ class MediaPlayerService : LifecycleService(), MediaPlayer{
 
     override fun isPlaying(): Boolean {
         return player.isPlaying
+    }
+
+    override fun currentPosition(): Int {
+        if(mPrepared)
+            return player.currentPosition
+        return 0;
     }
 }
