@@ -20,10 +20,10 @@ class MediaFile {
         this.link = link
         this.name = name
         this.duration = duration
-        this.artist = if(artist == null) "" else artist
-        this.genre = if(genre == null) "" else genre
-        this.album = if(album == null) "" else album
+        this.artist = if(artist == null) "unknown artist" else artist
+        this.genre = if(genre == null) "unknown genre" else genre
+        this.album = if(album == null) "unknown album" else album
         this.folder = folder
-        this.year = if(year == null) "" else year
+        this.year = if(year == null) "unknown year" else year
     }
 }

@@ -36,7 +36,7 @@ class MainActivity : BaseActivity() {
                     if(mediaFile != null){
                         if(playerControlContainer.visibility == View.GONE) playerControlContainer.visibility = View.VISIBLE
                         songTitle.setText(mediaFile.name)
-                        artistName.setText(if(mediaFile.artist.length == 0) "unknown" else mediaFile.artist)
+                        artistName.setText(mediaFile.artist)
                     }
                     else{
                         if(playerControlContainer.visibility == View.VISIBLE) playerControlContainer.visibility = View.GONE
