@@ -16,6 +16,7 @@ import com.simplesln.adapters.ViewPagerAdapter
 import com.simplesln.data.PrefDataProvider
 import com.simplesln.data.RoomDataProvider
 import com.simplesln.data.STATE_PLAYING
+import com.simplesln.data.entities.MediaFile
 import com.simplesln.services.MediaScanService
 import kotlinx.android.synthetic.main.activity_main.*
 import java.text.DecimalFormat
@@ -196,7 +197,6 @@ class MainActivity : BaseActivity() {
             Log.e("Touch","Action " + event?.action)
             false
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

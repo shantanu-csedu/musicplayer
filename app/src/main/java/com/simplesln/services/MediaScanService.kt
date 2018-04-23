@@ -75,15 +75,16 @@ class MediaScanService : Service() {
         }
 
         private fun getMediaFile(file : File) : MediaFile{
-            var folder = file.parent.substring(file.parent.lastIndexOf("/")+1)
-            var mmr = MediaMetadataRetriever()
+            val folder = file.parent.substring(file.parent.lastIndexOf("/")+1)
+            val mmr = MediaMetadataRetriever()
             mmr.setDataSource(file.absolutePath);
-            var album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
-            var artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
-            var genre =  mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
-            var year = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
+            val album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
+            val artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+            val genre =  mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
+            val year = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
+            val duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
 
-            return MediaFile(file.absolutePath,file.name,artist,genre,album,folder,year)
+            return MediaFile(file.absolutePath,file.name,duration.toLong(),artist,genre,album,folder,year)
         }
     }
 }
