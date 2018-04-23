@@ -4,24 +4,23 @@ import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.support.design.widget.TabLayout
+import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.DragEvent
+import android.view.Menu
 import android.view.MotionEvent
 import android.view.View
 import android.widget.SeekBar
+import com.simplesln.adapters.ViewPagerAdapter
 import com.simplesln.data.PrefDataProvider
 import com.simplesln.data.RoomDataProvider
 import com.simplesln.data.STATE_PLAYING
-import com.simplesln.data.entities.MediaFile
 import com.simplesln.services.MediaScanService
 import kotlinx.android.synthetic.main.activity_main.*
-import java.sql.Time
 import java.text.DecimalFormat
-import java.util.*
-import kotlin.math.max
 
 class MainActivity : BaseActivity() {
-
 
     private lateinit var pref : PrefDataProvider
     private lateinit var dataProvider: RoomDataProvider
@@ -67,6 +66,40 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar)
+        tabLayout.addTab(tabLayout.newTab().setText("Now Playing"))
+        tabLayout.addTab(tabLayout.newTab().setText("Music Library"))
+
+        viewPager.adapter = ViewPagerAdapter(2,supportFragmentManager)
+        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
+            override fun onPageScrollStateChanged(state: Int) {
+
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+            }
+
+            override fun onPageSelected(position: Int) {
+                tabLayout.getTabAt(position)?.select()
+            }
+
+        })
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                if(tab != null)
+                    viewPager.setCurrentItem(tab.position,true)
+            }
+
+        })
 
         pref = PrefDataProvider(this)
         dataProvider = RoomDataProvider(applicationContext)
@@ -97,37 +130,37 @@ class MainActivity : BaseActivity() {
             }
         })
 
-        button0.setOnClickListener(View.OnClickListener {
-            var mediaFileLiveData = dataProvider.getMediaFiles(0,10)
-            var mediaFileObserver = object  : Observer<List<MediaFile>> {
-                override fun onChanged(list : List<MediaFile>?) {
-                    if(list != null){
-                        mediaFileLiveData.removeObserver(this)
-                        var nowPlaying  = ArrayList<MediaFile>()
-                        var nowPlayId = 0L;
-                        for(mediaFile in list){
-                            Log.e("Name",mediaFile.name);
-                            Log.e("Path",mediaFile.link);
-                            Log.e("Folder",mediaFile.folder)
-                            if(mediaFile.folder.equals("Music")){
-                                if(nowPlayId == 0L) nowPlayId = mediaFile.id
-                                nowPlaying.add(mediaFile)
-                            }
-                        }
-                        if(nowPlaying.size > 0) {
-                            var nowPlayingLiveData = dataProvider.addNowPlaying(nowPlaying,true)
-                            nowPlayingLiveData.observe(this@MainActivity,object : Observer<Boolean>{
-                                override fun onChanged(result: Boolean?) {
-                                    nowPlayingLiveData.removeObserver(this)
-                                    dataProvider.setNowPlaying(nowPlayId)
-                                }
-                            })
-                        }
-                    }
-                }
-            }
-            mediaFileLiveData.observe(this,mediaFileObserver)
-        })
+//        button0.setOnClickListener(View.OnClickListener {
+//            var mediaFileLiveData = dataProvider.getMediaFiles(0,10)
+//            var mediaFileObserver = object  : Observer<List<MediaFile>> {
+//                override fun onChanged(list : List<MediaFile>?) {
+//                    if(list != null){
+//                        mediaFileLiveData.removeObserver(this)
+//                        var nowPlaying  = ArrayList<MediaFile>()
+//                        var nowPlayId = 0L;
+//                        for(mediaFile in list){
+//                            Log.e("Name",mediaFile.name);
+//                            Log.e("Path",mediaFile.link);
+//                            Log.e("Folder",mediaFile.folder)
+//                            if(mediaFile.folder.equals("Music")){
+//                                if(nowPlayId == 0L) nowPlayId = mediaFile.id
+//                                nowPlaying.add(mediaFile)
+//                            }
+//                        }
+//                        if(nowPlaying.size > 0) {
+//                            var nowPlayingLiveData = dataProvider.addNowPlaying(nowPlaying,true)
+//                            nowPlayingLiveData.observe(this@MainActivity,object : Observer<Boolean>{
+//                                override fun onChanged(result: Boolean?) {
+//                                    nowPlayingLiveData.removeObserver(this)
+//                                    dataProvider.setNowPlaying(nowPlayId)
+//                                }
+//                            })
+//                        }
+//                    }
+//                }
+//            }
+//            mediaFileLiveData.observe(this,mediaFileObserver)
+//        })
 
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
@@ -147,7 +180,7 @@ class MainActivity : BaseActivity() {
             }
         })
 
-        seekBar.setOnTouchListener { v, event ->
+        seekBar.setOnTouchListener { _ , event ->
             if(event?.action == MotionEvent.ACTION_UP){
                 val progress = seekBar.progress
                 if(mediaPlayer != null){
@@ -164,6 +197,11 @@ class MainActivity : BaseActivity() {
             false
         }
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.activity_main_menu,menu)
+        return true
     }
 
     override fun onPause() {
