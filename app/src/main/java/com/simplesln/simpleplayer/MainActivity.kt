@@ -21,6 +21,12 @@ import java.util.*
 import kotlin.math.max
 
 class MainActivity : BaseActivity() {
+
+
+    private lateinit var pref : PrefDataProvider
+    private lateinit var dataProvider: RoomDataProvider
+    private var countDownTimer: CountDownTimer? = null
+
     override fun onMediaPlayerConnected() {
         if(mediaPlayer != null){
             mediaPlayer!!.getMediaPlayerState().observe(this, Observer {
@@ -58,13 +64,10 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private lateinit var pref : PrefDataProvider
-    private lateinit var dataProvider: RoomDataProvider
-    private var timer : Timer? = null
-    private var countDownTimer: CountDownTimer? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         pref = PrefDataProvider(this)
         dataProvider = RoomDataProvider(applicationContext)
         if(!pref.everIndexed()){
@@ -138,55 +141,38 @@ class MainActivity : BaseActivity() {
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if(mediaPlayer != null) {
-                    var duration = mediaPlayer?.duration()!!
-                    currentTime.setText(formatDuration((progress * duration / 100)))
+                    val duration = mediaPlayer?.duration()!!
+                    currentTime.text = formatDuration((progress * duration / 100))
                 }
             }
         })
 
-        seekBar.setOnTouchListener(object : View.OnTouchListener{
-            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                if(event?.action == MotionEvent.ACTION_UP){
-                    var progress = seekBar.progress
-                    if(mediaPlayer != null){
-                        var duration = mediaPlayer?.duration()!!
-                        if(duration > 0){
-                            mediaPlayer?.seek((progress * duration / 100))
-                        }
-                        if(mediaPlayer?.isPlaying()!!) startCountDownTimer(duration.toLong())
+        seekBar.setOnTouchListener { v, event ->
+            if(event?.action == MotionEvent.ACTION_UP){
+                val progress = seekBar.progress
+                if(mediaPlayer != null){
+                    val duration = mediaPlayer?.duration()!!
+                    if(duration > 0){
+                        mediaPlayer?.seek((progress * duration / 100))
                     }
+                    if(mediaPlayer?.isPlaying()!!) startCountDownTimer(duration.toLong())
                 }
-                else if(event?.action == MotionEvent.ACTION_DOWN){
-                    stopCountDownTimer()
-                }
-                Log.e("Touch","Action " + event?.action)
-                return false
+            } else if(event?.action == MotionEvent.ACTION_DOWN){
+                stopCountDownTimer()
             }
-        })
+            Log.e("Touch","Action " + event?.action)
+            false
+        }
 
     }
 
     override fun onPause() {
         super.onPause()
-//        timer?.cancel()
-//        timer?.purge()
-//        timer = null
         stopCountDownTimer()
     }
 
     override fun onResume() {
         super.onResume()
-//        timer = Timer()
-//        timer?.scheduleAtFixedRate(object : TimerTask(){
-//            override fun run() {
-//                if(mediaPlayer != null) seekBar.setProgress(getProgress(mediaPlayer!!.currentPosition(),mediaPlayer!!.duration()))
-//            }
-//
-//            fun getProgress(current : Int, duration : Int) : Int {
-//                if(duration == 0) return  0
-//                return current * 100 / duration
-//            }
-//        },0,1000)
         if(mediaPlayer != null && mediaPlayer!!.isPlaying()) {
             startCountDownTimer(mediaPlayer!!.duration().toLong())
         }
@@ -195,23 +181,20 @@ class MainActivity : BaseActivity() {
     private fun startCountDownTimer(maxTime : Long){
         countDownTimer = object : CountDownTimer(maxTime,1000){
             override fun onFinish() {
-
             }
 
             override fun onTick(millisUntilFinished: Long) {
-//                Log.e("Tick","ontick")
                 if(mediaPlayer != null){
-                    var progress = getProgress(mediaPlayer!!.currentPosition(),mediaPlayer!!.duration())
+                    val progress = getProgress(mediaPlayer!!.currentPosition(),mediaPlayer!!.duration())
                     if(seekBar.progress == progress){
-                        currentTime.setText(formatDuration(mediaPlayer!!.currentPosition()))
+                        currentTime.text = formatDuration(mediaPlayer!!.currentPosition())
                     }
                     else{
-                        seekBar.setProgress(progress)
+                        seekBar.progress = progress
                     }
                 }
             }
-        }
-        countDownTimer?.start()
+        }.start()
     }
 
     private fun stopCountDownTimer(){
@@ -225,16 +208,18 @@ class MainActivity : BaseActivity() {
     }
 
     private fun formatDuration(duration : Int) : String{
-        var fstring = ""
+        var fstring = StringBuilder()
         var decimalFormat = DecimalFormat("#00")
         var sec =(duration / 1000)
         if( (sec / 3600) > 0) {
-            fstring += decimalFormat.format(sec / 3600) + ":";
+            fstring.append(decimalFormat.format(sec / 3600))
+            fstring.append(":")
             sec %= 3600
         }
-        fstring += decimalFormat.format(sec/60)
+        fstring.append(decimalFormat.format(sec/60))
         sec %= 60
-        fstring += ":" + decimalFormat.format(sec)
-        return fstring
+        fstring.append(":")
+        fstring.append(decimalFormat.format(sec))
+        return fstring.toString()
     }
 }
