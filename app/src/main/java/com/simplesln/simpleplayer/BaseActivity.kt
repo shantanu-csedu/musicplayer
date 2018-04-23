@@ -15,7 +15,6 @@ abstract class BaseActivity : AppCompatActivity() {
     protected var mediaPlayer: MediaPlayerService? = null
     protected var mBound: Boolean = false
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         startService(Intent(applicationContext,MediaPlayerService::class.java))

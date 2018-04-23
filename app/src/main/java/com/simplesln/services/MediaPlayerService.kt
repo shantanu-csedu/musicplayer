@@ -26,6 +26,7 @@ import com.simplesln.simpleplayer.R
 class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaPlayer.OnCompletionListener, android.media.MediaPlayer.OnPreparedListener {
     override fun onPrepared(mp: android.media.MediaPlayer?) {
         if(mp != null){
+            mPrepared = true
             if(mp.isPlaying){
                 liveMediaPlayerState.update(MediaPlayerState(STATE_PLAYING, mMediaFile))
             }
@@ -78,6 +79,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
             var notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW))
         }
+        liveMediaPlayerState.update(MediaPlayerState(STATE_STOPPED, mMediaFile))
         observeNowPlaying()
     }
 
@@ -139,18 +141,13 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
         mPrepared = false
         player.reset()
         player.setDataSource(mediaFile.link)
+        player.prepare()
         return true
     }
 
     override fun play() {
         if(mMediaFile != null) {
-            if (!mPrepared) {
-                player.prepare()
-                mPrepared = true
-            }
-            else{
-                liveMediaPlayerState.update(MediaPlayerState(STATE_PLAYING, mMediaFile))
-            }
+            liveMediaPlayerState.update(MediaPlayerState(STATE_PLAYING, mMediaFile))
             player.start()
         }
     }
