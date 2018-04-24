@@ -84,7 +84,7 @@ class MediaScanService : Service() {
             val year = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
             val duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
 
-            return MediaFile(file.absolutePath,file.name,duration.toLong(),artist,genre,album,folder,year)
+            return MediaFile(file.absolutePath,file.name,duration.toInt(),artist,genre,album,folder,year)
         }
     }
 }

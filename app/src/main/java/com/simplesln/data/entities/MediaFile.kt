@@ -10,14 +10,14 @@ class MediaFile {
     var id : Long = 0
     var link : String
     var name : String
-    var duration : Long
+    var duration : Int
     var artist : String
     var genre : String
     var album : String
     var folder : String
     var year : String
 
-    constructor(link: String, name: String, duration: Long, artist: String?, genre: String?, album: String?, folder: String, year: String?) {
+    constructor(link: String, name: String, duration: Int, artist: String?, genre: String?, album: String?, folder: String, year: String?) {
         this.link = link
         this.name = name
         this.duration = duration

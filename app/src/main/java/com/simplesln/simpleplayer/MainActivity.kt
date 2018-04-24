@@ -16,10 +16,12 @@ import com.simplesln.adapters.ViewPagerAdapter
 import com.simplesln.data.PrefDataProvider
 import com.simplesln.data.RoomDataProvider
 import com.simplesln.data.STATE_PLAYING
-import com.simplesln.data.entities.MediaFile
+import com.simplesln.formatDuration
+import com.simplesln.getProgress
+import com.simplesln.interfaces.MediaPlayer
+import com.simplesln.services.MediaPlayerService
 import com.simplesln.services.MediaScanService
 import kotlinx.android.synthetic.main.activity_main.*
-import java.text.DecimalFormat
 
 class MainActivity : BaseActivity() {
 
@@ -35,13 +37,13 @@ class MainActivity : BaseActivity() {
                     var mediaFile = mediaPlayerState.mediaFile
                     if(mediaFile != null){
                         if(playerControlContainer.visibility == View.GONE) playerControlContainer.visibility = View.VISIBLE
-                        songTitle.setText(mediaFile.name)
-                        artistName.setText(mediaFile.artist)
+                        songTitle.text = mediaFile.name
+                        artistName.text = mediaFile.artist
                     }
                     else{
                         if(playerControlContainer.visibility == View.VISIBLE) playerControlContainer.visibility = View.GONE
-                        songTitle.setText("")
-                        artistName.setText("")
+                        songTitle.text = ""
+                        artistName.text = ""
                     }
 
                     if (mediaPlayerState.state == STATE_PLAYING) {
@@ -50,8 +52,8 @@ class MainActivity : BaseActivity() {
                         actionPlay.setImageResource(R.mipmap.ic_play)
                     }
 
-                    totalTime.setText(formatDuration(mediaPlayer?.duration()!!))
-                    currentTime.setText(formatDuration(mediaPlayer?.currentPosition()!!))
+                    totalTime.text = formatDuration(mediaPlayer?.duration()!!)
+                    currentTime.text = formatDuration(mediaPlayer?.currentPosition()!!)
                     seekBar.progress = getProgress(mediaPlayer?.currentPosition()!!,mediaPlayer?.duration()!!)
                     if(mediaPlayerState.state != STATE_PLAYING){
                         Log.e("Playing","stoping countdown timer")
@@ -243,24 +245,11 @@ class MainActivity : BaseActivity() {
         countDownTimer = null
     }
 
-    private fun getProgress(current : Int, duration : Int) : Int {
-        if(duration == 0) return  0
-        return current * 100 / duration
+    fun getMediaPlayer() : MediaPlayer? {
+        return mediaPlayer
     }
 
-    private fun formatDuration(duration : Int) : String{
-        var fstring = StringBuilder()
-        var decimalFormat = DecimalFormat("#00")
-        var sec =(duration / 1000)
-        if( (sec / 3600) > 0) {
-            fstring.append(decimalFormat.format(sec / 3600))
-            fstring.append(":")
-            sec %= 3600
-        }
-        fstring.append(decimalFormat.format(sec/60))
-        sec %= 60
-        fstring.append(":")
-        fstring.append(decimalFormat.format(sec))
-        return fstring.toString()
+    fun getDataProvider() : RoomDataProvider{
+        return dataProvider
     }
 }

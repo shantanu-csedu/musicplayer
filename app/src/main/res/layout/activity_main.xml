@@ -127,7 +127,7 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:lines="1"
-                        android:textColor="@color/lightBlack"
+                        android:textColor="@color/lighterBlack"
                         tools:text="Best songs 2018"
                         android:textStyle="bold"
                         android:ellipsize="end"/>

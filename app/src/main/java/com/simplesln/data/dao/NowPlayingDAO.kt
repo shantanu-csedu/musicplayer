@@ -33,7 +33,7 @@ interface NowPlayingDAO {
     @Query("update media_now_playing set nowPlaying = 1 where media_file_id = :mediaId")
     fun setNowPlaying(mediaId : Long)
 
-    @Query("select media_library.* from media_library left join media_now_playing on media_now_playing.media_file_id = media_library.id order by media_now_playing.rank")
+    @Query("select media_library.* from media_now_playing  left join media_library on media_now_playing.media_file_id = media_library.id order by media_now_playing.rank")
     fun getNowPlayList() : LiveData<List<MediaFile>>
 
     @Insert
