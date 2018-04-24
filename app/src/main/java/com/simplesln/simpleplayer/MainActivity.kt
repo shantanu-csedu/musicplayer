@@ -54,11 +54,14 @@ class MainActivity : BaseActivity() {
                     currentTime.setText(formatDuration(mediaPlayer?.currentPosition()!!))
                     seekBar.progress = getProgress(mediaPlayer?.currentPosition()!!,mediaPlayer?.duration()!!)
                     if(mediaPlayerState.state != STATE_PLAYING){
+                        Log.e("Playing","stoping countdown timer")
                         stopCountDownTimer()
                     }
-                    else if(mediaPlayerState.state == STATE_PLAYING && countDownTimer == null){
+                    else if(mediaPlayerState.state == STATE_PLAYING && countDownTimer == null && mediaPlayer!!.duration() > 0){
+                        Log.e("Playing","starting countdown timer")
                         startCountDownTimer(mediaPlayer!!.duration().toLong())
                     }
+                    Log.e("Playing state","" + mediaPlayerState.state)
                 }
             })
         }

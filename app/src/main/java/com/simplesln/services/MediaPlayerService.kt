@@ -31,7 +31,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
                 liveMediaPlayerState.update(MediaPlayerState(STATE_PLAYING, mMediaFile))
             }
             else{
-                liveMediaPlayerState.update(MediaPlayerState(STATE_IDLE, mMediaFile))
+                liveMediaPlayerState.update(MediaPlayerState(STATE_READY, mMediaFile))
             }
         }
     }

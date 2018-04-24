@@ -6,6 +6,7 @@ val STATE_PLAYING = 1
 val STATE_STOPPED = 2
 val STATE_END = 3
 val STATE_ERROR = 4
+val STATE_READY = 5
 
 class MediaPlayerState {
     var state = STATE_IDLE
