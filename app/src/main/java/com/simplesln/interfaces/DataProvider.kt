@@ -3,6 +3,7 @@ package com.simplesln.interfaces
 import android.arch.lifecycle.LiveData
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.data.entities.NowPlayingFile
+import com.simplesln.data.entities.PlayList
 
 interface DataProvider {
     fun getNowPlayList() : LiveData<List<MediaFile>>
@@ -15,8 +16,14 @@ interface DataProvider {
     fun addMedia(files : List<MediaFile>)
     fun setNowPlaying(mediaId: Long)
     fun getMediaFiles(offset : Int,total : Int) : LiveData<List<MediaFile>>
+    fun getAlbumList() : LiveData<List<String>>
     fun remove() : LiveData<Int>
     fun remove(mediaId: Long)
     fun removeNowPlaying() : LiveData<Int>
     fun removeNowPlaying(mediaId : Long)
+
+    fun getArtistList(): LiveData<List<String>>
+    fun getGenreList(): LiveData<List<String>>
+    fun getPlayList(): LiveData<List<PlayList>>
+    fun getMediaFileByAlbum(name: String): LiveData<List<MediaFile>>
 }

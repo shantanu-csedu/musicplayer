@@ -5,17 +5,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardUseCompatPadding="true"
-    app:cardCornerRadius="4dp">
+    app:cardCornerRadius="4dp"
+    app:cardElevation="2px"
+    android:layout_marginTop="2dp"
+    >
 
-    <LinearLayout
+    <RelativeLayout
         android:clickable="true"
-        android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:orientation="vertical">
+        android:background="?android:attr/selectableItemBackground">
 
         <ImageView
+            android:padding="10dp"
+            android:layout_centerHorizontal="true"
             android:clickable="false"
             android:layout_gravity="center_horizontal"
             android:id="@+id/albumIcon"
@@ -25,17 +28,29 @@
             android:src="@mipmap/ic_launcher"/>
 
         <TextView
+            android:layout_marginTop="5dp"
+            android:layout_below="@id/albumIcon"
             android:clickable="false"
             android:id="@+id/albumName"
-            android:layout_gravity="bottom|center_horizontal"
-            android:padding="5dp"
+            android:layout_centerHorizontal="true"
+            android:padding="10dp"
             android:textSize="14sp"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:textColor="@color/lighterBlack"
             android:layout_height="wrap_content"
             android:gravity="center"
             tools:text="Albums"
             android:textStyle="bold"/>
-    </LinearLayout>
+
+        <ImageView
+            android:padding="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:id="@+id/menuOverflow"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@mipmap/ic_menu_overflow"/>
+
+    </RelativeLayout>
 
 </android.support.v7.widget.CardView>

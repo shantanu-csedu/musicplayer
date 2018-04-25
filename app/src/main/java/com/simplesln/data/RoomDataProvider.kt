@@ -7,18 +7,17 @@ import android.content.Context
 import android.util.Log
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.data.entities.NowPlayingFile
+import com.simplesln.data.entities.PlayList
 import com.simplesln.interfaces.DataProvider
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class RoomDataProvider(context : Context) : DataProvider{
-    private var db : MyDB?
-    private var executorService : ExecutorService
-    init {
-        db = getInstance(context)
-        executorService = Executors.newFixedThreadPool(3)
-    }
+
+
+    private var db : MyDB? = getInstance(context)
+    private var executorService : ExecutorService = Executors.newFixedThreadPool(3)
 
     override fun getNowPlay(): LiveData<MediaFile> {
         val distinctLiveData = MediatorLiveData<MediaFile>()
@@ -131,5 +130,23 @@ class RoomDataProvider(context : Context) : DataProvider{
         return db?.nowPlaying()!!.get()
     }
 
+    override fun getAlbumList(): LiveData<List<String>> {
+        return db?.library()!!.getAlbum()
+    }
 
+    override fun getArtistList(): LiveData<List<String>> {
+        return db?.library()!!.getArtist()
+    }
+
+    override fun getGenreList(): LiveData<List<String>> {
+        return db?.library()!!.getGenre()
+    }
+
+    override fun getPlayList(): LiveData<List<PlayList>> {
+        return db?.playlist()!!.getPlaylist()
+    }
+
+    override fun getMediaFileByAlbum(name: String) : LiveData<List<MediaFile>> {
+        return db?.library()!!.getMediaListByAlbum(name)
+    }
 }

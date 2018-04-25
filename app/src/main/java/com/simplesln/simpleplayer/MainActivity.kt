@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.design.widget.TabLayout
+import android.support.v4.app.Fragment
 import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.DragEvent
@@ -74,9 +75,13 @@ class MainActivity : BaseActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         tabLayout.addTab(tabLayout.newTab().setText("Now Playing"))
-        tabLayout.addTab(tabLayout.newTab().setText("Music Library"))
+        tabLayout.addTab(tabLayout.newTab().setText("Albums"))
+        tabLayout.addTab(tabLayout.newTab().setText("Artists"))
+        tabLayout.addTab(tabLayout.newTab().setText("Genre"))
+        tabLayout.addTab(tabLayout.newTab().setText("Playlist"))
+        tabLayout.addTab(tabLayout.newTab().setText("Songs"))
 
-        viewPager.adapter = ViewPagerAdapter(2,supportFragmentManager)
+        viewPager.adapter = ViewPagerAdapter(6,supportFragmentManager)
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
             override fun onPageScrollStateChanged(state: Int) {
 

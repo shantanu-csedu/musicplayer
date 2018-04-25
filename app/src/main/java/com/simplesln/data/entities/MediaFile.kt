@@ -5,26 +5,15 @@ import android.arch.persistence.room.PrimaryKey
 import android.text.TextUtils
 
 @Entity(tableName = "media_library")
-class MediaFile {
+class MediaFile(link: String, name: String, duration: Int, artist: String?, genre: String?, album: String?, folder: String, year: String?) {
     @PrimaryKey(autoGenerate = true)
     var id : Long = 0
-    var link : String
-    var name : String
-    var duration : Int
-    var artist : String
-    var genre : String
-    var album : String
-    var folder : String
-    var year : String
-
-    constructor(link: String, name: String, duration: Int, artist: String?, genre: String?, album: String?, folder: String, year: String?) {
-        this.link = link
-        this.name = name
-        this.duration = duration
-        this.artist = if(TextUtils.isEmpty(artist)) "unknown artist" else artist!!
-        this.genre = if(TextUtils.isEmpty(genre)) "unknown genre" else genre!!
-        this.album = if(TextUtils.isEmpty(album)) "unknown album" else album!!
-        this.folder = folder
-        this.year = if(year == null) "unknown year" else year
-    }
+    var link : String = link
+    var name : String = name
+    var duration : Int = duration
+    var artist : String = if(artist == null || artist.isEmpty()) "unknown" else artist
+    var genre : String = if(genre == null || genre.isEmpty()) "unknown" else genre
+    var album : String = if(album == null || album.isEmpty()) "unknown" else album
+    var folder : String = folder
+    var year : String = if(year == null || year.isEmpty()) "unknown" else year
 }

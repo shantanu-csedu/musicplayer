@@ -16,18 +16,11 @@ import android.arch.persistence.room.PrimaryKey
         ],
         indices = [Index(value = arrayOf("media_file_id"), unique = true)]
 )
-class NowPlayingFile {
+class NowPlayingFile(media_file_id: Long, rank : Double, nowPlaying : Boolean) {
     @PrimaryKey(autoGenerate = true)
-    var id : Long = 0
-    var media_file_id : Long
-    var rank : Double
-    var timestamp : Long
-    var nowPlaying : Boolean
-
-    constructor(media_file_id: Long, rank : Double, nowPlaying : Boolean) {
-        this.media_file_id = media_file_id
-        this.rank = rank
-        this.timestamp = System.currentTimeMillis()
-        this.nowPlaying = nowPlaying
-    }
+    var id: Long = 0
+    var media_file_id: Long = media_file_id
+    var rank: Double = rank
+    var timestamp: Long = System.currentTimeMillis()
+    var nowPlaying: Boolean = nowPlaying
 }

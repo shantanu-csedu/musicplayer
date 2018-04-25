@@ -15,8 +15,9 @@ import com.simplesln.simpleplayer.R
 
 class MusicLibraryFragment : Fragment(), AdapterView.OnItemClickListener {
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        val category = mAdapter.values[position]
+        when(position){
 
+        }
     }
 
     private lateinit var listView : RecyclerView

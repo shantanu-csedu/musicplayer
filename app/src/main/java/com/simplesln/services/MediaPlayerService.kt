@@ -123,11 +123,13 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
 
     private fun observeNowPlaying(){
         dataProvider.getNowPlay().observe(this, Observer {
-            if(initPlayer(it)){
-                if(mInit) play()
-                mInit = true
+            if(mMediaFile == null || mMediaFile?.id != it?.id) {
+                if (initPlayer(it)) {
+                    if (mInit) play()
+                    mInit = true
+                }
+                mMediaFile = it
             }
-            mMediaFile = it
         })
     }
 
@@ -146,6 +148,9 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
     override fun play() {
         if(mMediaFile != null) {
             liveMediaPlayerState.update(MediaPlayerState(STATE_PLAYING, mMediaFile))
+            if(player.currentPosition == player.duration){
+                player.seekTo(0)
+            }
             player.start()
         }
     }

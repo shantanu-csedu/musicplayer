@@ -6,6 +6,8 @@
     android:layout_height="wrap_content"
     app:cardUseCompatPadding="true"
     app:cardCornerRadius="4dp"
+    android:layout_marginTop="2dp"
+    app:cardElevation="2px"
     >
     <RelativeLayout
         android:background="?android:attr/selectableItemBackground"
