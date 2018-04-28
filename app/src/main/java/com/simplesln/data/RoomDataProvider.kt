@@ -58,26 +58,24 @@ class RoomDataProvider(context : Context) : DataProvider{
     }
 
     override fun addNowPlaying(files: List<MediaFile>,clear : Boolean) : LiveData<Boolean>{
-        return QueryExecutor(executorService, object : Callable<Boolean>{
-            override fun call(): Boolean{
-                var nowPlayingList  = ArrayList<NowPlayingFile>()
-                var rank = db?.nowPlaying()!!.getMaxRank() + 1
-                for(file in files){
-                    var nowPlayingFile = NowPlayingFile(file.id,rank,false)
-                    nowPlayingList.add(nowPlayingFile)
-                    rank++
-                }
-                if(clear) db?.nowPlaying()!!.delete()
-                if(nowPlayingList.size > 0) return (db?.nowPlaying()?.insert(nowPlayingList)!![0] > 0)
-                return false
+        return QueryExecutor(executorService, Callable<Boolean> {
+            val nowPlayingList  = ArrayList<NowPlayingFile>()
+            var rank = db?.nowPlaying()!!.getMaxRank() + 1
+            for(file in files){
+                val nowPlayingFile = NowPlayingFile(file.id,rank,false)
+                nowPlayingList.add(nowPlayingFile)
+                rank++
             }
+            if(clear) db?.nowPlaying()!!.delete()
+            if(nowPlayingList.size > 0) return@Callable (db?.nowPlaying()?.insert(nowPlayingList)!![0] > 0)
+            false
         })
     }
 
     override fun addNowPlaying(index: Int, file: MediaFile) {
-        executorService.submit(Runnable {
-            var nowPlayingList  = ArrayList<NowPlayingFile>()
-            var nowPlayingFile = NowPlayingFile(file.id, index.toDouble(),false)
+        executorService.submit({
+            val nowPlayingList  = ArrayList<NowPlayingFile>()
+            val nowPlayingFile = NowPlayingFile(file.id, index.toDouble(),false)
             nowPlayingList.add(nowPlayingFile)
             db?.nowPlaying()?.insert(nowPlayingList)
         })
@@ -85,11 +83,7 @@ class RoomDataProvider(context : Context) : DataProvider{
     }
 
     override fun remove() : LiveData<Int>{
-        return QueryExecutor(executorService,object : Callable<Int>{
-            override fun call(): Int {
-                return db?.library()?.delete()!!
-            }
-        })
+        return QueryExecutor(executorService, Callable<Int> { db?.library()?.delete()!! })
     }
 
     override fun removeNowPlaying() : LiveData<Int>{
@@ -101,13 +95,13 @@ class RoomDataProvider(context : Context) : DataProvider{
     }
 
     override fun removeNowPlaying(mediaId: Long) {
-        executorService.submit(Runnable {
+        executorService.submit({
             db?.nowPlaying()?.delete(mediaId)
         })
     }
 
     override fun remove(mediaId: Long){
-        executorService.submit(Runnable {
+        executorService.submit({
             db?.library()?.delete(mediaId)
         })
     }
@@ -117,12 +111,10 @@ class RoomDataProvider(context : Context) : DataProvider{
     }
 
     override fun setNowPlaying(mediaId: Long) {
-        QueryExecutor(executorService,object : Callable<Void>{
-            override fun call(): Void? {
-                db?.nowPlaying()!!.resetNowPlaying()
-                db?.nowPlaying()!!.setNowPlaying(mediaId)
-                return null
-            }
+        QueryExecutor(executorService, Callable<Void> {
+            db?.nowPlaying()!!.resetNowPlaying()
+            db?.nowPlaying()!!.setNowPlaying(mediaId)
+            null
         })
     }
 
@@ -146,7 +138,23 @@ class RoomDataProvider(context : Context) : DataProvider{
         return db?.playlist()!!.getPlaylist()
     }
 
-    override fun getMediaFileByAlbum(name: String) : LiveData<List<MediaFile>> {
+    override fun getMediaFilesByAlbum(name: String) : LiveData<List<MediaFile>> {
         return db?.library()!!.getMediaListByAlbum(name)
+    }
+
+    override fun getMediaFiles(): LiveData<List<MediaFile>> {
+        return db?.library()!!.get()
+    }
+
+    override fun getMediaFilesByArtist(name: String): LiveData<List<MediaFile>> {
+        return db?.library()!!.getMediaListByArtist(name)
+    }
+
+    override fun getMediaFilesByGenre(name: String): LiveData<List<MediaFile>> {
+        return db?.library()!!.getMediaListByGenre(name)
+    }
+
+    override fun getMediaFilesByPlaylist(name: String): LiveData<List<MediaFile>> {
+        return db?.playlist()!!.getMediaFiles(name)
     }
 }

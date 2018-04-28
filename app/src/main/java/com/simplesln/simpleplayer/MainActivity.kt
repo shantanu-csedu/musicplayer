@@ -35,7 +35,7 @@ class MainActivity : BaseActivity() {
             mediaPlayer!!.getMediaPlayerState().observe(this, Observer {
                 mediaPlayerState ->
                 if(mediaPlayerState != null) {
-                    var mediaFile = mediaPlayerState.mediaFile
+                    val mediaFile = mediaPlayerState.mediaFile
                     if(mediaFile != null){
                         if(playerControlContainer.visibility == View.GONE) playerControlContainer.visibility = View.VISIBLE
                         songTitle.text = mediaFile.name
@@ -141,39 +141,6 @@ class MainActivity : BaseActivity() {
             }
         })
 
-//        button0.setOnClickListener(View.OnClickListener {
-//            var mediaFileLiveData = dataProvider.getMediaFiles(0,10)
-//            var mediaFileObserver = object  : Observer<List<MediaFile>> {
-//                override fun onChanged(list : List<MediaFile>?) {
-//                    if(list != null){
-//                        mediaFileLiveData.removeObserver(this)
-//                        var nowPlaying  = ArrayList<MediaFile>()
-//                        var nowPlayId = 0L;
-//                        for(mediaFile in list){
-//                            Log.e("Name",mediaFile.name);
-//                            Log.e("Path",mediaFile.link);
-//                            Log.e("Folder",mediaFile.folder)
-//                            if(mediaFile.folder.equals("Music")){
-//                                if(nowPlayId == 0L) nowPlayId = mediaFile.id
-//                                nowPlaying.add(mediaFile)
-//                            }
-//                        }
-//                        if(nowPlaying.size > 0) {
-//                            var nowPlayingLiveData = dataProvider.addNowPlaying(nowPlaying,true)
-//                            nowPlayingLiveData.observe(this@MainActivity,object : Observer<Boolean>{
-//                                override fun onChanged(result: Boolean?) {
-//                                    nowPlayingLiveData.removeObserver(this)
-//                                    dataProvider.setNowPlaying(nowPlayId)
-//                                }
-//                            })
-//                        }
-//                    }
-//                }
-//            }
-//            mediaFileLiveData.observe(this,mediaFileObserver)
-//        })
-
-
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
 
@@ -206,6 +173,13 @@ class MainActivity : BaseActivity() {
             }
             Log.e("Touch","Action " + event?.action)
             false
+        }
+
+        supportFragmentManager.addOnBackStackChangedListener {
+            if(supportFragmentManager.backStackEntryCount == 0){
+                title = ""
+                tabLayout.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -256,5 +230,14 @@ class MainActivity : BaseActivity() {
 
     fun getDataProvider() : RoomDataProvider{
         return dataProvider
+    }
+
+    fun addDetailsFragment(title: String, fragment: Fragment) {
+        this.title = title
+        tabLayout.visibility = View.GONE
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.songListContainer,fragment)
+                .addToBackStack("")
+                .commit()
     }
 }

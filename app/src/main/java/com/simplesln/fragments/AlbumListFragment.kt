@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import com.simplesln.adapters.AlbumListAdapter
 import com.simplesln.data.Album
 import com.simplesln.data.entities.MediaFile
@@ -17,7 +18,13 @@ import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
 
-class AlbumListFragment : Fragment(), OnIMenuItemClickListener {
+class AlbumListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnItemClickListener {
+
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        val album = mAdapter.values[position]
+        val fragment = createInstance(TYPE_ALBUM,album.name)
+        (activity as MainActivity).addDetailsFragment(album.name,fragment)
+    }
 
     override fun onMenuClicked(anchorView: View,position : Int) {
         val popupMenu = PopupMenu(activity!!,anchorView)
@@ -26,7 +33,7 @@ class AlbumListFragment : Fragment(), OnIMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem?): Boolean {
                 if(item?.itemId == R.id.menu_play){
                     val album = mAdapter.values[position]
-                    val mediaListLiveData = (activity as MainActivity).getDataProvider().getMediaFileByAlbum(album.name)
+                    val mediaListLiveData = (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(album.name)
                     mediaListLiveData.observe(this@AlbumListFragment,object : Observer<List<MediaFile>>{
                         override fun onChanged(t: List<MediaFile>?) {
                             mediaListLiveData.removeObserver(this)
@@ -46,7 +53,7 @@ class AlbumListFragment : Fragment(), OnIMenuItemClickListener {
                 }
                 else if(item?.itemId == R.id.menu_queue){
                     val album = mAdapter.values[position]
-                    val mediaListLiveData = (activity as MainActivity).getDataProvider().getMediaFileByAlbum(album.name)
+                    val mediaListLiveData = (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(album.name)
                     mediaListLiveData.observe(this@AlbumListFragment,object : Observer<List<MediaFile>>{
                         override fun onChanged(t: List<MediaFile>?) {
                             mediaListLiveData.removeObserver(this)
@@ -73,6 +80,7 @@ class AlbumListFragment : Fragment(), OnIMenuItemClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mAdapter = AlbumListAdapter(activity!!,this)
+        mAdapter.setOnItemClickListener(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

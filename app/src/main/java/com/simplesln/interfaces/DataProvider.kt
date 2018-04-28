@@ -25,5 +25,9 @@ interface DataProvider {
     fun getArtistList(): LiveData<List<String>>
     fun getGenreList(): LiveData<List<String>>
     fun getPlayList(): LiveData<List<PlayList>>
-    fun getMediaFileByAlbum(name: String): LiveData<List<MediaFile>>
+    fun getMediaFilesByAlbum(name: String): LiveData<List<MediaFile>>
+    fun getMediaFilesByArtist(name: String): LiveData<List<MediaFile>>
+    fun getMediaFilesByGenre(name: String): LiveData<List<MediaFile>>
+    fun getMediaFilesByPlaylist(name: String): LiveData<List<MediaFile>>
+    fun getMediaFiles(): LiveData<List<MediaFile>>
 }

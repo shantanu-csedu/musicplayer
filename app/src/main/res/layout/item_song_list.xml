@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="4dp"
+    android:layout_marginTop="2dp"
+    app:cardElevation="2px"
+    >
+    <RelativeLayout
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/musicArt"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@mipmap/ic_album"/>
+        <TextView
+            android:layout_marginLeft="8dp"
+            android:layout_toRightOf="@id/musicArt"
+            android:id="@+id/musicName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/lightBlack"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            tools:text="The silence of the lambs"/>
+
+        <TextView
+            android:id="@+id/musicArtist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:layout_marginTop="5dp"
+            android:layout_alignLeft="@id/musicName"
+            android:layout_below="@id/musicName"
+            tools:text="A.R. Rahman"/>
+
+        <TextView
+            android:id="@+id/musicDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:layout_alignBaseline="@id/musicArtist"
+            android:layout_alignParentRight="true"
+            tools:text="04:25"/>
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
