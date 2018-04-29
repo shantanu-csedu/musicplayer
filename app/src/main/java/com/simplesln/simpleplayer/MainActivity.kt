@@ -28,8 +28,8 @@ class MainActivity : BaseActivity() {
     private var countDownTimer: CountDownTimer? = null
 
     override fun onMediaPlayerConnected() {
-        if(mediaPlayer != null){
-            mediaPlayer!!.getMediaPlayerState().observe(this, Observer {
+        if(mediaPlayerService != null){
+            mediaPlayerService!!.getMediaPlayerState().observe(this, Observer {
                 mediaPlayerState ->
                 if(mediaPlayerState != null) {
                     val mediaFile = mediaPlayerState.mediaFile
@@ -50,16 +50,16 @@ class MainActivity : BaseActivity() {
                         actionPlay.setImageResource(R.mipmap.ic_play)
                     }
 
-                    totalTime.text = formatDuration(mediaPlayer?.duration()!!)
-                    currentTime.text = formatDuration(mediaPlayer?.currentPosition()!!)
-                    seekBar.progress = getProgress(mediaPlayer?.currentPosition()!!,mediaPlayer?.duration()!!)
+                    totalTime.text = formatDuration(mediaPlayerService?.duration()!!)
+                    currentTime.text = formatDuration(mediaPlayerService?.currentPosition()!!)
+                    seekBar.progress = getProgress(mediaPlayerService?.currentPosition()!!,mediaPlayerService?.duration()!!)
                     if(mediaPlayerState.state != STATE_PLAYING){
                         Log.e("Playing","stoping countdown timer")
                         stopCountDownTimer()
                     }
-                    else if(mediaPlayerState.state == STATE_PLAYING && countDownTimer == null && mediaPlayer!!.duration() > 0){
+                    else if(mediaPlayerState.state == STATE_PLAYING && countDownTimer == null && mediaPlayerService!!.duration() > 0){
                         Log.e("Playing","starting countdown timer")
-                        startCountDownTimer(mediaPlayer!!.duration().toLong())
+                        startCountDownTimer(mediaPlayerService!!.duration().toLong())
                     }
                     Log.e("Playing state","" + mediaPlayerState.state)
                 }
@@ -116,25 +116,25 @@ class MainActivity : BaseActivity() {
         }
 
         actionPlay.setOnClickListener(View.OnClickListener {
-            if(mediaPlayer != null){
-                if(mediaPlayer!!.isPlaying()) {
-                    mediaPlayer?.stop()
+            if(mediaPlayerService != null){
+                if(mediaPlayerService!!.isPlaying()) {
+                    mediaPlayerService?.stop()
                 }
                 else{
-                    mediaPlayer?.play()
+                    mediaPlayerService?.play()
                 }
             }
         })
 
         actionPrevious.setOnClickListener(View.OnClickListener {
-            if(mediaPlayer != null){
-                mediaPlayer?.prev()
+            if(mediaPlayerService != null){
+                mediaPlayerService?.prev()
             }
         })
 
         actionNext.setOnClickListener(View.OnClickListener {
-            if(mediaPlayer != null){
-                mediaPlayer?.next()
+            if(mediaPlayerService != null){
+                mediaPlayerService?.next()
             }
         })
 
@@ -148,8 +148,8 @@ class MainActivity : BaseActivity() {
             }
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if(mediaPlayer != null) {
-                    val duration = mediaPlayer?.duration()!!
+                if(mediaPlayerService != null) {
+                    val duration = mediaPlayerService?.duration()!!
                     currentTime.text = formatDuration((progress * duration / 100))
                 }
             }
@@ -158,12 +158,12 @@ class MainActivity : BaseActivity() {
         seekBar.setOnTouchListener { _ , event ->
             if(event?.action == MotionEvent.ACTION_UP){
                 val progress = seekBar.progress
-                if(mediaPlayer != null){
-                    val duration = mediaPlayer?.duration()!!
+                if(mediaPlayerService != null){
+                    val duration = mediaPlayerService?.duration()!!
                     if(duration > 0){
-                        mediaPlayer?.seek((progress * duration / 100))
+                        mediaPlayerService?.seek((progress * duration / 100))
                     }
-                    if(mediaPlayer?.isPlaying()!!) startCountDownTimer(duration.toLong())
+                    if(mediaPlayerService?.isPlaying()!!) startCountDownTimer(duration.toLong())
                 }
             } else if(event?.action == MotionEvent.ACTION_DOWN){
                 stopCountDownTimer()
@@ -178,6 +178,13 @@ class MainActivity : BaseActivity() {
                 tabLayout.visibility = View.VISIBLE
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
             }
+        }
+
+        playerRowContainer.setOnClickListener {
+            while(supportFragmentManager.backStackEntryCount > 0){
+                supportFragmentManager.popBackStackImmediate()
+            }
+            viewPager.setCurrentItem(0,true)
         }
     }
 
@@ -200,8 +207,8 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        if(mediaPlayer != null && mediaPlayer!!.isPlaying()) {
-            startCountDownTimer(mediaPlayer!!.duration().toLong())
+        if(mediaPlayerService != null && mediaPlayerService!!.isPlaying()) {
+            startCountDownTimer(mediaPlayerService!!.duration().toLong())
         }
     }
 
@@ -211,10 +218,10 @@ class MainActivity : BaseActivity() {
             }
 
             override fun onTick(millisUntilFinished: Long) {
-                if(mediaPlayer != null){
-                    val progress = getProgress(mediaPlayer!!.currentPosition(),mediaPlayer!!.duration())
+                if(mediaPlayerService != null){
+                    val progress = getProgress(mediaPlayerService!!.currentPosition(),mediaPlayerService!!.duration())
                     if(seekBar.progress == progress){
-                        currentTime.text = formatDuration(mediaPlayer!!.currentPosition())
+                        currentTime.text = formatDuration(mediaPlayerService!!.currentPosition())
                     }
                     else{
                         seekBar.progress = progress
@@ -227,10 +234,6 @@ class MainActivity : BaseActivity() {
     private fun stopCountDownTimer(){
         countDownTimer?.cancel()
         countDownTimer = null
-    }
-
-    fun getMediaPlayer() : MediaPlayer? {
-        return mediaPlayer
     }
 
     fun getDataProvider() : RoomDataProvider{

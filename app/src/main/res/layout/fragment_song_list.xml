@@ -5,28 +5,6 @@
     android:orientation="vertical"
     android:background="@color/windowBackground">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_horizontal">
-
-        <Button
-            android:layout_margin="8dp"
-            android:id="@+id/addToQueue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add to queue"/>
-
-        <Button
-            android:layout_margin="8dp"
-            android:id="@+id/shuffle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Shuffle"/>
-
-    </LinearLayout>
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/listView"
         android:layout_marginLeft="10dp"

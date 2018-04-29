@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.ImageView
 import android.widget.TextView
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.formatDuration
@@ -17,6 +18,7 @@ import kotlinx.android.synthetic.main.item_now_playing.view.*
 class NowPlayListAdapter(val context : Context) : RecyclerView.Adapter<NowPlayListAdapter.ViewHolder>() {
     val values = ArrayList<MediaFile>()
     private var onItemClickListener: AdapterView.OnItemClickListener? = null
+    private var currentMediaFile : MediaFile? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_now_playing,parent,false))
@@ -24,6 +26,10 @@ class NowPlayListAdapter(val context : Context) : RecyclerView.Adapter<NowPlayLi
 
     override fun getItemCount(): Int {
         return values.size
+    }
+
+    fun setCurrentMediaFile(mediaFile: MediaFile?){
+        this.currentMediaFile = mediaFile
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -35,6 +41,12 @@ class NowPlayListAdapter(val context : Context) : RecyclerView.Adapter<NowPlayLi
         holder.itemView.setOnClickListener(View.OnClickListener {
             onItemClickListener?.onItemClick(null,holder.itemView,position,0)
         })
+        if(currentMediaFile?.id == mediaFile.id){
+            holder.musicArt.setImageResource(R.mipmap.ic_album)
+        }
+        else{
+            holder.musicArt.setImageResource(R.mipmap.ic_default_music)
+        }
     }
 
     fun setOnItemClickListener(onItemClickListener: AdapterView.OnItemClickListener) {
@@ -42,13 +54,9 @@ class NowPlayListAdapter(val context : Context) : RecyclerView.Adapter<NowPlayLi
     }
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
-        val musicName : TextView
-        val musicArtist : TextView
-        val musicDuration : TextView
-        init {
-            musicName = itemView.findViewById(R.id.musicName)
-            musicArtist = itemView.findViewById(R.id.musicArtist)
-            musicDuration = itemView.findViewById(R.id.musicDuration)
-        }
+        val musicName : TextView = itemView.findViewById(R.id.musicName)
+        val musicArtist : TextView = itemView.findViewById(R.id.musicArtist)
+        val musicDuration : TextView = itemView.findViewById(R.id.musicDuration)
+        val musicArt : ImageView = itemView.findViewById(R.id.musicArt)
     }
 }

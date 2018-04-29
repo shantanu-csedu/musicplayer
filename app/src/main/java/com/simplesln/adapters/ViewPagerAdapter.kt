@@ -13,7 +13,7 @@ class ViewPagerAdapter(private val childCount : Int, fm: FragmentManager?) : Fra
             2 -> ArtistListFragment()
             3 -> GenreListFragment()
             4 -> PlayListFragment()
-            5 -> AlbumListFragment()
+            5 -> createInstance(TYPE_ALL)
             else -> null
         }
     }

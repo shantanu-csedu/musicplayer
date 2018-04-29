@@ -10,6 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import com.simplesln.adapters.NowPlayListAdapter
+import com.simplesln.data.MediaPlayerState
+import com.simplesln.data.STATE_PLAYING
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
 import kotlinx.android.synthetic.main.fragment_now_playing.*
@@ -40,6 +42,16 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener {
         listView.adapter = mAdapter
 
         observeNowPlaying()
+//        val mediaPlayerService = (activity as MainActivity).mediaPlayerService
+//        mediaPlayerService?.getMediaPlayerState()?.observe(this, Observer {
+//            if(it?.state == STATE_PLAYING){
+//                mAdapter.setCurrentMediaFile(it.mediaFile)
+//                mAdapter.notifyDataSetChanged()
+//            } else{
+//                mAdapter.setCurrentMediaFile(null)
+//                mAdapter.notifyDataSetChanged()
+//            }
+//        })
     }
 
     private fun observeNowPlaying(){

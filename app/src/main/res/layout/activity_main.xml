@@ -119,6 +119,8 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/playerRowContainer"
+                android:clickable="true"
                 android:padding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="62dp"

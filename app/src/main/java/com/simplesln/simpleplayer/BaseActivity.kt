@@ -4,15 +4,13 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
 import com.simplesln.services.MediaPlayerService
 
 abstract class BaseActivity : AppCompatActivity() {
-    protected var mediaPlayer: MediaPlayerService? = null
+    var mediaPlayerService: MediaPlayerService? = null
     protected var mBound: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +34,7 @@ abstract class BaseActivity : AppCompatActivity() {
         override fun onServiceConnected(className: ComponentName,
                                         service: IBinder) {
             val binder = service as MediaPlayerService.MediaPlayerServiceBinder
-            mediaPlayer = binder.getMediaService()
+            mediaPlayerService = binder.getMediaService()
             mBound = true
             onMediaPlayerConnected()
         }
