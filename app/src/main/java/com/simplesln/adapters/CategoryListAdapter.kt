@@ -44,8 +44,8 @@ class CategoryListAdapter(val context : Context) : RecyclerView.Adapter<Category
         val categoryName : TextView
 
         init {
-            categoryIcon = itemView.findViewById(R.id.albumIcon)
-            categoryName = itemView.findViewById(R.id.albumName)
+            categoryIcon = itemView.findViewById(R.id.icon)
+            categoryName = itemView.findViewById(R.id.name)
         }
     }
 }

@@ -18,7 +18,7 @@
         <ImageView
             android:clickable="false"
             android:layout_gravity="center_horizontal"
-            android:id="@+id/albumIcon"
+            android:id="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
@@ -26,7 +26,7 @@
 
         <TextView
             android:clickable="false"
-            android:id="@+id/albumName"
+            android:id="@+id/name"
             android:layout_gravity="bottom|center_horizontal"
             android:padding="5dp"
             android:textSize="14sp"

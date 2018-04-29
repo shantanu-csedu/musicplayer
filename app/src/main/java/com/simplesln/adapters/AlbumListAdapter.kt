@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ActionMenuView
 import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
@@ -29,8 +28,8 @@ class AlbumListAdapter(val context : Context, val menuItemClickListener: OnIMenu
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val album = values[position]
-        holder.albumName.text = album.name
-        holder.albumIcon.setImageResource(album.icon)
+        holder.name.text = album.name
+        holder.icon.setImageResource(album.icon)
 
         holder.itemView.setOnClickListener(View.OnClickListener {
             onItemClickListener?.onItemClick(null,holder.itemView,position,0)
@@ -46,8 +45,8 @@ class AlbumListAdapter(val context : Context, val menuItemClickListener: OnIMenu
     }
 
     inner class ViewHolder(itemView: View ) : RecyclerView.ViewHolder(itemView){
-        val albumIcon : ImageView = itemView.findViewById(R.id.albumIcon)
-        val albumName : TextView = itemView.findViewById(R.id.albumName)
+        val icon : ImageView = itemView.findViewById(R.id.icon)
+        val name : TextView = itemView.findViewById(R.id.name)
         val menu : ImageView = itemView.findViewById(R.id.menuOverflow)
     }
 }

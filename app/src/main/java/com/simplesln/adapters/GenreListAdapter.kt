@@ -9,16 +9,17 @@ import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
 import com.simplesln.data.Genre
+import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.R
 
-class GenreListAdapter(val context : Context) : RecyclerView.Adapter<GenreListAdapter.ViewHolder>() {
+class GenreListAdapter(val context : Context, val menuItemClickListener: OnIMenuItemClickListener? = null) : RecyclerView.Adapter<GenreListAdapter.ViewHolder>() {
 
     val values = ArrayList<Genre>()
     private var onItemClickListener: AdapterView.OnItemClickListener? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_category_library,parent,false))
+        return ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_genre_list,parent,false))
     }
 
     override fun getItemCount(): Int {
@@ -26,12 +27,16 @@ class GenreListAdapter(val context : Context) : RecyclerView.Adapter<GenreListAd
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val category = values[position]
-        holder.albumName.text = category.name
-        holder.albumIcon.setImageResource(category.icon)
+        val album = values[position]
+        holder.name.text = album.name
+        holder.icon.setImageResource(album.icon)
 
         holder.itemView.setOnClickListener(View.OnClickListener {
             onItemClickListener?.onItemClick(null,holder.itemView,position,0)
+        })
+
+        holder.menu.setOnClickListener(View.OnClickListener {
+            menuItemClickListener?.onMenuClicked(holder.menu,position)
         })
     }
 
@@ -40,7 +45,8 @@ class GenreListAdapter(val context : Context) : RecyclerView.Adapter<GenreListAd
     }
 
     inner class ViewHolder(itemView: View ) : RecyclerView.ViewHolder(itemView){
-        val albumIcon : ImageView = itemView.findViewById(R.id.albumIcon)
-        val albumName : TextView = itemView.findViewById(R.id.albumName)
+        val icon : ImageView = itemView.findViewById(R.id.icon)
+        val name : TextView = itemView.findViewById(R.id.name)
+        val menu : ImageView = itemView.findViewById(R.id.menuOverflow)
     }
 }

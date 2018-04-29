@@ -40,7 +40,7 @@ class PlayListAdapter(val context : Context) : RecyclerView.Adapter<PlayListAdap
     }
 
     inner class ViewHolder(itemView: View ) : RecyclerView.ViewHolder(itemView){
-        val albumIcon : ImageView = itemView.findViewById(R.id.albumIcon)
-        val albumName : TextView = itemView.findViewById(R.id.albumName)
+        val albumIcon : ImageView = itemView.findViewById(R.id.icon)
+        val albumName : TextView = itemView.findViewById(R.id.name)
     }
 }
