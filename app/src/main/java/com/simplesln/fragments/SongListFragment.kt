@@ -13,6 +13,7 @@ import com.simplesln.adapters.SongListAdapter
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
+import kotlinx.android.synthetic.main.fragment_song_list.*
 
 class SongListFragment : Fragment(), AdapterView.OnItemClickListener {
     private lateinit var mAdapter : SongListAdapter
@@ -43,6 +44,25 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener {
         listView = view.findViewById(R.id.listView)
         listView.layoutManager = LinearLayoutManager(activity)
         listView.adapter = mAdapter
+
+        addToQueue.setOnClickListener {
+            if(mAdapter.values.size > 0) {
+                (activity as MainActivity).getDataProvider().addNowPlaying(mAdapter.values, false)
+            }
+        }
+
+        shuffle.setOnClickListener {
+            if(mAdapter.values.size > 0) {
+                var shuffledList = mAdapter.values.shuffled()
+                val addNowPlayLiveData = (activity as MainActivity).getDataProvider().addNowPlaying(shuffledList, true)
+                addNowPlayLiveData.observe(this,object : Observer<Boolean>{
+                    override fun onChanged(t: Boolean?) {
+                        addNowPlayLiveData.removeObserver(this)
+                        (activity as MainActivity).getDataProvider().setNowPlaying(shuffledList[0].id)
+                    }
+                })
+            }
+        }
     }
 
     private fun observe(){

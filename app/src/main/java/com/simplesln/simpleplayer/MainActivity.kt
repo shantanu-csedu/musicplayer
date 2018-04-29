@@ -8,10 +8,7 @@ import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewPager
 import android.util.Log
-import android.view.DragEvent
-import android.view.Menu
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
 import android.widget.SeekBar
 import com.simplesln.adapters.ViewPagerAdapter
 import com.simplesln.data.PrefDataProvider
@@ -179,6 +176,7 @@ class MainActivity : BaseActivity() {
             if(supportFragmentManager.backStackEntryCount == 0){
                 title = ""
                 tabLayout.visibility = View.VISIBLE
+                supportActionBar?.setDisplayHomeAsUpEnabled(false)
             }
         }
     }
@@ -186,6 +184,13 @@ class MainActivity : BaseActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_main_menu,menu)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            android.R.id.home -> supportFragmentManager.popBackStack()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onPause() {
@@ -235,6 +240,7 @@ class MainActivity : BaseActivity() {
     fun addDetailsFragment(title: String, fragment: Fragment) {
         this.title = title
         tabLayout.visibility = View.GONE
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportFragmentManager.beginTransaction()
                 .replace(R.id.songListContainer,fragment)
                 .addToBackStack("")

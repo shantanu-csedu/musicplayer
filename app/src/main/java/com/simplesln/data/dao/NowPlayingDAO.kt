@@ -3,10 +3,7 @@ package com.simplesln.data.dao
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.Observer
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Delete
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.Query
+import android.arch.persistence.room.*
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.data.entities.NowPlayingFile
 
@@ -36,7 +33,7 @@ interface NowPlayingDAO {
     @Query("select media_library.* from media_now_playing  left join media_library on media_now_playing.media_file_id = media_library.id order by media_now_playing.rank")
     fun getNowPlayList() : LiveData<List<MediaFile>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(nowPlayList : List<NowPlayingFile>) : List<Long>
 
     @Query("delete from media_now_playing")
