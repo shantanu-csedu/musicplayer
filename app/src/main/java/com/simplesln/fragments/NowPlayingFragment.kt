@@ -42,16 +42,6 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener {
         listView.adapter = mAdapter
 
         observeNowPlaying()
-//        val mediaPlayerService = (activity as MainActivity).mediaPlayerService
-//        mediaPlayerService?.getMediaPlayerState()?.observe(this, Observer {
-//            if(it?.state == STATE_PLAYING){
-//                mAdapter.setCurrentMediaFile(it.mediaFile)
-//                mAdapter.notifyDataSetChanged()
-//            } else{
-//                mAdapter.setCurrentMediaFile(null)
-//                mAdapter.notifyDataSetChanged()
-//            }
-//        })
     }
 
     private fun observeNowPlaying(){
@@ -63,5 +53,4 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener {
             mAdapter.notifyDataSetChanged()
         })
     }
-
 }
