@@ -2,6 +2,7 @@ package com.simplesln.simpleplayer
 
 import android.arch.lifecycle.Observer
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.design.widget.TabLayout
@@ -77,7 +78,6 @@ class MainActivity : BaseActivity() {
         tabLayout.addTab(tabLayout.newTab().setText("Genre"))
         tabLayout.addTab(tabLayout.newTab().setText("Playlist"))
         tabLayout.addTab(tabLayout.newTab().setText("Songs"))
-
         viewPager.adapter = ViewPagerAdapter(6,supportFragmentManager)
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
             override fun onPageScrollStateChanged(state: Int) {

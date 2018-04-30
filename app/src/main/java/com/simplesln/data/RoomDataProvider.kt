@@ -9,9 +9,11 @@ import com.simplesln.data.entities.MediaFile
 import com.simplesln.data.entities.NowPlayingFile
 import com.simplesln.data.entities.PlayList
 import com.simplesln.interfaces.DataProvider
+import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import javax.security.auth.callback.Callback
 
 class RoomDataProvider(context : Context) : DataProvider{
 
@@ -60,13 +62,19 @@ class RoomDataProvider(context : Context) : DataProvider{
     override fun addNowPlaying(files: List<MediaFile>,clear : Boolean) : LiveData<Boolean>{
         return QueryExecutor(executorService, Callable<Boolean> {
             val nowPlayingList  = ArrayList<NowPlayingFile>()
-            var rank = db?.nowPlaying()!!.getMaxRank() + 1
-            for(file in files){
-                val nowPlayingFile = NowPlayingFile(file.id,rank,false)
-                nowPlayingList.add(nowPlayingFile)
-                rank++
+            var rank = 0.0
+            if(clear) {
+                db?.nowPlaying()!!.delete()
             }
-            if(clear) db?.nowPlaying()!!.delete()
+            else{
+                rank = db?.nowPlaying()!!.getMaxRank() + 1
+            }
+            for((index,file) in files.withIndex()){
+                val nowPlayingFile = NowPlayingFile(file.id,rank+index,false)
+                nowPlayingList.add(nowPlayingFile)
+//                Log.e("add nowplaying","" + (rank+index) + " " + file.name)
+            }
+
             if(nowPlayingList.size > 0) return@Callable (db?.nowPlaying()?.insert(nowPlayingList)!![0] > 0)
             false
         })
@@ -156,5 +164,27 @@ class RoomDataProvider(context : Context) : DataProvider{
 
     override fun getMediaFilesByPlaylist(name: String): LiveData<List<MediaFile>> {
         return db?.playlist()!!.getMediaFiles(name)
+    }
+
+    override fun getRank(fromId: Long, toId: Long): LiveData<Double> {
+        return QueryExecutor(executorService, Callable<Double> {
+            db?.nowPlaying()!!.getAvgRank(fromId,toId)
+        })
+    }
+
+    override fun getRank(id: Long, before: Boolean): LiveData<Double> {
+        return QueryExecutor(executorService, Callable<Double>{
+            if(before) db?.nowPlaying()!!.getRank(id) -1
+            else db?.nowPlaying()!!.getRank(id) + 1
+        })
+    }
+
+    override fun updateRank(file: MediaFile, rank: Double) {
+        QueryExecutor(executorService, Callable<Void> {
+            val npid = db?.nowPlaying()?.getNowPlayingId()
+            val nowPlayingFile = NowPlayingFile(file.id, rank, file.id == npid)
+            db?.nowPlaying()?.insert(Arrays.asList(nowPlayingFile))
+            null
+        })
     }
 }

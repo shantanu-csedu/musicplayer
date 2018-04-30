@@ -30,4 +30,9 @@ interface DataProvider {
     fun getMediaFilesByGenre(name: String): LiveData<List<MediaFile>>
     fun getMediaFilesByPlaylist(name: String): LiveData<List<MediaFile>>
     fun getMediaFiles(): LiveData<List<MediaFile>>
+
+    fun getRank(fromId : Long, toId : Long) : LiveData<Double>
+    fun getRank(id : Long, before : Boolean) : LiveData<Double>
+
+    fun updateRank(file : MediaFile, rank : Double)
 }

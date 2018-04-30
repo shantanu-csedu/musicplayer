@@ -48,4 +48,12 @@ interface NowPlayingDAO {
     @Query("select * from media_now_playing")
     fun get() : LiveData<List<NowPlayingFile>>
 
+    @Query("select avg(rank) from media_now_playing where media_file_id = :fromId or media_file_id = :toId")
+    fun getAvgRank(fromId: Long, toId: Long): Double
+
+    @Query("select rank from media_now_playing where media_file_id = :id")
+    fun getRank(id: Long): Double
+
+    @Query("select media_file_id from media_now_playing where nowPlaying=1 limit 1")
+    fun getNowPlayingId() : Long
 }

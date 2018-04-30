@@ -53,23 +53,11 @@
     </FrameLayout>
 
 
-    <android.support.v7.widget.CardView
+    <FrameLayout
         android:id="@+id/playerControlContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="8dp"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0.0px"
-        android:clipToPadding="false"
-        android:clipChildren="false"
-        app:cardElevation="2px"
-        app:cardPreventCornerOverlap="false"
-        app:cardUseCompatPadding="true"
-        app:cardCornerRadius="3dp"
-        app:cardBackgroundColor="#EFEBE9"
-        android:layout_marginBottom="-3dp"
-        android:layout_marginLeft="-3dp"
-        android:layout_marginRight="-3dp"
+        android:background="#EFEBE9"
         >
 
         <!--<View-->
@@ -194,6 +182,6 @@
 
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </FrameLayout>
 
 </LinearLayout>
