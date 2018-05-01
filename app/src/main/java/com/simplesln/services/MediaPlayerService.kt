@@ -47,7 +47,13 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
             else{
                 liveMediaPlayerState.update(MediaPlayerState(STATE_STOPPED, mMediaFile))
                 handler.postDelayed({
-                    next()
+                    if(mMediaFile != null && mRepeatCount < mMediaFile?.repeatCount!!){
+                        mRepeatCount++
+                        play()
+                    }
+                    else {
+                        next()
+                    }
                 },500)
             }
         }
@@ -63,6 +69,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
     private var mMediaFile : MediaFile? = null
     private var handler = Handler()
     private var mInit: Boolean = false
+    private var mRepeatCount = 1
 
     init {
         player.setOnCompletionListener(this)
@@ -80,6 +87,10 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
         }
         liveMediaPlayerState.update(MediaPlayerState(STATE_STOPPED, mMediaFile))
         observeNowPlaying()
+        handler.postDelayed({
+            mInit = true
+        },1000)
+
     }
 
     fun getMediaPlayerState() : LiveData<MediaPlayerState>{
@@ -123,12 +134,21 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
 
     private fun observeNowPlaying(){
         dataProvider.getNowPlay().observe(this, Observer {
-            if(mMediaFile == null || mMediaFile?.id != it?.id) {
+            if(mMediaFile == null || !isPlaying() || mMediaFile?.id != it?.id) {
+                mMediaFile = it
                 if (initPlayer(it)) {
-                    if (mInit) play()
+                    if (mInit){
+                        mRepeatCount = 1
+                        play()
+                    }
                     mInit = true
                 }
+            }
+            else{
                 mMediaFile = it
+            }
+            if(mMediaFile == null){
+                stop()
             }
         })
     }

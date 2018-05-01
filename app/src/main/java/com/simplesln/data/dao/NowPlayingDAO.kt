@@ -21,8 +21,14 @@ interface NowPlayingDAO {
     @Query("select media_library.* from media_library  left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.rank > (select rank from media_now_playing where nowPlaying = 1 limit 1) order by media_now_playing.rank limit 1")
     fun getNext() : LiveData<MediaFile>
 
+    @Query("select media_library.* from media_library  left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.rank > (select rank from media_now_playing where nowPlaying = 1 limit 1) order by media_now_playing.rank limit 1")
+    fun getNextSync() : MediaFile
+
     @Query("select media_library.* from media_library  left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.rank < (select rank from media_now_playing where nowPlaying = 1 order by timestamp limit 1) order by media_now_playing.rank desc limit 1")
     fun getPrevious() : LiveData<MediaFile>
+
+    @Query("select media_library.* from media_library  left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.rank < (select rank from media_now_playing where nowPlaying = 1 order by timestamp limit 1) order by media_now_playing.rank desc limit 1")
+    fun getPreviousSync() : MediaFile
 
     @Query("update media_now_playing set nowPlaying = 0 where nowPlaying = 1")
     fun resetNowPlaying()
@@ -33,8 +39,11 @@ interface NowPlayingDAO {
     @Query("select media_library.* from media_now_playing  left join media_library on media_now_playing.media_file_id = media_library.id order by media_now_playing.rank")
     fun getNowPlayList() : LiveData<List<MediaFile>>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(nowPlayList : List<NowPlayingFile>) : List<Long>
+
+    @Update
+    fun update(nowPlayList : List<NowPlayingFile>)
 
     @Query("delete from media_now_playing")
     fun delete() : Int

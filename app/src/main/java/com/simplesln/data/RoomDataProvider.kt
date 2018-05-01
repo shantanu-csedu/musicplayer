@@ -22,23 +22,24 @@ class RoomDataProvider(context : Context) : DataProvider{
     private var executorService : ExecutorService = Executors.newFixedThreadPool(3)
 
     override fun getNowPlay(): LiveData<MediaFile> {
-        val distinctLiveData = MediatorLiveData<MediaFile>()
-        distinctLiveData.addSource(db?.nowPlaying()!!.getNowPlayingItem(), object : Observer<MediaFile> {
-            private var initialized = false
-            private var lastObj: MediaFile? = null
-            override fun onChanged(obj: MediaFile?) {
-                if(obj == null) return
-                if (!initialized) {
-                    initialized = true
-                    lastObj = obj
-                    distinctLiveData.postValue(lastObj)
-                } else if (obj != lastObj) {
-                    lastObj = obj
-                    distinctLiveData.postValue(lastObj)
-                }
-            }
-        })
-        return distinctLiveData
+        return db?.nowPlaying()!!.getNowPlayingItem()
+//        val distinctLiveData = MediatorLiveData<MediaFile>()
+//        distinctLiveData.addSource(db?.nowPlaying()!!.getNowPlayingItem(), object : Observer<MediaFile> {
+//            private var initialized = false
+//            private var lastObj: MediaFile? = null
+//            override fun onChanged(obj: MediaFile?) {
+//                if(obj == null) return
+//                if (!initialized) {
+//                    initialized = true
+//                    lastObj = obj
+//                    distinctLiveData.postValue(lastObj)
+//                } else if (obj != lastObj) {
+//                    lastObj = obj
+//                    distinctLiveData.postValue(lastObj)
+//                }
+//            }
+//        })
+//        return distinctLiveData
     }
 
     override fun getNowPlayList(): LiveData<List<MediaFile>> {
@@ -104,6 +105,16 @@ class RoomDataProvider(context : Context) : DataProvider{
 
     override fun removeNowPlaying(mediaId: Long) {
         executorService.submit({
+            val npId = db?.nowPlaying()?.getNowPlayingId()
+            if(mediaId == npId){//deleted item is currently playing, need to set another now playing
+                var nextFile = db?.nowPlaying()?.getNextSync()
+                if(nextFile == null){
+                    nextFile = db?.nowPlaying()?.getPreviousSync()
+                }
+                if(nextFile != null){//only 1 file
+                    db?.nowPlaying()?.setNowPlaying(nextFile.id)
+                }
+            }
             db?.nowPlaying()?.delete(mediaId)
         })
     }
