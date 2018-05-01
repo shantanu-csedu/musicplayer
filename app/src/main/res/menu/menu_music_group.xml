@@ -10,4 +10,10 @@
         app:showAsAction="never"
         android:title="Add to queue"
         />
+
+
+    <item android:id="@+id/menu_add_playlist"
+        app:showAsAction="never"
+        android:title="Add to playlist"
+        />
 </menu>

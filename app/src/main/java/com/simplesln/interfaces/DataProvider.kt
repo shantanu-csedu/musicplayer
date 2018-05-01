@@ -37,4 +37,6 @@ interface DataProvider {
     fun updateRank(file : MediaFile, rank : Double)
 
     fun updateMediaFile(file : MediaFile)
+    fun createPlaylist(name: String): LiveData<Long>
+    fun addToPlayList(playlistName :String,mediaFiles:List<MediaFile>)
 }

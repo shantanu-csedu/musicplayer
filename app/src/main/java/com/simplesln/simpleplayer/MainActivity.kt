@@ -186,6 +186,8 @@ class MainActivity : BaseActivity() {
             }
             viewPager.setCurrentItem(0,true)
         }
+
+        dataProvider.createPlaylist("Recent")
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

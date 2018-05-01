@@ -5,11 +5,13 @@ import android.content.Context
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.data.entities.NowPlayingFile
 import com.simplesln.data.entities.PlayList
+import com.simplesln.data.entities.PlayListData
 import com.simplesln.interfaces.DataProvider
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
 
 class RoomDataProvider(context : Context) : DataProvider{
 
@@ -201,6 +203,29 @@ class RoomDataProvider(context : Context) : DataProvider{
     override fun updateMediaFile(file: MediaFile) {
         QueryExecutor(executorService, Callable<Void> {
             db?.library()?.update(Arrays.asList(file))
+            null
+        })
+    }
+
+    override fun createPlaylist(name: String): LiveData<Long> {
+        return QueryExecutor(executorService,Callable<Long>{
+            val playList = PlayList(name)
+             db?.playlist()?.insert(playList)
+        })
+    }
+
+    override fun addToPlayList(playListName: String, mediaFiles: List<MediaFile>) {
+        QueryExecutor(executorService,Callable<Void>{
+            val playlistDataList = ArrayList<PlayListData>()
+            var playlistId = db?.playlist()?.getPlaylistId(playListName)
+            if(playlistId == -1L){//doesn't exits
+                playlistId = db?.playlist()?.insert(PlayList(playListName))
+            }
+            for(mediaFile in mediaFiles){
+                val playlistData = PlayListData(mediaFile.id, playlistId!!)
+                playlistDataList.add(playlistData)
+            }
+            db?.playlist()?.insertPlayListData(playlistDataList)
             null
         })
     }
