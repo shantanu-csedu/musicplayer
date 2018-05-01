@@ -26,7 +26,7 @@
             tools:text="1"
             android:gravity="center"
             android:textStyle="bold"
-            android:padding="8dp"/>
+            android:padding="10dp"/>
 
         <ImageView
             android:id="@+id/musicArt"

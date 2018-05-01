@@ -57,7 +57,7 @@ class AlbumListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
                     mediaListLiveData.observe(this@AlbumListFragment,object : Observer<List<MediaFile>>{
                         override fun onChanged(t: List<MediaFile>?) {
                             mediaListLiveData.removeObserver(this)
-                            if(t != null && t.size > 0) {
+                            if(t != null && t.isNotEmpty()) {
                                 (activity as MainActivity).getDataProvider().addNowPlaying(t, false)
                             }
                         }

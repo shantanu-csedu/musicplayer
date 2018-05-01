@@ -1,10 +1,7 @@
 package com.simplesln.data
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MediatorLiveData
-import android.arch.lifecycle.Observer
 import android.content.Context
-import android.util.Log
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.data.entities.NowPlayingFile
 import com.simplesln.data.entities.PlayList
@@ -13,7 +10,6 @@ import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import javax.security.auth.callback.Callback
 
 class RoomDataProvider(context : Context) : DataProvider{
 
@@ -22,9 +18,9 @@ class RoomDataProvider(context : Context) : DataProvider{
     private var executorService : ExecutorService = Executors.newFixedThreadPool(3)
 
     override fun getNowPlay(): LiveData<MediaFile> {
-        return db?.nowPlaying()!!.getNowPlayingItem()
+        return db?.nowPlaying()!!.getNowPlayingItems()
 //        val distinctLiveData = MediatorLiveData<MediaFile>()
-//        distinctLiveData.addSource(db?.nowPlaying()!!.getNowPlayingItem(), object : Observer<MediaFile> {
+//        distinctLiveData.addSource(db?.nowPlaying()!!.getNowPlayingItems(), object : Observer<MediaFile> {
 //            private var initialized = false
 //            private var lastObj: MediaFile? = null
 //            override fun onChanged(obj: MediaFile?) {
@@ -194,7 +190,10 @@ class RoomDataProvider(context : Context) : DataProvider{
         QueryExecutor(executorService, Callable<Void> {
             val npid = db?.nowPlaying()?.getNowPlayingId()
             val nowPlayingFile = NowPlayingFile(file.id, rank, file.id == npid)
-            db?.nowPlaying()?.insert(Arrays.asList(nowPlayingFile))
+            nowPlayingFile.id = db?.nowPlaying()?.getNowPlayingItem(file.id)!!
+            if(nowPlayingFile.id > 0) {
+                db?.nowPlaying()?.update(Arrays.asList(nowPlayingFile))
+            }
             null
         })
     }

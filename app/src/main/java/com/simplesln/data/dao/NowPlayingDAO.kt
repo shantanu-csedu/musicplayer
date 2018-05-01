@@ -16,7 +16,7 @@ interface NowPlayingDAO {
     fun getLastItem() : LiveData<MediaFile>
 
     @Query("select media_library.* from media_library  left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.nowPlaying = 1 limit 1" )
-    fun getNowPlayingItem() : LiveData<MediaFile>
+    fun getNowPlayingItems() : LiveData<MediaFile>
 
     @Query("select media_library.* from media_library  left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.rank > (select rank from media_now_playing where nowPlaying = 1 limit 1) order by media_now_playing.rank limit 1")
     fun getNext() : LiveData<MediaFile>
@@ -39,8 +39,9 @@ interface NowPlayingDAO {
     @Query("select media_library.* from media_now_playing  left join media_library on media_now_playing.media_file_id = media_library.id order by media_now_playing.rank")
     fun getNowPlayList() : LiveData<List<MediaFile>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(nowPlayList : List<NowPlayingFile>) : List<Long>
+
 
     @Update
     fun update(nowPlayList : List<NowPlayingFile>)
@@ -65,4 +66,7 @@ interface NowPlayingDAO {
 
     @Query("select media_file_id from media_now_playing where nowPlaying=1 limit 1")
     fun getNowPlayingId() : Long
+
+    @Query("select id from media_now_playing where media_file_id = :id")
+    fun getNowPlayingItem(id: Long): Long
 }
