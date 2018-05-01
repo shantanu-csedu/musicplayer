@@ -187,4 +187,11 @@ class RoomDataProvider(context : Context) : DataProvider{
             null
         })
     }
+
+    override fun updateMediaFile(file: MediaFile) {
+        QueryExecutor(executorService, Callable<Void> {
+            db?.library()?.update(Arrays.asList(file))
+            null
+        })
+    }
 }

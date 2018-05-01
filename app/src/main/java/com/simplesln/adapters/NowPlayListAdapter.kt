@@ -14,13 +14,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.simplesln.adapters.helper.ItemTouchHelperAdapter
 import com.simplesln.adapters.helper.ItemTouchHelperViewHolder
+import com.simplesln.data.RoomDataProvider
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.formatDuration
 import com.simplesln.fragments.NowPlayingFragment
+import com.simplesln.interfaces.DataProvider
 import com.simplesln.simpleplayer.R
+import com.simplesln.widgets.RepeatCounterView
 import kotlinx.android.synthetic.main.item_now_playing.view.*
 
-class NowPlayListAdapter(val context : Context) : RecyclerView.Adapter<NowPlayListAdapter.ViewHolder>() {
+class NowPlayListAdapter(val context : Context, val dataProvider: DataProvider) : RecyclerView.Adapter<NowPlayListAdapter.ViewHolder>() {
 
     fun onItemMove(fromPosition: Int, toPosition: Int) {
         val prev = values[fromPosition]
@@ -57,15 +60,23 @@ class NowPlayListAdapter(val context : Context) : RecyclerView.Adapter<NowPlayLi
         holder.musicName.text = mediaFile.name
         holder.musicArtist.text = mediaFile.artist
         holder.musicDuration.text = formatDuration(mediaFile.duration)
+        holder.repeatCounter.setCount(mediaFile.repeatCount)
 
         holder.itemView.setOnClickListener(View.OnClickListener {
             onItemClickListener?.onItemClick(null,holder.itemView,position,0)
         })
+
         if(currentMediaFile?.id == mediaFile.id){
             holder.musicArt.setImageResource(R.mipmap.ic_album)
         }
         else{
             holder.musicArt.setImageResource(R.mipmap.ic_default_music)
+        }
+
+        holder.repeatCounter.setOnClickListener {
+            holder.repeatCounter.toggle()
+            mediaFile.repeatCount = holder.repeatCounter.getCount()
+            dataProvider.updateMediaFile(mediaFile)
         }
     }
 
@@ -94,5 +105,6 @@ class NowPlayListAdapter(val context : Context) : RecyclerView.Adapter<NowPlayLi
         val musicArtist : TextView = itemView.findViewById(R.id.musicArtist)
         val musicDuration : TextView = itemView.findViewById(R.id.musicDuration)
         val musicArt : ImageView = itemView.findViewById(R.id.musicArt)
+        val repeatCounter : RepeatCounterView = itemView.findViewById(R.id.repeatCounter)
     }
 }

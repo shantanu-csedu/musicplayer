@@ -82,7 +82,7 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mAdapter = NowPlayListAdapter(activity!!)
+        mAdapter = NowPlayListAdapter(activity!!,(activity as MainActivity).getDataProvider())
         mAdapter.setOnItemClickListener(this)
     }
 

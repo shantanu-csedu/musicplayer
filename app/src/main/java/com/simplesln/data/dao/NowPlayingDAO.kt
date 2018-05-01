@@ -33,7 +33,7 @@ interface NowPlayingDAO {
     @Query("select media_library.* from media_now_playing  left join media_library on media_now_playing.media_file_id = media_library.id order by media_now_playing.rank")
     fun getNowPlayList() : LiveData<List<MediaFile>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(nowPlayList : List<NowPlayingFile>) : List<Long>
 
     @Query("delete from media_now_playing")

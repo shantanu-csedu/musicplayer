@@ -35,4 +35,6 @@ interface DataProvider {
     fun getRank(id : Long, before : Boolean) : LiveData<Double>
 
     fun updateRank(file : MediaFile, rank : Double)
+
+    fun updateMediaFile(file : MediaFile)
 }

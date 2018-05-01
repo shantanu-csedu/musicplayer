@@ -6,8 +6,11 @@ import com.simplesln.data.entities.MediaFile
 
 @Dao
 interface LibraryDAO {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(mediaFiles : List<MediaFile>)
+
+    @Update
+    fun update(mediaFiles : List<MediaFile>)
 
     @Query("delete from media_library")
     fun delete() : Int
