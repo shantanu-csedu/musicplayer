@@ -12,7 +12,7 @@ import com.simplesln.data.Group
 import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.R
 
-class GroupListAdapter(val context : Context, val menuItemClickListener: OnIMenuItemClickListener? = null) : RecyclerView.Adapter<GroupListAdapter.ViewHolder>() {
+class GroupListAdapter(val context : Context, private val menuItemClickListener: OnIMenuItemClickListener? = null) : RecyclerView.Adapter<GroupListAdapter.ViewHolder>() {
 
     val values = ArrayList<Group>()
     private var onItemClickListener: AdapterView.OnItemClickListener? = null

@@ -6,12 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.ImageView
 import android.widget.TextView
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.formatDuration
+import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.R
 
-class SongListAdapter(val context : Context) : RecyclerView.Adapter<SongListAdapter.ViewHolder>() {
+class SongListAdapter(val context : Context,private val menuItemClickListener: OnIMenuItemClickListener? = null) : RecyclerView.Adapter<SongListAdapter.ViewHolder>() {
     val values = ArrayList<MediaFile>()
     private var onItemClickListener: AdapterView.OnItemClickListener? = null
 
@@ -32,6 +34,9 @@ class SongListAdapter(val context : Context) : RecyclerView.Adapter<SongListAdap
         holder.itemView.setOnClickListener(View.OnClickListener {
             onItemClickListener?.onItemClick(null,holder.itemView,position,0)
         })
+        holder.overflowMenu.setOnClickListener(View.OnClickListener {
+            menuItemClickListener?.onMenuClicked(holder.itemView,position)
+        })
     }
 
     fun setOnItemClickListener(onItemClickListener: AdapterView.OnItemClickListener) {
@@ -39,13 +44,9 @@ class SongListAdapter(val context : Context) : RecyclerView.Adapter<SongListAdap
     }
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
-        val musicName : TextView
-        val musicArtist : TextView
-        val musicDuration : TextView
-        init {
-            musicName = itemView.findViewById(R.id.musicName)
-            musicArtist = itemView.findViewById(R.id.musicArtist)
-            musicDuration = itemView.findViewById(R.id.musicDuration)
-        }
+        val musicName : TextView = itemView.findViewById(R.id.musicName)
+        val musicArtist : TextView = itemView.findViewById(R.id.musicArtist)
+        val musicDuration : TextView = itemView.findViewById(R.id.musicDuration)
+        val overflowMenu : ImageView = itemView.findViewById(R.id.menuOverflow)
     }
 }

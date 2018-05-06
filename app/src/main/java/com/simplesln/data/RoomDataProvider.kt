@@ -229,4 +229,41 @@ class RoomDataProvider(context : Context) : DataProvider{
             null
         })
     }
+
+    override fun setNext(id: Long) {
+        QueryExecutor(executorService,Callable<Void>{
+            val nowPlayingItem = db?.nowPlaying()?.getNowPlayingItemSync()
+            val nextPlayingItem = db?.nowPlaying()?.getNextSync()
+            val mediaFile = db?.nowPlaying()?.get(id)
+            if(mediaFile == null){ //insert
+                if(nowPlayingItem == null){
+                    db?.nowPlaying()?.insert(Arrays.asList(NowPlayingFile(id,0.0,true)))
+                }
+                else if(nextPlayingItem == null){ //no next item
+                    db?.nowPlaying()?.insert(Arrays.asList(NowPlayingFile(id,db?.nowPlaying()?.getRank(nowPlayingItem.id)!! + 1,false)))
+                }
+                else{
+                    db?.nowPlaying()?.insert(Arrays.asList(NowPlayingFile(id,db?.nowPlaying()?.getAvgRank(nowPlayingItem.id,nextPlayingItem.id)!!,false)))
+                }
+            }
+            else{ //update
+                if(nowPlayingItem == null){
+                    mediaFile.rank = 0.0
+                    mediaFile.nowPlaying = true
+                    db?.nowPlaying()?.update(Arrays.asList(mediaFile))
+                }
+                else if(nextPlayingItem == null){ //no next item
+                    mediaFile.rank = db?.nowPlaying()?.getRank(nowPlayingItem.id)!! + 1
+                    mediaFile.nowPlaying = false
+                    db?.nowPlaying()?.insert(Arrays.asList(mediaFile))
+                }
+                else{
+                    mediaFile.rank = db?.nowPlaying()?.getAvgRank(nowPlayingItem.id,nextPlayingItem.id)!!
+                    mediaFile.nowPlaying = false
+                    db?.nowPlaying()?.insert(Arrays.asList(mediaFile))
+                }
+            }
+            null
+        })
+    }
 }

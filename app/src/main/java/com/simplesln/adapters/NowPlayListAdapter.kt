@@ -17,7 +17,7 @@ import com.simplesln.interfaces.DataProvider
 import com.simplesln.simpleplayer.R
 import com.simplesln.widgets.RepeatCounterView
 
-class NowPlayListAdapter(val context : Context, val dataProvider: DataProvider) : RecyclerView.Adapter<NowPlayListAdapter.ViewHolder>() {
+class NowPlayListAdapter(val context : Context, private val dataProvider: DataProvider) : RecyclerView.Adapter<NowPlayListAdapter.ViewHolder>() {
 
     fun onItemMove(fromPosition: Int, toPosition: Int) {
         val prev = values[fromPosition]

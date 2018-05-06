@@ -16,6 +16,9 @@ interface NowPlayingDAO {
     @Query("select media_library.* from media_library  left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.nowPlaying = 1 limit 1" )
     fun getNowPlayingItems() : LiveData<MediaFile>
 
+    @Query("select media_library.* from media_library  left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.nowPlaying = 1 limit 1" )
+    fun getNowPlayingItemSync() : MediaFile
+
     @Query("select media_library.* from media_library  left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.rank > (select rank from media_now_playing where nowPlaying = 1 limit 1) order by media_now_playing.rank limit 1")
     fun getNext() : LiveData<MediaFile>
 
@@ -55,6 +58,12 @@ interface NowPlayingDAO {
 
     @Query("select * from media_now_playing")
     fun get() : LiveData<List<NowPlayingFile>>
+
+    @Query("select * from media_now_playing where media_file_id =:mediaFileId")
+    fun get(mediaFileId : Long) : NowPlayingFile
+
+    @Query("select media_library.* from media_library left join media_now_playing on media_now_playing.media_file_id = media_library.id where media_now_playing.media_file_id = :mediaFileId order by media_now_playing.rank limit 1" )
+    fun getMedia(mediaFileId : Long) : MediaFile
 
     @Query("select avg(rank) from media_now_playing where media_file_id = :fromId or media_file_id = :toId")
     fun getAvgRank(fromId: Long, toId: Long): Double
