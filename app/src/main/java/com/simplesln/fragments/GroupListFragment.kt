@@ -2,36 +2,33 @@ package com.simplesln.fragments
 
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
-import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.PopupMenu
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.EditText
-import android.widget.ListAdapter
 import android.widget.Toast
-import com.simplesln.adapters.AlbumListAdapter
+import com.simplesln.adapters.GroupListAdapter
 import com.simplesln.adapters.PlaylistDialogListAdapter
-import com.simplesln.data.Album
+import com.simplesln.data.Group
 import com.simplesln.data.PlayList
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
 
-class AlbumListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnItemClickListener {
-
+class GroupListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnItemClickListener {
+    private var groupType = TYPE_ALBUM
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        val album = mAdapter.values[position]
-        val fragment = createInstance(TYPE_ALBUM,album.name)
-        (activity as MainActivity).addDetailsFragment(album.name,fragment)
+        val group = mAdapter.values[position]
+        val fragment = createSongListFragmentInstance(groupType,group.name)
+        (activity as MainActivity).addDetailsFragment(group.name,fragment)
     }
 
     override fun onMenuClicked(anchorView: View,position : Int) {
@@ -42,13 +39,13 @@ class AlbumListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
                 if(item?.itemId == R.id.menu_play){
                     val album = mAdapter.values[position]
                     val mediaListLiveData = (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(album.name)
-                    mediaListLiveData.observe(this@AlbumListFragment,object : Observer<List<MediaFile>>{
+                    mediaListLiveData.observe(this@GroupListFragment,object : Observer<List<MediaFile>>{
                         override fun onChanged(t: List<MediaFile>?) {
                             mediaListLiveData.removeObserver(this)
                             if(t != null && t.size > 0) {
                                 val nowPlayMediaId = t[0].id
                                 val addNowPlayLiveData = (activity as MainActivity).getDataProvider().addNowPlaying(t, true)
-                                addNowPlayLiveData.observe(this@AlbumListFragment,object : Observer<Boolean>{
+                                addNowPlayLiveData.observe(this@GroupListFragment,object : Observer<Boolean>{
                                     override fun onChanged(t: Boolean?) {
                                         addNowPlayLiveData.removeObserver(this)
                                         (activity as MainActivity).getDataProvider().setNowPlaying(nowPlayMediaId)
@@ -62,7 +59,7 @@ class AlbumListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
                 else if(item?.itemId == R.id.menu_queue){
                     val album = mAdapter.values[position]
                     val mediaListLiveData = (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(album.name)
-                    mediaListLiveData.observe(this@AlbumListFragment,object : Observer<List<MediaFile>>{
+                    mediaListLiveData.observe(this@GroupListFragment,object : Observer<List<MediaFile>>{
                         override fun onChanged(t: List<MediaFile>?) {
                             mediaListLiveData.removeObserver(this)
                             if(t != null && t.isNotEmpty()) {
@@ -75,14 +72,14 @@ class AlbumListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
                 else if(item?.itemId == R.id.menu_add_playlist){
                     val album = mAdapter.values[position]
                     val mediaListLiveData = (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(album.name)
-                    mediaListLiveData.observe(this@AlbumListFragment,object : Observer<List<MediaFile>>{
+                    mediaListLiveData.observe(this@GroupListFragment,object : Observer<List<MediaFile>>{
                         override fun onChanged(t: List<MediaFile>?) {
                             mediaListLiveData.removeObserver(this)
                             if(t != null && t.isNotEmpty()) {
                                 val builder = AlertDialog.Builder(activity)
                                 val dialogAdapter = PlaylistDialogListAdapter(activity!!)
                                 val playlistLiveData = (activity as MainActivity).getDataProvider().getPlayList()
-                                playlistLiveData.observe(this@AlbumListFragment, Observer {
+                                playlistLiveData.observe(this@GroupListFragment, Observer {
                                     if(it != null){
                                         for(playList in it){
                                             dialogAdapter.add(PlayList(playList))
@@ -141,11 +138,14 @@ class AlbumListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
     }
 
     lateinit var listView : RecyclerView
-    lateinit var mAdapter : AlbumListAdapter
+    lateinit var mAdapter : GroupListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mAdapter = AlbumListAdapter(activity!!,this)
+        if(arguments?.getInt(GROUP_TYPE) != null){
+            groupType = arguments?.getInt(GROUP_TYPE)!!
+        }
+        mAdapter = GroupListAdapter(activity!!,this)
         mAdapter.setOnItemClickListener(this)
     }
 
@@ -162,14 +162,47 @@ class AlbumListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
     }
 
     private fun observe(){
-        (activity as MainActivity).getDataProvider().getAlbumList().observe(this, Observer {
-            if(it != null){
-                mAdapter.values.clear()
-                for(name in it){
-                    mAdapter.values.add(Album(name))
-                }
-                mAdapter.notifyDataSetChanged()
-            }
-        })
+        when(groupType){
+            TYPE_ALBUM ->
+                (activity as MainActivity).getDataProvider().getAlbumList().observe(this, Observer {
+                    if(it != null){
+                        mAdapter.values.clear()
+                        for(name in it){
+                            mAdapter.values.add(Group(name))
+                        }
+                        mAdapter.notifyDataSetChanged()
+                    }
+                })
+            TYPE_ARTIST ->
+                (activity as MainActivity).getDataProvider().getArtistList().observe(this, Observer {
+                    if(it != null){
+                        mAdapter.values.clear()
+                        for(name in it){
+                            mAdapter.values.add(Group(name))
+                        }
+                        mAdapter.notifyDataSetChanged()
+                    }
+                })
+            TYPE_GENRE ->
+                (activity as MainActivity).getDataProvider().getGenreList().observe(this, Observer {
+                    if(it != null){
+                        mAdapter.values.clear()
+                        for(name in it){
+                            mAdapter.values.add(Group(name))
+                        }
+                        mAdapter.notifyDataSetChanged()
+                    }
+                })
+        }
+
     }
+
+}
+private const val GROUP_TYPE = "group_type"
+fun createGroupListFragmentInstance(type : Int) : GroupListFragment{
+    val groupListFragment = GroupListFragment()
+    val bundle = Bundle()
+    bundle.putInt(GROUP_TYPE,type)
+    groupListFragment.arguments = bundle
+    return groupListFragment
 }

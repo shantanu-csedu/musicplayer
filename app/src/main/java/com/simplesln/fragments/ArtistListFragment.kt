@@ -21,9 +21,9 @@ import com.simplesln.simpleplayer.R
 class ArtistListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnItemClickListener {
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        val artist = mAdapter.values[position]
-        val fragment = createInstance(TYPE_ARTIST,artist.name)
-        (activity as MainActivity).addDetailsFragment(artist.name,fragment)
+        val group = mAdapter.values[position]
+        val fragment = createSongListFragmentInstance(TYPE_ARTIST,group.name)
+        (activity as MainActivity).addDetailsFragment(group.name,fragment)
     }
 
     override fun onMenuClicked(anchorView: View,position : Int) {

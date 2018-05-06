@@ -22,7 +22,7 @@ class GenreListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         val genre = mAdapter.values[position]
-        val fragment = createInstance(TYPE_GENRE,genre.name)
+        val fragment = createSongListFragmentInstance(TYPE_GENRE,genre.name)
         (activity as MainActivity).addDetailsFragment(genre.name,fragment)
     }
 

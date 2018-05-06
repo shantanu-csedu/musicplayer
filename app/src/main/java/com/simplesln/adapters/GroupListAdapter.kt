@@ -8,13 +8,13 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
-import com.simplesln.data.Album
+import com.simplesln.data.Group
 import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.R
 
-class AlbumListAdapter(val context : Context, val menuItemClickListener: OnIMenuItemClickListener? = null) : RecyclerView.Adapter<AlbumListAdapter.ViewHolder>() {
+class GroupListAdapter(val context : Context, val menuItemClickListener: OnIMenuItemClickListener? = null) : RecyclerView.Adapter<GroupListAdapter.ViewHolder>() {
 
-    val values = ArrayList<Album>()
+    val values = ArrayList<Group>()
     private var onItemClickListener: AdapterView.OnItemClickListener? = null
 
 

@@ -114,7 +114,7 @@ const val TYPE_ALL = 4
 private const val GROUP_TYPE = "group_type"
 private const val GROUP_NAME = "group_name"
 
-fun createInstance(type : Int,name : String = "") : SongListFragment{
+fun createSongListFragmentInstance(type : Int, name : String = "") : SongListFragment{
     val bundle = Bundle()
     bundle.putInt(GROUP_TYPE,type)
     bundle.putString(GROUP_NAME,name)
