@@ -37,8 +37,16 @@ class GroupListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
         popupMenu.setOnMenuItemClickListener(object : OnIMenuItemClickListener, PopupMenu.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem?): Boolean {
                 if(item?.itemId == R.id.menu_play){
-                    val album = mAdapter.values[position]
-                    val mediaListLiveData = (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(album.name)
+                    val group = mAdapter.values[position]
+                    val mediaListLiveData = when(groupType){
+                        TYPE_ARTIST ->
+                            (activity as MainActivity).getDataProvider().getMediaFilesByArtist(group.name)
+                        TYPE_GENRE ->
+                            (activity as MainActivity).getDataProvider().getMediaFilesByGenre(group.name)
+                        else ->
+                            (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(group.name)
+                    }
+
                     mediaListLiveData.observe(this@GroupListFragment,object : Observer<List<MediaFile>>{
                         override fun onChanged(t: List<MediaFile>?) {
                             mediaListLiveData.removeObserver(this)
@@ -57,8 +65,15 @@ class GroupListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
                     return true
                 }
                 else if(item?.itemId == R.id.menu_queue){
-                    val album = mAdapter.values[position]
-                    val mediaListLiveData = (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(album.name)
+                    val group = mAdapter.values[position]
+                    val mediaListLiveData = when(groupType){
+                        TYPE_ARTIST ->
+                            (activity as MainActivity).getDataProvider().getMediaFilesByArtist(group.name)
+                        TYPE_GENRE ->
+                            (activity as MainActivity).getDataProvider().getMediaFilesByGenre(group.name)
+                        else ->
+                            (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(group.name)
+                    }
                     mediaListLiveData.observe(this@GroupListFragment,object : Observer<List<MediaFile>>{
                         override fun onChanged(t: List<MediaFile>?) {
                             mediaListLiveData.removeObserver(this)
@@ -69,9 +84,46 @@ class GroupListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
                     })
                     return true
                 }
+                else if(item?.itemId == R.id.menu_shuffle){
+                    val group = mAdapter.values[position]
+                    if(mAdapter.values.size > 0) {
+                        val mediaListLiveData = when(groupType){
+                            TYPE_ARTIST ->
+                                (activity as MainActivity).getDataProvider().getMediaFilesByArtist(group.name)
+                            TYPE_GENRE ->
+                                (activity as MainActivity).getDataProvider().getMediaFilesByGenre(group.name)
+                            else ->
+                                (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(group.name)
+                        }
+
+                        mediaListLiveData.observe(this@GroupListFragment,object : Observer<List<MediaFile>>{
+                            override fun onChanged(t: List<MediaFile>?) {
+                                if(t?.size!! > 0) {
+                                    mediaListLiveData.removeObserver(this)
+                                    val shuffledList = t.shuffled()
+                                    val addNowPlayLiveData = (activity as MainActivity).getDataProvider().addNowPlaying(shuffledList, true)
+                                    addNowPlayLiveData.observe(this@GroupListFragment, object : Observer<Boolean> {
+                                        override fun onChanged(t: Boolean?) {
+                                            addNowPlayLiveData.removeObserver(this)
+                                            (activity as MainActivity).getDataProvider().setNowPlaying(shuffledList[0].id)
+                                        }
+                                    })
+                                }
+                            }
+                        })
+
+                    }
+                }
                 else if(item?.itemId == R.id.menu_add_playlist){
-                    val album = mAdapter.values[position]
-                    val mediaListLiveData = (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(album.name)
+                    val group = mAdapter.values[position]
+                    val mediaListLiveData = when(groupType){
+                        TYPE_ARTIST ->
+                            (activity as MainActivity).getDataProvider().getMediaFilesByArtist(group.name)
+                        TYPE_GENRE ->
+                            (activity as MainActivity).getDataProvider().getMediaFilesByGenre(group.name)
+                        else ->
+                            (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(group.name)
+                    }
                     mediaListLiveData.observe(this@GroupListFragment,object : Observer<List<MediaFile>>{
                         override fun onChanged(t: List<MediaFile>?) {
                             mediaListLiveData.removeObserver(this)

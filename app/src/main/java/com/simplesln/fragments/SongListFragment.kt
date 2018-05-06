@@ -1,5 +1,6 @@
 package com.simplesln.fragments
 
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -7,11 +8,14 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.AdapterView
+import android.widget.EditText
+import android.widget.Toast
+import com.simplesln.adapters.PlaylistDialogListAdapter
 import com.simplesln.adapters.SongListAdapter
+import com.simplesln.data.PlayList
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
-import kotlinx.android.synthetic.main.fragment_song_list.*
 
 class SongListFragment : Fragment(), AdapterView.OnItemClickListener {
     private lateinit var mAdapter : SongListAdapter
@@ -59,6 +63,55 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener {
             R.id.menu_add_queue ->
                 if(mAdapter.values.size > 0) {
                     (activity as MainActivity).getDataProvider().addNowPlaying(mAdapter.values, false)
+                }
+            R.id.menu_add_playlist ->
+                if(mAdapter.values.size > 0) {
+                    val builder = AlertDialog.Builder(activity)
+                    val dialogAdapter = PlaylistDialogListAdapter(activity!!)
+                    val playlistLiveData = (activity as MainActivity).getDataProvider().getPlayList()
+                    playlistLiveData.observe(this@SongListFragment, Observer {
+                        if(it != null){
+                            for(playList in it){
+                                dialogAdapter.add(PlayList(playList))
+                            }
+                            dialogAdapter.notifyDataSetChanged()
+                        }
+                    })
+                    builder.setTitle("Playlist")
+                    builder.setAdapter(dialogAdapter) {
+                        dialog, which ->
+                        dialog?.dismiss()
+                        val playlist = dialogAdapter.getItem(which)
+                        (activity as MainActivity).getDataProvider().addToPlayList(playlist.name,mAdapter.values)
+                        Toast.makeText(activity,"added to " + playlist.name, Toast.LENGTH_SHORT).show()
+                    }
+                    builder.setPositiveButton("Create"){
+                        dialog, _ ->
+                        dialog.dismiss()
+                        val createDialog = AlertDialog.Builder(activity)
+                        createDialog.setTitle("Create Playlist")
+                        val inflatedView = LayoutInflater.from(activity).inflate(R.layout.dialog_playlist_entry,null)
+                        createDialog.setView(inflatedView)
+                        val editText : EditText = inflatedView.findViewById(R.id.playlistName)
+                        createDialog.setPositiveButton("Okay"){
+                            dialog, _ ->
+                            dialog.dismiss()
+                            if(editText.text.toString().isNotEmpty()) {
+                                (activity as MainActivity).getDataProvider().addToPlayList(editText.text.toString(), mAdapter.values)
+                                Toast.makeText(activity, "added to " + editText.text.toString(), Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        createDialog.setNegativeButton("Cancel"){
+                            dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        createDialog.create().show()
+                    }
+                    builder.setNegativeButton("Cancel"){
+                        dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    builder.create().show()
                 }
         }
         return super.onOptionsItemSelected(item)

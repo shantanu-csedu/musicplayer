@@ -2,7 +2,6 @@ package com.simplesln.data.entities
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
-import android.text.TextUtils
 
 @Entity(tableName = "media_library")
 class MediaFile(link: String, name: String, duration: Int, artist: String?, genre: String?, album: String?, folder: String, year: String?,repeatCount : Int = 1) {

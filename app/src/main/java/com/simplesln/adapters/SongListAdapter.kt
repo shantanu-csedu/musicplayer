@@ -2,7 +2,6 @@ package com.simplesln.adapters
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.RecyclerView.ViewHolder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +9,7 @@ import android.widget.AdapterView
 import android.widget.TextView
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.formatDuration
-import com.simplesln.fragments.NowPlayingFragment
 import com.simplesln.simpleplayer.R
-import kotlinx.android.synthetic.main.item_now_playing.view.*
 
 class SongListAdapter(val context : Context) : RecyclerView.Adapter<SongListAdapter.ViewHolder>() {
     val values = ArrayList<MediaFile>()

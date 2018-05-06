@@ -1,8 +1,6 @@
 package com.simplesln.data.dao
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MediatorLiveData
-import android.arch.lifecycle.Observer
 import android.arch.persistence.room.*
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.data.entities.NowPlayingFile

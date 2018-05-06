@@ -1,25 +1,22 @@
 package com.simplesln.services
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
 import android.arch.lifecycle.LifecycleService
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
+import android.content.Context
 import android.content.Intent
 import android.os.Binder
+import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.support.v4.app.NotificationCompat
+import com.simplesln.data.*
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.interfaces.DataProvider
 import com.simplesln.interfaces.MediaPlayer
-import android.support.v4.app.NotificationCompat
-import android.app.Notification.MediaStyle
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.arch.lifecycle.LiveData
-import android.content.Context
-import android.os.Build
-import android.os.Handler
-import android.support.annotation.RequiresApi
-import android.util.Log
-import com.simplesln.data.*
 import com.simplesln.simpleplayer.R
 
 

@@ -4,24 +4,18 @@ import android.content.Context
 import android.os.Build
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.RecyclerView.ViewHolder
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
-import com.simplesln.adapters.helper.ItemTouchHelperAdapter
 import com.simplesln.adapters.helper.ItemTouchHelperViewHolder
-import com.simplesln.data.RoomDataProvider
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.formatDuration
-import com.simplesln.fragments.NowPlayingFragment
 import com.simplesln.interfaces.DataProvider
 import com.simplesln.simpleplayer.R
 import com.simplesln.widgets.RepeatCounterView
-import kotlinx.android.synthetic.main.item_now_playing.view.*
 
 class NowPlayListAdapter(val context : Context, val dataProvider: DataProvider) : RecyclerView.Adapter<NowPlayListAdapter.ViewHolder>() {
 

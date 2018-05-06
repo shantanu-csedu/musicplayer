@@ -6,10 +6,17 @@
         android:title="Play"
         />
 
+    <item android:id="@+id/menu_shuffle"
+        app:showAsAction="never"
+        android:title="Shuffle"
+        />
+
     <item android:id="@+id/menu_queue"
         app:showAsAction="never"
         android:title="Add to queue"
         />
+
+
 
 
     <item android:id="@+id/menu_add_playlist"

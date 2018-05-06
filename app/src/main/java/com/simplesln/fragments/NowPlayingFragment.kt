@@ -1,6 +1,5 @@
 package com.simplesln.fragments
 
-import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.os.Handler
@@ -16,11 +15,8 @@ import android.widget.AdapterView
 import com.simplesln.adapters.NowPlayListAdapter
 import com.simplesln.adapters.helper.ItemTouchHelperAdapter
 import com.simplesln.adapters.helper.SimpleItemTouchHelperCallback
-import com.simplesln.data.MediaPlayerState
-import com.simplesln.data.STATE_PLAYING
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
-import kotlinx.android.synthetic.main.fragment_now_playing.*
 
 class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouchHelperAdapter {
     override fun onItemReleased() {

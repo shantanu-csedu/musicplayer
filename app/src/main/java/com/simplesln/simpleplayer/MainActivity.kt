@@ -2,14 +2,16 @@ package com.simplesln.simpleplayer
 
 import android.arch.lifecycle.Observer
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewPager
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
 import android.widget.SeekBar
 import com.simplesln.adapters.ViewPagerAdapter
 import com.simplesln.data.PrefDataProvider
@@ -17,8 +19,6 @@ import com.simplesln.data.RoomDataProvider
 import com.simplesln.data.STATE_PLAYING
 import com.simplesln.formatDuration
 import com.simplesln.getProgress
-import com.simplesln.interfaces.MediaPlayer
-import com.simplesln.services.MediaPlayerService
 import com.simplesln.services.MediaScanService
 import kotlinx.android.synthetic.main.activity_main.*
 
