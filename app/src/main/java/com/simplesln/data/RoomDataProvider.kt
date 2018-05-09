@@ -255,12 +255,12 @@ class RoomDataProvider(context : Context) : DataProvider{
                 else if(nextPlayingItem == null){ //no next item
                     mediaFile.rank = db?.nowPlaying()?.getRank(nowPlayingItem.id)!! + 1
                     mediaFile.nowPlaying = false
-                    db?.nowPlaying()?.insert(Arrays.asList(mediaFile))
+                    db?.nowPlaying()?.update(Arrays.asList(mediaFile))
                 }
                 else{
                     mediaFile.rank = db?.nowPlaying()?.getAvgRank(nowPlayingItem.id,nextPlayingItem.id)!!
                     mediaFile.nowPlaying = false
-                    db?.nowPlaying()?.insert(Arrays.asList(mediaFile))
+                    db?.nowPlaying()?.update(Arrays.asList(mediaFile))
                 }
             }
             null

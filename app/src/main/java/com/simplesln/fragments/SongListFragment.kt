@@ -24,20 +24,19 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
     override fun onMenuClicked(anchorView: View, position: Int) {
         val popupMenu = PopupMenu(activity!!,anchorView)
         popupMenu.menuInflater.inflate(R.menu.menu_song_item,popupMenu.menu)
-        popupMenu.setOnMenuItemClickListener(object  : PopupMenu.OnMenuItemClickListener{
-            override fun onMenuItemClick(item: MenuItem?): Boolean {
-                val mediaFile = mAdapter.values[position]
-                when(item?.itemId){
-                    R.id.menu_play_next ->
-                        (activity as MainActivity).getDataProvider().setNext(mediaFile.id)
-                    R.id.menu_add_queue ->
-                        (activity as MainActivity).getDataProvider().addNowPlaying(Arrays.asList(mediaFile),false)
-                    R.id.menu_add_playlist ->
-                        addToPlaylist(Arrays.asList(mediaFile))
-                }
-                return true
+        popupMenu.setOnMenuItemClickListener { item ->
+            val mediaFile = mAdapter.values[position]
+            when(item?.itemId){
+                R.id.menu_play_next ->
+                    (activity as MainActivity).getDataProvider().setNext(mediaFile.id)
+                R.id.menu_add_queue ->
+                    (activity as MainActivity).getDataProvider().addNowPlaying(Arrays.asList(mediaFile),false)
+                R.id.menu_add_playlist ->
+                    addToPlaylist(Arrays.asList(mediaFile))
             }
-        })
+            true
+        }
+        popupMenu.show()
     }
 
     private lateinit var mAdapter : SongListAdapter

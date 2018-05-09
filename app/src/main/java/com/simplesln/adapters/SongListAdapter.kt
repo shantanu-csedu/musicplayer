@@ -35,7 +35,7 @@ class SongListAdapter(val context : Context,private val menuItemClickListener: O
             onItemClickListener?.onItemClick(null,holder.itemView,position,0)
         })
         holder.overflowMenu.setOnClickListener(View.OnClickListener {
-            menuItemClickListener?.onMenuClicked(holder.itemView,position)
+            menuItemClickListener?.onMenuClicked(holder.overflowMenu,position)
         })
     }
 

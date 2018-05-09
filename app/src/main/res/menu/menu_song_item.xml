@@ -6,7 +6,7 @@
         android:title="Play next"
         />
 
-    <item android:id="@+id/menu_queue"
+    <item android:id="@+id/menu_add_queue"
         app:showAsAction="never"
         android:title="Add to queue"
         />

@@ -10,41 +10,45 @@
     app:cardElevation="2px"
     >
 
-    <ImageView
-        android:clickable="true"
-        android:background="@color/lighterBlack"
-        android:layout_gravity="right"
-        android:id="@+id/menuOverflow"
-        android:layout_width="wrap_content"
-        android:paddingLeft="15dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="15dp"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:src="@mipmap/ic_menu_overflow"
-        />
+
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="?android:attr/selectableItemBackground"
-        android:padding="10dp">
-
+        >
+        <ImageView
+            android:clickable="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:id="@+id/menuOverflow"
+            android:layout_width="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingLeft="15dp"
+            android:paddingBottom="15dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@mipmap/ic_menu_overflow"
+            />
 
 
         <ImageView
+            android:layout_marginLeft="5dp"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
             android:id="@+id/musicArt"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@mipmap/ic_default_music" />
 
         <TextView
+            android:layout_marginTop="10dp"
             android:id="@+id/musicName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_toRightOf="@id/musicArt"
+            android:layout_toLeftOf="@id/menuOverflow"
             android:ellipsize="marquee"
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceSmall"
