@@ -105,6 +105,7 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
             TYPE_ALBUM -> (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(groupName).observe(this,mediaFileObserver)
             TYPE_ARTIST -> (activity as MainActivity).getDataProvider().getMediaFilesByArtist(groupName).observe(this,mediaFileObserver)
             TYPE_GENRE -> (activity as MainActivity).getDataProvider().getMediaFilesByGenre(groupName).observe(this,mediaFileObserver)
+            TYPE_PLAYLIST -> (activity as MainActivity).getDataProvider().getMediaFilesByPlaylist(groupName).observe(this,mediaFileObserver)
             TYPE_ALL -> (activity as MainActivity).getDataProvider().getMediaFiles().observe(this,mediaFileObserver)
         }
     }
@@ -188,7 +189,8 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
 const val TYPE_ALBUM = 1
 const val TYPE_ARTIST = 2
 const val TYPE_GENRE = 3
-const val TYPE_ALL = 4
+const val TYPE_PLAYLIST = 4
+const val TYPE_ALL = 5
 private const val GROUP_TYPE = "group_type"
 private const val GROUP_NAME = "group_name"
 

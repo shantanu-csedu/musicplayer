@@ -21,7 +21,7 @@ interface PlayListDAO {
     fun getMediaFiles(name : String) : LiveData<List<MediaFile>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertPlayListData(playlistData : List<PlayListData>)
+    fun insertPlayListData(playlistData : PlayListData) : Long
 
     @Query("select id from media_playlist where name=:name")
     fun getPlaylistId(name : String) : Long

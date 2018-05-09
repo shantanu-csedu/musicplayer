@@ -20,8 +20,7 @@ import android.arch.persistence.room.PrimaryKey
                     onDelete = ForeignKey.CASCADE
             ))
         ],
-        indices = [(Index(value = arrayOf("media_file_id"), unique = true)),
-                (Index(value = arrayOf("media_playlist_id"), unique = true))]
+        indices = [(Index(value = arrayOf("media_file_id","media_playlist_id"), unique = true))]
 )
 class PlayListData(media_file_id: Long, media_playlist_id : Long) {
     @PrimaryKey(autoGenerate = true)

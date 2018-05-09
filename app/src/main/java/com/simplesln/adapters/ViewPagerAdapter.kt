@@ -12,7 +12,7 @@ class ViewPagerAdapter(private val childCount : Int, fm: FragmentManager?) : Fra
             1 -> createGroupListFragmentInstance(TYPE_ALBUM)
             2 -> createGroupListFragmentInstance(TYPE_ARTIST)
             3 -> createGroupListFragmentInstance(TYPE_GENRE)
-            4 -> PlayListFragment()
+            4 -> createGroupListFragmentInstance(TYPE_PLAYLIST)
             5 -> createSongListFragmentInstance(TYPE_ALL)
             else -> null
         }

@@ -73,10 +73,10 @@ class MainActivity : BaseActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         tabLayout.addTab(tabLayout.newTab().setText("Now Playing"))
+        tabLayout.addTab(tabLayout.newTab().setText("Playlist"))
         tabLayout.addTab(tabLayout.newTab().setText("Albums"))
         tabLayout.addTab(tabLayout.newTab().setText("Artists"))
         tabLayout.addTab(tabLayout.newTab().setText("Genre"))
-        tabLayout.addTab(tabLayout.newTab().setText("Playlist"))
         tabLayout.addTab(tabLayout.newTab().setText("Songs"))
         viewPager.adapter = ViewPagerAdapter(6,supportFragmentManager)
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{

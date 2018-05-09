@@ -34,6 +34,7 @@ class GroupListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
     override fun onMenuClicked(anchorView: View,position : Int) {
         val popupMenu = PopupMenu(activity!!,anchorView)
         popupMenu.menuInflater.inflate(R.menu.menu_music_group,popupMenu.menu)
+        if(groupType == TYPE_PLAYLIST) popupMenu.menu.removeItem(R.id.menu_add_playlist)
         popupMenu.setOnMenuItemClickListener(object : OnIMenuItemClickListener, PopupMenu.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem?): Boolean {
                 if(item?.itemId == R.id.menu_play){
@@ -235,12 +236,24 @@ class GroupListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
                         mAdapter.notifyDataSetChanged()
                     }
                 })
+
             TYPE_GENRE ->
                 (activity as MainActivity).getDataProvider().getGenreList().observe(this, Observer {
                     if(it != null){
                         mAdapter.values.clear()
                         for(name in it){
                             mAdapter.values.add(Group(name))
+                        }
+                        mAdapter.notifyDataSetChanged()
+                    }
+                })
+
+            TYPE_PLAYLIST ->
+                (activity as MainActivity).getDataProvider().getPlayList().observe(this, Observer {
+                    if(it != null){
+                        mAdapter.values.clear()
+                        for(playList in it){
+                            mAdapter.values.add(Group(playList.name))
                         }
                         mAdapter.notifyDataSetChanged()
                     }

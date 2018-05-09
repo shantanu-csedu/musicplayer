@@ -2,6 +2,7 @@ package com.simplesln.data
 
 import android.arch.lifecycle.LiveData
 import android.content.Context
+import android.util.Log
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.data.entities.NowPlayingFile
 import com.simplesln.data.entities.PlayList
@@ -214,18 +215,16 @@ class RoomDataProvider(context : Context) : DataProvider{
         })
     }
 
-    override fun addToPlayList(playListName: String, mediaFiles: List<MediaFile>) {
+    override fun addToPlayList(name: String, mediaFiles: List<MediaFile>) {
         QueryExecutor(executorService,Callable<Void>{
-            val playlistDataList = ArrayList<PlayListData>()
-            var playlistId = db?.playlist()?.getPlaylistId(playListName)
+            var playlistId = db?.playlist()?.getPlaylistId(name)
             if(playlistId == -1L){//doesn't exits
-                playlistId = db?.playlist()?.insert(PlayList(playListName))
+                playlistId = db?.playlist()?.insert(PlayList(name))
             }
             for(mediaFile in mediaFiles){
                 val playlistData = PlayListData(mediaFile.id, playlistId!!)
-                playlistDataList.add(playlistData)
+                db?.playlist()?.insertPlayListData(playlistData)
             }
-            db?.playlist()?.insertPlayListData(playlistDataList)
             null
         })
     }

@@ -29,6 +29,7 @@
             android:padding="10dp"/>
 
         <ImageView
+            android:padding="8dp"
             android:id="@+id/musicArt"
             android:layout_width="48dp"
             android:layout_height="48dp"
