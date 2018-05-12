@@ -16,4 +16,5 @@ class MediaFile(link: String, name: String, duration: Int, artist: String?, genr
     var folder : String = folder
     var year : String = if(year == null || year.isEmpty()) "unknown" else year
     var repeatCount : Int = repeatCount
+    var art : String = ""
 }

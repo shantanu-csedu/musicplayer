@@ -4,21 +4,22 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import com.simplesln.fragments.*
+import com.simplesln.simpleplayer.*
 
-class ViewPagerAdapter(private val childCount : Int, fm: FragmentManager?) : FragmentPagerAdapter(fm) {
+class ViewPagerAdapter(private val tabs : Array<String>, fm: FragmentManager?) : FragmentPagerAdapter(fm) {
     override fun getItem(position: Int): Fragment? {
-        return when(position){
-            0 -> NowPlayingFragment()
-            1 -> createGroupListFragmentInstance(TYPE_ALBUM)
-            2 -> createGroupListFragmentInstance(TYPE_ARTIST)
-            3 -> createGroupListFragmentInstance(TYPE_GENRE)
-            4 -> createGroupListFragmentInstance(TYPE_PLAYLIST)
-            5 -> createSongListFragmentInstance(TYPE_ALL)
+        return when(tabs[position]){
+            NOW_PLAYING -> NowPlayingFragment()
+            ALBUM -> createGroupListFragmentInstance(TYPE_ALBUM)
+            ARTIST -> createGroupListFragmentInstance(TYPE_ARTIST)
+            GENRE -> createGroupListFragmentInstance(TYPE_GENRE)
+            PLAYLIST -> createGroupListFragmentInstance(TYPE_PLAYLIST)
+            SONGS -> createSongListFragmentInstance(TYPE_ALL)
             else -> null
         }
     }
 
     override fun getCount(): Int {
-        return childCount;
+        return tabs.size;
     }
 }

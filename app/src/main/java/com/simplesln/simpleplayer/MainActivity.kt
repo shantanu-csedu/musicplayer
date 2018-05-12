@@ -22,11 +22,18 @@ import com.simplesln.getProgress
 import com.simplesln.services.MediaScanService
 import kotlinx.android.synthetic.main.activity_main.*
 
+const val NOW_PLAYING = "Now Playing"
+const val PLAYLIST = "Playlist"
+const val ALBUM = "Album"
+const val ARTIST = "Artist"
+const val GENRE = "Genre"
+const val SONGS = "Songs"
 class MainActivity : BaseActivity() {
 
     private lateinit var pref : PrefDataProvider
     private lateinit var dataProvider: RoomDataProvider
     private var countDownTimer: CountDownTimer? = null
+    val TABS = arrayOf(NOW_PLAYING, PLAYLIST, ALBUM, ARTIST, GENRE, SONGS)
 
     override fun onMediaPlayerConnected() {
         if(mediaPlayerService != null){
@@ -72,13 +79,10 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        tabLayout.addTab(tabLayout.newTab().setText("Now Playing"))
-        tabLayout.addTab(tabLayout.newTab().setText("Playlist"))
-        tabLayout.addTab(tabLayout.newTab().setText("Albums"))
-        tabLayout.addTab(tabLayout.newTab().setText("Artists"))
-        tabLayout.addTab(tabLayout.newTab().setText("Genre"))
-        tabLayout.addTab(tabLayout.newTab().setText("Songs"))
-        viewPager.adapter = ViewPagerAdapter(6,supportFragmentManager)
+        for(tab in TABS){
+            tabLayout.addTab(tabLayout.newTab().setText(tab))
+        }
+        viewPager.adapter = ViewPagerAdapter(TABS,supportFragmentManager)
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
             override fun onPageScrollStateChanged(state: Int) {
 
