@@ -122,26 +122,24 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
         mImageTouchHelper = ItemTouchHelper(callback)
         mImageTouchHelper.attachToRecyclerView(listView)
 
-        observeNowPlaying()
+        observerQueue()
         observeMediaPlayerState()
     }
 
-    private fun observeNowPlaying(){
+    private fun observerQueue(){
         (activity as MainActivity).getDataProvider().getQueue().observe(this, Observer {
             mAdapter.values.clear()
             if (it != null) {
                 val lastState = (activity as MainActivity).liveMediaPlayerState.lastState
-                if(lastState!= null) {
-                    if(lastState.mediaFile != null) {
-                        Log.e("last state", lastState.mediaFile?.name)
-                    }
-                    else{
-                        Log.e("last state", "media file null")
-                    }
+                if(lastState.mediaFile != null) {
+                    Log.e("last state", lastState.mediaFile?.name)
+                }
+                else{
+                    Log.e("last state", "media file null")
                 }
                 for(entity in it){
                     val mFile = MediaFile(entity)
-                    if(lastState != null && lastState.mediaFile?.link.equals(mFile.link)){
+                    if(lastState.mediaFile?.link.equals(mFile.link)){
                         mFile.playing = (lastState.state == STATE_PLAYING)
                     }
                     mAdapter.values.add(mFile)

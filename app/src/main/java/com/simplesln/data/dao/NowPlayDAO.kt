@@ -21,4 +21,7 @@ interface NowPlayDAO {
 
     @Query("select media_library.* from media_now_play left join media_queue on media_now_play.nowPlayId = media_queue.id left join media_library on media_library.id = media_queue.media_file_id limit 1")
     fun getSync() : MediaFile
+
+    @Query("select media_queue.media_file_id from media_now_play left join media_queue on media_now_play.nowPlayId = media_queue.id limit 1")
+    fun getMediaFileId() : Long
 }

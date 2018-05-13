@@ -10,6 +10,6 @@ class LiveMediaPlayerState : MutableLiveData<MediaPlayerState>() {
     }
 
     fun update(state: Int){
-        value = MediaPlayerState(state,lastState.mediaFile)
+        update(MediaPlayerState(state,lastState.mediaFile))
     }
 }

@@ -71,7 +71,7 @@ class RoomDataProvider(context : Context) : DataProvider{
 
     override fun removeQueue(mediaId: Long) {
         executorService.submit({
-            val npId = db?.queue()?.getId(mediaId)
+            val npId = db?.nowPlay()?.getMediaFileId()
             if(mediaId == npId){//deleted item is currently playing, need to set another now playing
                 var nextFile = db?.queue()?.getNext()
                 if(nextFile == null){
@@ -79,6 +79,9 @@ class RoomDataProvider(context : Context) : DataProvider{
                 }
                 if(nextFile != null){//only 1 file
                     setNowPlaying(nextFile.id)
+                }
+                else{
+                    db?.nowPlay()?.reset()
                 }
             }
             db?.queue()?.delete(mediaId)

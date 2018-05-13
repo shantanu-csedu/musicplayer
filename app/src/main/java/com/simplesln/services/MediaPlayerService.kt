@@ -14,6 +14,7 @@ import com.simplesln.interfaces.DataProvider
 import com.simplesln.interfaces.Player
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
+import android.util.Log
 import com.simplesln.helpers.AudioFocusHelper
 import com.simplesln.helpers.NOTIFICATION_ID
 import com.simplesln.helpers.NotificationHelper
@@ -99,7 +100,9 @@ class MediaPlayerService : LifecycleService(){
 
     private fun observeNowPlaying(){
         dataProvider.getNowPlay().observe(this, Observer {
-            if(mMediaFile == null || !player.isPlaying() || mMediaFile?.id != it?.id) {
+            if(mMediaFile == null ||
+                    !player.isPlaying() ||
+                    mMediaFile?.id != it?.id) {
                 mMediaFile = it
                 if (player.initPlayer(it)) {
                     if (mInit){
