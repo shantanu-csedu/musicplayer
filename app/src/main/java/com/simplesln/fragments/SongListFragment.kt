@@ -7,18 +7,22 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PopupMenu
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Toast
 import com.simplesln.adapters.PlaylistDialogListAdapter
 import com.simplesln.adapters.SongListAdapter
+import com.simplesln.data.MediaPlayerState
 import com.simplesln.data.PlayList
+import com.simplesln.data.STATE_PLAYING
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
 import java.util.*
+import kotlin.collections.ArrayList
 
 class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuItemClickListener {
     override fun onMenuClicked(anchorView: View, position: Int) {
@@ -30,9 +34,9 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
                 R.id.menu_play_next ->
                     (activity as MainActivity).getDataProvider().setNext(mediaFile.id)
                 R.id.menu_add_queue ->
-                    (activity as MainActivity).getDataProvider().addNowPlaying(Arrays.asList(mediaFile),false)
+                    (activity as MainActivity).getDataProvider().addNowPlaying(Arrays.asList(mediaFile.getEntity()),false)
                 R.id.menu_add_playlist ->
-                    addToPlaylist(Arrays.asList(mediaFile))
+                    addToPlaylist(Arrays.asList(mediaFile.getEntity()))
             }
             true
         }
@@ -57,6 +61,7 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
             }
         }
         observe()
+        observeMediaPlayerState()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -73,7 +78,11 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
             R.id.menu_shuffle ->
                 if(mAdapter.values.size > 0) {
                     val shuffledList = mAdapter.values.shuffled()
-                    val addNowPlayLiveData = (activity as MainActivity).getDataProvider().addNowPlaying(shuffledList, true)
+                    val mediaFileList = ArrayList<MediaFile>()
+                    for(file in shuffledList){
+                        mediaFileList.add(file.getEntity())
+                    }
+                    val addNowPlayLiveData = (activity as MainActivity).getDataProvider().addNowPlaying(mediaFileList, true)
                     addNowPlayLiveData.observe(this,object : Observer<Boolean>{
                         override fun onChanged(t: Boolean?) {
                             addNowPlayLiveData.removeObserver(this)
@@ -83,11 +92,19 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
                 }
             R.id.menu_add_queue ->
                 if(mAdapter.values.size > 0) {
-                    (activity as MainActivity).getDataProvider().addNowPlaying(mAdapter.values, false)
+                    val mediaFileList = ArrayList<MediaFile>()
+                    for(file in mAdapter.values){
+                        mediaFileList.add(file.getEntity())
+                    }
+                    (activity as MainActivity).getDataProvider().addNowPlaying(mediaFileList, false)
                 }
             R.id.menu_add_playlist ->
                 if(mAdapter.values.size > 0) {
-                    addToPlaylist(mAdapter.values)
+                    val mediaFileList = ArrayList<MediaFile>()
+                    for(file in mAdapter.values){
+                        mediaFileList.add(file.getEntity())
+                    }
+                    addToPlaylist(mediaFileList)
                 }
         }
         return super.onOptionsItemSelected(item)
@@ -113,14 +130,27 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
     private val mediaFileObserver =  Observer<List<MediaFile>>{
         addedToNowPlayList = false
         mAdapter.values.clear()
-        mAdapter.values.addAll(it!!)
+        if(it != null){
+            val lastState = (activity as MainActivity).liveMediaPlayerState.lastState
+            for(entity in it){
+                val mFile = com.simplesln.data.MediaFile(entity)
+                if(lastState != null && lastState.mediaFile?.link.equals(mFile.link)){
+                    mFile.playing = (lastState.state == STATE_PLAYING)
+                }
+                mAdapter.values.add(mFile)
+            }
+        }
         mAdapter.notifyDataSetChanged()
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         val mediaFile = mAdapter.values[position]
         if(!addedToNowPlayList) {
-            val nowPlayingLiveData = (activity as MainActivity).getDataProvider().addNowPlaying(mAdapter.values, true)
+            val mediaFileList = ArrayList<MediaFile>()
+            for(file in mAdapter.values){
+                mediaFileList.add(file.getEntity())
+            }
+            val nowPlayingLiveData = (activity as MainActivity).getDataProvider().addNowPlaying(mediaFileList, true)
             nowPlayingLiveData.observe(this, object : Observer<Boolean> {
                 override fun onChanged(it: Boolean?) {
                     if (it == true) {
@@ -183,6 +213,32 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
             dialog.dismiss()
         }
         builder.create().show()
+    }
+
+    private fun observeMediaPlayerState(){
+        (activity as MainActivity).liveMediaPlayerState.observe(this, Observer<MediaPlayerState> { it ->
+            if(it != null){
+                if(it.mediaFile != null) {
+                    Log.e("state change", it.mediaFile?.name)
+                }
+                else{
+                    Log.e("state change","media file null")
+                }
+                updatePlayingState(it)
+            }
+        })
+    }
+
+    private fun updatePlayingState(mediaPlayerState: MediaPlayerState){
+        for(file in mAdapter.values){
+            if(file.link.equals(mediaPlayerState.mediaFile?.link)){
+                file.playing = (mediaPlayerState.state == STATE_PLAYING)
+            }
+            else{
+                file.playing = false
+            }
+            mAdapter.notifyDataSetChanged()
+        }
     }
 
 }

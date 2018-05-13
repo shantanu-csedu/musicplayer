@@ -1,5 +1,6 @@
 package com.simplesln.simpleplayer
 
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
@@ -14,9 +15,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.SeekBar
 import com.simplesln.adapters.ViewPagerAdapter
-import com.simplesln.data.PrefDataProvider
-import com.simplesln.data.RoomDataProvider
-import com.simplesln.data.STATE_PLAYING
+import com.simplesln.data.*
 import com.simplesln.formatDuration
 import com.simplesln.getProgress
 import com.simplesln.services.MediaScanService
@@ -34,12 +33,15 @@ class MainActivity : BaseActivity() {
     private lateinit var dataProvider: RoomDataProvider
     private var countDownTimer: CountDownTimer? = null
     val TABS = arrayOf(NOW_PLAYING, PLAYLIST, ALBUM, ARTIST, GENRE, SONGS)
+    val liveMediaPlayerState : LiveMediaPlayerState = LiveMediaPlayerState()
 
     override fun onMediaPlayerConnected() {
         if(mediaPlayerService != null){
+            liveMediaPlayerState.update(mediaPlayerService!!.getMediaPlayerState().lastState!!)
             mediaPlayerService!!.getMediaPlayerState().observe(this, Observer {
                 mediaPlayerState ->
                 if(mediaPlayerState != null) {
+                    liveMediaPlayerState.update(mediaPlayerState)
                     val mediaFile = mediaPlayerState.mediaFile
                     if(mediaFile != null){
                         if(playerControlContainer.visibility == View.GONE) playerControlContainer.visibility = View.VISIBLE

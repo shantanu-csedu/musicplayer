@@ -1,13 +1,12 @@
 package com.simplesln.data
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 
-class LiveMediaPlayerState : LiveData<MediaPlayerState>() {
+class LiveMediaPlayerState : MutableLiveData<MediaPlayerState>() {
+    var lastState : MediaPlayerState? = null
     fun update(mediaPlayerState: MediaPlayerState){
+        lastState = mediaPlayerState
         value = mediaPlayerState
-    }
-
-    fun post(mediaPlayerState: MediaPlayerState){
-        postValue(mediaPlayerState)
     }
 }

@@ -11,7 +11,7 @@ import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
 import com.simplesln.adapters.helper.ItemTouchHelperViewHolder
-import com.simplesln.data.entities.MediaFile
+import com.simplesln.data.MediaFile
 import com.simplesln.formatDuration
 import com.simplesln.interfaces.DataProvider
 import com.simplesln.simpleplayer.R
@@ -35,7 +35,6 @@ class NowPlayListAdapter(val context : Context, private val dataProvider: DataPr
     val values = ArrayList<MediaFile>()
     var moveToIndex = -1
     private var onItemClickListener: AdapterView.OnItemClickListener? = null
-    private var currentMediaFile : MediaFile? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_now_playing,parent,false))
@@ -43,10 +42,6 @@ class NowPlayListAdapter(val context : Context, private val dataProvider: DataPr
 
     override fun getItemCount(): Int {
         return values.size
-    }
-
-    fun setCurrentMediaFile(mediaFile: MediaFile?){
-        this.currentMediaFile = mediaFile
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -60,7 +55,7 @@ class NowPlayListAdapter(val context : Context, private val dataProvider: DataPr
             onItemClickListener?.onItemClick(null,holder.itemView,position,0)
         })
 
-        if(currentMediaFile?.id == mediaFile.id){
+        if(mediaFile.playing){
             holder.musicArt.setImageResource(R.mipmap.ic_album)
         }
         else{
@@ -70,7 +65,7 @@ class NowPlayListAdapter(val context : Context, private val dataProvider: DataPr
         holder.repeatCounter.setOnClickListener {
             holder.repeatCounter.toggle()
             mediaFile.repeatCount = holder.repeatCounter.getCount()
-            dataProvider.updateMediaFile(mediaFile)
+            dataProvider.updateMediaFile(mediaFile.getEntity())
         }
     }
 

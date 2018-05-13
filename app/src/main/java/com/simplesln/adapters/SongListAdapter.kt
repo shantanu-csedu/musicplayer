@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
-import com.simplesln.data.entities.MediaFile
+import com.simplesln.data.MediaFile
 import com.simplesln.formatDuration
 import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.R
@@ -37,6 +37,12 @@ class SongListAdapter(val context : Context,private val menuItemClickListener: O
         holder.overflowMenu.setOnClickListener(View.OnClickListener {
             menuItemClickListener?.onMenuClicked(holder.overflowMenu,position)
         })
+        if(mediaFile.playing){
+            holder.musicArt.setImageResource(R.mipmap.ic_album)
+        }
+        else{
+            holder.musicArt.setImageResource(R.mipmap.ic_default_music)
+        }
     }
 
     fun setOnItemClickListener(onItemClickListener: AdapterView.OnItemClickListener) {
@@ -48,5 +54,6 @@ class SongListAdapter(val context : Context,private val menuItemClickListener: O
         val musicArtist : TextView = itemView.findViewById(R.id.musicArtist)
         val musicDuration : TextView = itemView.findViewById(R.id.musicDuration)
         val overflowMenu : ImageView = itemView.findViewById(R.id.menuOverflow)
+        val musicArt : ImageView = itemView.findViewById(R.id.musicArt)
     }
 }

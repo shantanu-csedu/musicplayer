@@ -151,7 +151,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
         }
     }
 
-    fun getMediaPlayerState() : LiveData<MediaPlayerState>{
+    fun getMediaPlayerState() : LiveMediaPlayerState{
         return liveMediaPlayerState
     }
     val ACTION_PLAY = "action.play"

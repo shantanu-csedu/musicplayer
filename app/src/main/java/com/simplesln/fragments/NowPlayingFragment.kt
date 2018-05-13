@@ -15,6 +15,9 @@ import android.widget.AdapterView
 import com.simplesln.adapters.NowPlayListAdapter
 import com.simplesln.adapters.helper.ItemTouchHelperAdapter
 import com.simplesln.adapters.helper.SimpleItemTouchHelperCallback
+import com.simplesln.data.MediaFile
+import com.simplesln.data.MediaPlayerState
+import com.simplesln.data.STATE_PLAYING
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
 
@@ -30,7 +33,7 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
                 rankLiveData.observe(this,object : Observer<Double>{
                     override fun onChanged(rank: Double?) {
                         rankLiveData.removeObserver(this)
-                        (activity as MainActivity).getDataProvider().updateRank(mAdapter.values[toPosition],rank!!)
+                        (activity as MainActivity).getDataProvider().updateRank(mAdapter.values[toPosition].getEntity(),rank!!)
                     }
                 })
             }
@@ -40,7 +43,7 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
                 rankLiveData.observe(this,object : Observer<Double>{
                     override fun onChanged(rank: Double?) {
                         rankLiveData.removeObserver(this)
-                        (activity as MainActivity).getDataProvider().updateRank(mAdapter.values[toPosition],rank!!)
+                        (activity as MainActivity).getDataProvider().updateRank(mAdapter.values[toPosition].getEntity(),rank!!)
                     }
                 })
             }
@@ -49,7 +52,7 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
                 rankLiveData.observe(this,object : Observer<Double>{
                     override fun onChanged(rank: Double?) {
                         rankLiveData.removeObserver(this)
-                        (activity as MainActivity).getDataProvider().updateRank(mAdapter.values[toPosition],rank!!)
+                        (activity as MainActivity).getDataProvider().updateRank(mAdapter.values[toPosition].getEntity(),rank!!)
                     }
                 })
             }
@@ -97,15 +100,57 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
         mImageTouchHelper.attachToRecyclerView(listView)
 
         observeNowPlaying()
+        observeMediaPlayerState()
     }
 
     private fun observeNowPlaying(){
         (activity as MainActivity).getDataProvider().getNowPlayList().observe(this, Observer {
             mAdapter.values.clear()
             if (it != null) {
-                mAdapter.values.addAll(it)
+                val lastState = (activity as MainActivity).liveMediaPlayerState.lastState
+                if(lastState!= null) {
+                    if(lastState.mediaFile != null) {
+                        Log.e("last state", lastState.mediaFile?.name)
+                    }
+                    else{
+                        Log.e("last state", "media file null")
+                    }
+                }
+                for(entity in it){
+                    val mFile = MediaFile(entity)
+                    if(lastState != null && lastState.mediaFile?.link.equals(mFile.link)){
+                        mFile.playing = (lastState.state == STATE_PLAYING)
+                    }
+                    mAdapter.values.add(mFile)
+                }
             }
             mAdapter.notifyDataSetChanged()
         })
+    }
+
+    private fun observeMediaPlayerState(){
+        (activity as MainActivity).liveMediaPlayerState.observe(this, Observer<MediaPlayerState> { it ->
+            if(it != null){
+                if(it.mediaFile != null) {
+                    Log.e("state change", it.mediaFile?.name)
+                }
+                else{
+                    Log.e("state change","media file null")
+                }
+                updatePlayingState(it)
+            }
+        })
+    }
+
+    private fun updatePlayingState(mediaPlayerState: MediaPlayerState){
+        for(file in mAdapter.values){
+            if(file.link.equals(mediaPlayerState.mediaFile?.link)){
+                file.playing = (mediaPlayerState.state == STATE_PLAYING)
+            }
+            else{
+                file.playing = false
+            }
+            mAdapter.notifyDataSetChanged()
+        }
     }
 }

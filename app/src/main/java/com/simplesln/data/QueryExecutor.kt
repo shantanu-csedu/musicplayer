@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService
 class QueryExecutor<T>(executorService: ExecutorService,callable : Callable<T>) : LiveData<T>() {
     init {
         executorService.submit({
-            var result = callable.call()
+            val result = callable.call()
             postValue(result)
         })
     }
