@@ -133,7 +133,9 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
         dataProvider = RoomDataProvider(this)
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW))
+            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW)
+            channel.setShowBadge(false)
+            notificationManager.createNotificationChannel(channel)
         }
         liveMediaPlayerState.update(MediaPlayerState(STATE_STOPPED, mMediaFile))
         observeNowPlaying()

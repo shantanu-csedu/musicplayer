@@ -24,7 +24,7 @@ class SplashActivity : AppCompatActivity() {
         handler.postDelayed(Runnable {
             startActivity(Intent(applicationContext,MainActivity::class.java))
             finish()
-        },1000)
+        },500)
     }
 
     private fun askStorageReadPermission() : Boolean {
