@@ -63,7 +63,7 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
     }
 
     override fun onItemDismiss(position: Int) {
-        (activity as MainActivity).getDataProvider().removeNowPlaying(mAdapter.values[position].id)
+        (activity as MainActivity).getDataProvider().removeQueue(mAdapter.values[position].id)
         mAdapter.onItemDismiss(position)
     }
 
@@ -127,7 +127,7 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
     }
 
     private fun observeNowPlaying(){
-        (activity as MainActivity).getDataProvider().getNowPlayList().observe(this, Observer {
+        (activity as MainActivity).getDataProvider().getQueue().observe(this, Observer {
             mAdapter.values.clear()
             if (it != null) {
                 val lastState = (activity as MainActivity).liveMediaPlayerState.lastState

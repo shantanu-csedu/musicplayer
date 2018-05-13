@@ -2,11 +2,9 @@ package com.simplesln.data
 
 import android.arch.lifecycle.LiveData
 import android.content.Context
-import android.util.Log
+import com.simplesln.data.entities.*
 import com.simplesln.data.entities.MediaFile
-import com.simplesln.data.entities.NowPlayingFile
 import com.simplesln.data.entities.PlayList
-import com.simplesln.data.entities.PlayListData
 import com.simplesln.interfaces.DataProvider
 import java.util.*
 import java.util.concurrent.Callable
@@ -21,39 +19,22 @@ class RoomDataProvider(context : Context) : DataProvider{
     private var executorService : ExecutorService = Executors.newFixedThreadPool(3)
 
     override fun getNowPlay(): LiveData<MediaFile> {
-        return db?.nowPlaying()!!.getNowPlayingItems()
-//        val distinctLiveData = MediatorLiveData<MediaFile>()
-//        distinctLiveData.addSource(db?.nowPlaying()!!.getNowPlayingItems(), object : Observer<MediaFile> {
-//            private var initialized = false
-//            private var lastObj: MediaFile? = null
-//            override fun onChanged(obj: MediaFile?) {
-//                if(obj == null) return
-//                if (!initialized) {
-//                    initialized = true
-//                    lastObj = obj
-//                    distinctLiveData.postValue(lastObj)
-//                } else if (obj != lastObj) {
-//                    lastObj = obj
-//                    distinctLiveData.postValue(lastObj)
-//                }
-//            }
-//        })
-//        return distinctLiveData
+        return db?.nowPlay()!!.get()
     }
 
-    override fun getNowPlayList(): LiveData<List<MediaFile>> {
-        return db?.nowPlaying()!!.getNowPlayList()
+    override fun getQueue(): LiveData<List<MediaFile>> {
+        return db?.queue()!!.getQueue()
     }
 
     override fun getNext(): LiveData<MediaFile> {
         return QueryExecutor(executorService,Callable<MediaFile>{
-            db?.nowPlaying()!!.getNextSync()
+            db?.queue()!!.getNext()
         })
     }
 
     override fun getPrev(): LiveData<MediaFile> {
         return QueryExecutor(executorService,Callable<MediaFile>{
-            db?.nowPlaying()!!.getPreviousSync()
+            db?.queue()!!.getPrevious()
         })
     }
 
@@ -65,60 +46,42 @@ class RoomDataProvider(context : Context) : DataProvider{
 
     override fun addNowPlaying(files: List<MediaFile>,clear : Boolean) : LiveData<Boolean>{
         return QueryExecutor(executorService, Callable<Boolean> {
-            val nowPlayingList  = ArrayList<NowPlayingFile>()
+            val nowPlayingList  = ArrayList<MediaQueue>()
             var rank = 0.0
             if(clear) {
-                db?.nowPlaying()!!.delete()
+                db?.queue()!!.delete()
             }
             else{
-                rank = db?.nowPlaying()!!.getMaxRank() + 1
+                rank = db?.queue()!!.getMaxRank() + 1
             }
             for((index,file) in files.withIndex()){
-                val nowPlayingFile = NowPlayingFile(file.id,rank+index,false)
+                val nowPlayingFile = MediaQueue(file.id,rank+index)
                 nowPlayingList.add(nowPlayingFile)
-//                Log.e("add nowplaying","" + (rank+index) + " " + file.name)
             }
 
-            if(nowPlayingList.size > 0) return@Callable (db?.nowPlaying()?.insert(nowPlayingList)!![0] > 0)
+            if(nowPlayingList.size > 0) return@Callable (db?.queue()?.insert(nowPlayingList)!![0] > 0)
             false
         })
     }
 
-    override fun addNowPlaying(index: Int, file: MediaFile) {
-        executorService.submit({
-            val nowPlayingList  = ArrayList<NowPlayingFile>()
-            val nowPlayingFile = NowPlayingFile(file.id, index.toDouble(),false)
-            nowPlayingList.add(nowPlayingFile)
-            db?.nowPlaying()?.insert(nowPlayingList)
-        })
-
-    }
 
     override fun remove() : LiveData<Int>{
         return QueryExecutor(executorService, Callable<Int> { db?.library()?.delete()!! })
     }
 
-    override fun removeNowPlaying() : LiveData<Int>{
-        return QueryExecutor(executorService,object : Callable<Int>{
-            override fun call(): Int {
-                return db?.nowPlaying()?.delete()!!
-            }
-        })
-    }
-
-    override fun removeNowPlaying(mediaId: Long) {
+    override fun removeQueue(mediaId: Long) {
         executorService.submit({
-            val npId = db?.nowPlaying()?.getNowPlayingId()
+            val npId = db?.queue()?.getId(mediaId)
             if(mediaId == npId){//deleted item is currently playing, need to set another now playing
-                var nextFile = db?.nowPlaying()?.getNextSync()
+                var nextFile = db?.queue()?.getNext()
                 if(nextFile == null){
-                    nextFile = db?.nowPlaying()?.getPreviousSync()
+                    nextFile = db?.queue()?.getPrevious()
                 }
                 if(nextFile != null){//only 1 file
-                    db?.nowPlaying()?.setNowPlaying(nextFile.id)
+                    setNowPlaying(nextFile.id)
                 }
             }
-            db?.nowPlaying()?.delete(mediaId)
+            db?.queue()?.delete(mediaId)
         })
     }
 
@@ -128,20 +91,14 @@ class RoomDataProvider(context : Context) : DataProvider{
         })
     }
 
-    override fun getMediaFiles(offset: Int, total: Int) : LiveData<List<MediaFile>> {
-        return db?.library()!!.get(offset,total)
-    }
 
     override fun setNowPlaying(mediaId: Long) {
         QueryExecutor(executorService, Callable<Void> {
-            db?.nowPlaying()!!.resetNowPlaying()
-            db?.nowPlaying()!!.setNowPlaying(mediaId)
+            db?.nowPlay()!!.reset()
+            db?.nowPlay()!!.set(
+                    NowPlay(0L,db?.queue()!!.getId(mediaId)))
             null
         })
-    }
-
-    override fun getNowPlayList2() : LiveData<List<NowPlayingFile>>{
-        return db?.nowPlaying()!!.get()
     }
 
     override fun getAlbumList(): LiveData<List<String>> {
@@ -182,24 +139,24 @@ class RoomDataProvider(context : Context) : DataProvider{
 
     override fun getRank(fromId: Long, toId: Long): LiveData<Double> {
         return QueryExecutor(executorService, Callable<Double> {
-            db?.nowPlaying()!!.getAvgRank(fromId,toId)
+            db?.queue()!!.getAvgRank(fromId,toId)
         })
     }
 
     override fun getRank(id: Long, before: Boolean): LiveData<Double> {
         return QueryExecutor(executorService, Callable<Double>{
-            if(before) db?.nowPlaying()!!.getRank(id) -1
-            else db?.nowPlaying()!!.getRank(id) + 1
+            if(before) db?.queue()!!.getRank(id) -1
+            else db?.queue()!!.getRank(id) + 1
         })
     }
 
     override fun updateRank(file: MediaFile, rank: Double) {
         QueryExecutor(executorService, Callable<Void> {
-            val npid = db?.nowPlaying()?.getNowPlayingId()
-            val nowPlayingFile = NowPlayingFile(file.id, rank, file.id == npid)
-            nowPlayingFile.id = db?.nowPlaying()?.getNowPlayingItem(file.id)!!
+            val npid = db?.queue()?.getId(file.id)
+            val nowPlayingFile = MediaQueue(file.id, rank)
+            nowPlayingFile.id = if(npid != null) npid else 0L
             if(nowPlayingFile.id > 0) {
-                db?.nowPlaying()?.update(Arrays.asList(nowPlayingFile))
+                db?.queue()?.update(Arrays.asList(nowPlayingFile))
             }
             null
         })
@@ -235,35 +192,32 @@ class RoomDataProvider(context : Context) : DataProvider{
 
     override fun setNext(id: Long) {
         QueryExecutor(executorService,Callable<Void>{
-            val nowPlayingItem = db?.nowPlaying()?.getNowPlayingItemSync()
-            val nextPlayingItem = db?.nowPlaying()?.getNextSync()
-            val mediaFile = db?.nowPlaying()?.get(id)
+            val nowPlayingItem = db?.nowPlay()?.getSync()
+            val nextPlayingItem = db?.queue()?.getNext()
+            val mediaFile = db?.queue()?.get(id)
             if(mediaFile == null){ //insert
                 if(nowPlayingItem == null){
-                    db?.nowPlaying()?.insert(Arrays.asList(NowPlayingFile(id,0.0,true)))
+                    db?.queue()?.insert(Arrays.asList(MediaQueue(id,0.0)))
                 }
                 else if(nextPlayingItem == null){ //no next item
-                    db?.nowPlaying()?.insert(Arrays.asList(NowPlayingFile(id,db?.nowPlaying()?.getRank(nowPlayingItem.id)!! + 1,false)))
+                    db?.queue()?.insert(Arrays.asList(MediaQueue(id,db?.queue()?.getRank(nowPlayingItem.id)!! + 1)))
                 }
                 else{
-                    db?.nowPlaying()?.insert(Arrays.asList(NowPlayingFile(id,db?.nowPlaying()?.getAvgRank(nowPlayingItem.id,nextPlayingItem.id)!!,false)))
+                    db?.queue()?.insert(Arrays.asList(MediaQueue(id,db?.queue()?.getAvgRank(nowPlayingItem.id,nextPlayingItem.id)!!)))
                 }
             }
             else{ //update
                 if(nowPlayingItem == null){
                     mediaFile.rank = 0.0
-                    mediaFile.nowPlaying = true
-                    db?.nowPlaying()?.update(Arrays.asList(mediaFile))
+                    db?.queue()?.update(Arrays.asList(mediaFile))
                 }
                 else if(nextPlayingItem == null){ //no next item
-                    mediaFile.rank = db?.nowPlaying()?.getRank(nowPlayingItem.id)!! + 1
-                    mediaFile.nowPlaying = false
-                    db?.nowPlaying()?.update(Arrays.asList(mediaFile))
+                    mediaFile.rank = db?.queue()?.getRank(nowPlayingItem.id)!! + 1
+                    db?.queue()?.update(Arrays.asList(mediaFile))
                 }
                 else{
-                    mediaFile.rank = db?.nowPlaying()?.getAvgRank(nowPlayingItem.id,nextPlayingItem.id)!!
-                    mediaFile.nowPlaying = false
-                    db?.nowPlaying()?.update(Arrays.asList(mediaFile))
+                    mediaFile.rank = db?.queue()?.getAvgRank(nowPlayingItem.id,nextPlayingItem.id)!!
+                    db?.queue()?.update(Arrays.asList(mediaFile))
                 }
             }
             null

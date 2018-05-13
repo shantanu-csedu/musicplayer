@@ -5,7 +5,7 @@ import android.arch.persistence.room.ForeignKey
 import android.arch.persistence.room.Index
 import android.arch.persistence.room.PrimaryKey
 
-@Entity(tableName = "media_now_playing",
+@Entity(tableName = "media_queue",
         foreignKeys = [
             ForeignKey(
                     entity = MediaFile::class,
@@ -16,11 +16,10 @@ import android.arch.persistence.room.PrimaryKey
         ],
         indices = [Index(value = arrayOf("media_file_id"), unique = true)]
 )
-class NowPlayingFile(media_file_id: Long, rank : Double, nowPlaying : Boolean) {
+class MediaQueue(media_file_id: Long, rank : Double) {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
     var media_file_id: Long = media_file_id
     var rank: Double = rank
     var timestamp: Long = System.currentTimeMillis()
-    var nowPlaying: Boolean = nowPlaying
 }
