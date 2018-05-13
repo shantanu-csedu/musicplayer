@@ -125,7 +125,6 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
         instance = this
         mSession = MediaSessionCompat(this, resources.getString(R.string.app_name))
         mSession.setCallback(MediaSessionCallback())
-        mSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS or MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
         val intent = Intent(this, MainActivity::class.java)
         val pi = PendingIntent.getActivity(this, REQUEST_MEDIA_CONTROL,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -138,7 +137,9 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
             notificationManager.createNotificationChannel(channel)
         }
         liveMediaPlayerState.update(MediaPlayerState(STATE_STOPPED, mMediaFile))
+
         observeNowPlaying()
+
         handler.postDelayed({
             mInit = true
         },1000)

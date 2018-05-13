@@ -46,11 +46,15 @@ class RoomDataProvider(context : Context) : DataProvider{
     }
 
     override fun getNext(): LiveData<MediaFile> {
-        return db?.nowPlaying()!!.getNext()
+        return QueryExecutor(executorService,Callable<MediaFile>{
+            db?.nowPlaying()!!.getNextSync()
+        })
     }
 
     override fun getPrev(): LiveData<MediaFile> {
-        return db?.nowPlaying()!!.getPrevious()
+        return QueryExecutor(executorService,Callable<MediaFile>{
+            db?.nowPlaying()!!.getPreviousSync()
+        })
     }
 
     override fun addMedia(files: List<MediaFile>) {

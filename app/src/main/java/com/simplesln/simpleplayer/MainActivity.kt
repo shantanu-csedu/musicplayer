@@ -82,39 +82,6 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        for(tab in TABS){
-            tabLayout.addTab(tabLayout.newTab().setText(tab))
-        }
-        viewPager.adapter = ViewPagerAdapter(TABS,supportFragmentManager)
-        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
-            override fun onPageScrollStateChanged(state: Int) {
-
-            }
-
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-
-            }
-
-            override fun onPageSelected(position: Int) {
-                tabLayout.getTabAt(position)?.select()
-            }
-
-        })
-
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-            }
-
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                if(tab != null)
-                    viewPager.setCurrentItem(tab.position,true)
-            }
-
-        })
 
         pref = PrefDataProvider(this)
         dataProvider = RoomDataProvider(applicationContext)
@@ -194,7 +161,40 @@ class MainActivity : BaseActivity() {
             viewPager.setCurrentItem(0,true)
         }
 
-//        dataProvider.createPlaylist("Recent")
+        for(tab in TABS){
+            tabLayout.addTab(tabLayout.newTab().setText(tab))
+        }
+        viewPager.adapter = ViewPagerAdapter(TABS,supportFragmentManager)
+        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
+            override fun onPageScrollStateChanged(state: Int) {
+
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+            }
+
+            override fun onPageSelected(position: Int) {
+                tabLayout.getTabAt(position)?.select()
+            }
+
+        })
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                if(tab != null)
+                    viewPager.setCurrentItem(tab.position,true)
+            }
+
+        })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
