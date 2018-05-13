@@ -32,8 +32,14 @@ import android.graphics.Bitmap
 import android.media.*
 import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
+import com.simplesln.helpers.NOTIFICATION_ID
+import com.simplesln.helpers.NotificationHelper
 
 
+const val ACTION_PLAY = "action.play"
+const val ACTION_NEXT = "action.next"
+const val ACTION_PAUSE = "action.pause"
+const val ACTION_PREV = "action.prev"
 class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaPlayer.OnCompletionListener, android.media.MediaPlayer.OnPreparedListener, AudioManager.OnAudioFocusChangeListener {
     override fun onAudioFocusChange(focusChange: Int) {
         when (focusChange) {
@@ -54,12 +60,11 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
             mPrepared = true
             if(mp.isPlaying){
                 liveMediaPlayerState.update(MediaPlayerState(STATE_PLAYING, mMediaFile))
-                startForeground(NOTIFICATION_ID,createNotification())
             }
             else{
                 liveMediaPlayerState.update(MediaPlayerState(STATE_READY, mMediaFile))
             }
-            updateNotification()
+            startForeground(NOTIFICATION_ID,notificationHelper.createNotification(liveMediaPlayerState.lastState!!))
         }
     }
 
@@ -85,22 +90,21 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
                     }
                 },500)
             }
-            updateNotification()
+            notificationHelper.updateNotification(liveMediaPlayerState.lastState!!)
         }
     }
 
     lateinit var instance : MediaPlayerService
     private var player : android.media.MediaPlayer = android.media.MediaPlayer()
     private lateinit var dataProvider : DataProvider
-    private val CHANNEL_ID = "com.simplesln.simpler.player.notification"
-    private val CHANNEL_NAME = "Simple Music Player"
+
     private var mPrepared = false
     private var liveMediaPlayerState : LiveMediaPlayerState = LiveMediaPlayerState()
     private var mMediaFile : MediaFile? = null
     private var handler = Handler()
     private var mInit: Boolean = false
     private var mRepeatCount = 1
-    private val NOTIFICATION_ID = 982734
+    private lateinit var notificationHelper : NotificationHelper
 
     init {
         player.setOnCompletionListener(this)
@@ -117,25 +121,13 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
     private class MediaSessionCallback : MediaSessionCompat.Callback(){
 
     }
-    private val REQUEST_MEDIA_CONTROL = 98
-    private lateinit var notificationManager: NotificationManager
 
     override fun onCreate() {
         super.onCreate()
         instance = this
-        mSession = MediaSessionCompat(this, resources.getString(R.string.app_name))
-        mSession.setCallback(MediaSessionCallback())
-        val intent = Intent(this, MainActivity::class.java)
-        val pi = PendingIntent.getActivity(this, REQUEST_MEDIA_CONTROL,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        mSession.setSessionActivity(pi)
+        notificationHelper = NotificationHelper(this)
         dataProvider = RoomDataProvider(this)
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW)
-            channel.setShowBadge(false)
-            notificationManager.createNotificationChannel(channel)
-        }
+
         liveMediaPlayerState.update(MediaPlayerState(STATE_STOPPED, mMediaFile))
 
         observeNowPlaying()
@@ -144,6 +136,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
             mInit = true
         },1000)
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val mPlaybackAttributes = AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_GAME)
@@ -160,10 +153,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
     fun getMediaPlayerState() : LiveMediaPlayerState{
         return liveMediaPlayerState
     }
-    val ACTION_PLAY = "action.play"
-    val ACTION_NEXT = "action.next"
-    val ACTION_PAUSE = "action.pause"
-    val ACTION_PREV = "action.prev"
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         val filter = IntentFilter()
@@ -191,76 +181,6 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
                         prev()
             }
         }
-    }
-
-    private fun createNotification(): Notification? {
-        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
-
-
-        var fetchArtUrl: String? = null
-        var art: Bitmap? = null
-        if (mMediaFile?.art != null) {
-            val artUrl = mMediaFile?.art
-            fetchArtUrl = artUrl
-            art = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
-        }
-
-        addPrevAction(notificationBuilder)
-        addPlayPauseAction(notificationBuilder)
-        addNextAction(notificationBuilder)
-        notificationBuilder
-                .setStyle(android.support.v4.media.app.NotificationCompat.MediaStyle()
-                        .setMediaSession(mSession.sessionToken))
-                .setColor(resources.getColor(R.color.colorPrimary))
-                .setSmallIcon(R.drawable.abc_btn_check_material)
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setContentIntent(createContentIntent()) // Create an intent that would open the UI when user clicks the notification
-                .setContentTitle(mMediaFile?.name)
-                .setContentText(mMediaFile?.artist)
-                .setLargeIcon(art)
-
-//        if (fetchArtUrl != null) {
-//            fetchBitmapFromURLAsync(fetchArtUrl, notificationBuilder)
-//        }
-
-        return notificationBuilder.build()
-    }
-
-    private fun updateNotification(){
-        notificationManager.notify(NOTIFICATION_ID, createNotification());
-    }
-
-
-    private fun addPlayPauseAction(builder : NotificationCompat.Builder) {
-        var icon =0
-        var label = ""
-        var intent : PendingIntent? = null
-        if (isPlaying()) {
-            icon = R.mipmap.ic_pause;
-            label = "Pause"
-            intent = PendingIntent.getBroadcast(this,0,Intent(ACTION_PAUSE),PendingIntent.FLAG_UPDATE_CURRENT)
-        } else {
-            icon = R.mipmap.ic_play;
-            label = "Play"
-            intent = PendingIntent.getBroadcast(this,0,Intent(ACTION_PLAY),PendingIntent.FLAG_UPDATE_CURRENT)
-        }
-        builder.addAction(NotificationCompat.Action(icon, label, intent));
-    }
-
-    private fun addNextAction(builder: NotificationCompat.Builder){
-        builder.addAction(NotificationCompat.Action(R.mipmap.ic_next,"Next",PendingIntent.getBroadcast(this,0,Intent(ACTION_NEXT.toString()),PendingIntent.FLAG_UPDATE_CURRENT)))
-    }
-
-    private fun addPrevAction(builder: NotificationCompat.Builder){
-        builder.addAction(NotificationCompat.Action(R.mipmap.ic_prev,"Previous",PendingIntent.getBroadcast(this,0,Intent(ACTION_PREV),PendingIntent.FLAG_UPDATE_CURRENT)))
-    }
-
-
-    private fun createContentIntent() : PendingIntent{
-        val intent = Intent(this, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT
-        return PendingIntent.getActivity(this, 0,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -314,7 +234,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
                 player.seekTo(0)
             }
             player.start()
-            updateNotification()
+            notificationHelper.updateNotification(liveMediaPlayerState.lastState!!)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             audioManager.requestAudioFocus(mFocusRequest)
@@ -322,13 +242,13 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
         else {
             audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
         }
-        startForeground(NOTIFICATION_ID,createNotification())
+        startForeground(NOTIFICATION_ID,notificationHelper.createNotification(liveMediaPlayerState.lastState!!))
     }
 
     override fun stop() {
         liveMediaPlayerState.update(MediaPlayerState(STATE_STOPPED, mMediaFile))
         player.pause()
-        updateNotification()
+        notificationHelper.updateNotification(liveMediaPlayerState.lastState!!)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             audioManager.abandonAudioFocusRequest(mFocusRequest)
         }
