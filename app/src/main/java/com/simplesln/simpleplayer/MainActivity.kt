@@ -38,7 +38,7 @@ class MainActivity : BaseActivity() {
 
     override fun onMediaPlayerConnected() {
         if(mediaPlayerService != null){
-            liveMediaPlayerState.update(mediaPlayerService!!.getMediaPlayerState().lastState!!)
+            liveMediaPlayerState.update(mediaPlayerService!!.getMediaPlayerState().lastState)
             mediaPlayerService!!.getMediaPlayerState().observe(this, Observer {
                 mediaPlayerState ->
                 if(mediaPlayerState != null) {
@@ -61,16 +61,16 @@ class MainActivity : BaseActivity() {
                         actionPlay.setImageResource(R.mipmap.ic_play)
                     }
 
-                    totalTime.text = formatDuration(mediaPlayerService?.duration()!!)
-                    currentTime.text = formatDuration(mediaPlayerService?.currentPosition()!!)
-                    seekBar.progress = getProgress(mediaPlayerService?.currentPosition()!!,mediaPlayerService?.duration()!!)
+                    totalTime.text = formatDuration(mediaPlayerService?.getPlayer()!!.duration())
+                    currentTime.text = formatDuration(mediaPlayerService?.getPlayer()!!.currentPosition())
+                    seekBar.progress = getProgress(mediaPlayerService?.getPlayer()!!.currentPosition(),mediaPlayerService?.getPlayer()!!.duration())
                     if(mediaPlayerState.state != STATE_PLAYING){
                         Log.e("Playing","stoping countdown timer")
                         stopCountDownTimer()
                     }
-                    else if(mediaPlayerState.state == STATE_PLAYING && countDownTimer == null && mediaPlayerService!!.duration() > 0){
+                    else if(mediaPlayerState.state == STATE_PLAYING && countDownTimer == null && mediaPlayerService?.getPlayer()!!.duration() > 0){
                         Log.e("Playing","starting countdown timer")
-                        startCountDownTimer(mediaPlayerService!!.duration().toLong())
+                        startCountDownTimer(mediaPlayerService?.getPlayer()!!.duration().toLong())
                     }
                     Log.e("Playing state","" + mediaPlayerState.state)
                 }
@@ -91,24 +91,24 @@ class MainActivity : BaseActivity() {
 
         actionPlay.setOnClickListener(View.OnClickListener {
             if(mediaPlayerService != null){
-                if(mediaPlayerService!!.isPlaying()) {
-                    mediaPlayerService?.stop()
+                if(mediaPlayerService?.getPlayer()!!.isPlaying()) {
+                    mediaPlayerService?.getPlayer()!!.stop()
                 }
                 else{
-                    mediaPlayerService?.play()
+                    mediaPlayerService?.getPlayer()!!.play()
                 }
             }
         })
 
         actionPrevious.setOnClickListener(View.OnClickListener {
             if(mediaPlayerService != null){
-                mediaPlayerService?.prev()
+                mediaPlayerService?.getPlayer()!!.prev()
             }
         })
 
         actionNext.setOnClickListener(View.OnClickListener {
             if(mediaPlayerService != null){
-                mediaPlayerService?.next()
+                mediaPlayerService?.getPlayer()!!.next()
             }
         })
 
@@ -123,7 +123,7 @@ class MainActivity : BaseActivity() {
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if(mediaPlayerService != null) {
-                    val duration = mediaPlayerService?.duration()!!
+                    val duration = mediaPlayerService?.getPlayer()!!.duration()
                     currentTime.text = formatDuration((progress * duration / 100))
                 }
             }
@@ -133,11 +133,11 @@ class MainActivity : BaseActivity() {
             if(event?.action == MotionEvent.ACTION_UP){
                 val progress = seekBar.progress
                 if(mediaPlayerService != null){
-                    val duration = mediaPlayerService?.duration()!!
+                    val duration = mediaPlayerService?.getPlayer()!!.duration()
                     if(duration > 0){
-                        mediaPlayerService?.seek((progress * duration / 100))
+                        mediaPlayerService?.getPlayer()!!.seek((progress * duration / 100))
                     }
-                    if(mediaPlayerService?.isPlaying()!!) startCountDownTimer(duration.toLong())
+                    if(mediaPlayerService?.getPlayer()!!.isPlaying()) startCountDownTimer(duration.toLong())
                 }
             } else if(event?.action == MotionEvent.ACTION_DOWN){
                 stopCountDownTimer()
@@ -220,8 +220,8 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        if(mediaPlayerService != null && mediaPlayerService!!.isPlaying()) {
-            startCountDownTimer(mediaPlayerService!!.duration().toLong())
+        if(mediaPlayerService != null && mediaPlayerService?.getPlayer()!!.isPlaying()) {
+            startCountDownTimer(mediaPlayerService?.getPlayer()!!.duration().toLong())
         }
     }
 
@@ -232,9 +232,9 @@ class MainActivity : BaseActivity() {
 
             override fun onTick(millisUntilFinished: Long) {
                 if(mediaPlayerService != null){
-                    val progress = getProgress(mediaPlayerService!!.currentPosition(),mediaPlayerService!!.duration())
+                    val progress = getProgress(mediaPlayerService?.getPlayer()!!.currentPosition(),mediaPlayerService?.getPlayer()!!.duration())
                     if(seekBar.progress == progress){
-                        currentTime.text = formatDuration(mediaPlayerService!!.currentPosition())
+                        currentTime.text = formatDuration(mediaPlayerService?.getPlayer()!!.currentPosition())
                     }
                     else{
                         seekBar.progress = progress
