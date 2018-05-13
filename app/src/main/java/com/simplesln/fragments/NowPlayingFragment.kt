@@ -8,9 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AdapterView
 import com.simplesln.adapters.NowPlayListAdapter
 import com.simplesln.adapters.helper.ItemTouchHelperAdapter
@@ -81,12 +79,33 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         mAdapter = NowPlayListAdapter(activity!!,(activity as MainActivity).getDataProvider())
         mAdapter.setOnItemClickListener(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_now_playing,container,false)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.fragment_now_playing_menu,menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            R.id.menu_shuffle->
+                shuffle()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun shuffle(){
+        val shuffledList = mAdapter.values.shuffled()
+        for((index,file) in shuffledList.withIndex()){
+            (activity as MainActivity).getDataProvider().updateRank(file.getEntity(), index.toDouble())
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

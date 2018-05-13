@@ -1,6 +1,5 @@
 package com.simplesln.data
 
-import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 
 class LiveMediaPlayerState : MutableLiveData<MediaPlayerState>() {
