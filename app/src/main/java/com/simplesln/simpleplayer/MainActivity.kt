@@ -14,6 +14,7 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.widget.SeekBar
+import android.widget.Toast
 import com.simplesln.adapters.ViewPagerAdapter
 import com.simplesln.data.*
 import com.simplesln.formatDuration
@@ -193,7 +194,7 @@ class MainActivity : BaseActivity() {
             viewPager.setCurrentItem(0,true)
         }
 
-        dataProvider.createPlaylist("Recent")
+//        dataProvider.createPlaylist("Recent")
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -204,6 +205,10 @@ class MainActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
             android.R.id.home -> supportFragmentManager.popBackStack()
+            R.id.menu_scan -> {
+                startService(Intent(applicationContext,MediaScanService::class.java))
+                Toast.makeText(this,"Scanning library...",Toast.LENGTH_SHORT).show()
+            }
         }
         return super.onOptionsItemSelected(item)
     }

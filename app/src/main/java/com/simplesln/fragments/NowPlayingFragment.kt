@@ -105,7 +105,11 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
         val shuffledList = mAdapter.values.shuffled()
         for((index,file) in shuffledList.withIndex()){
             (activity as MainActivity).getDataProvider().updateRank(file.getEntity(), index.toDouble())
+            if(index == 0){
+                (activity as MainActivity).getDataProvider().setNowPlaying(file.id)
+            }
         }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

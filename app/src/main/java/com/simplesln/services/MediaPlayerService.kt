@@ -54,6 +54,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
             mPrepared = true
             if(mp.isPlaying){
                 liveMediaPlayerState.update(MediaPlayerState(STATE_PLAYING, mMediaFile))
+                startForeground(NOTIFICATION_ID,createNotification())
             }
             else{
                 liveMediaPlayerState.update(MediaPlayerState(STATE_READY, mMediaFile))
@@ -66,12 +67,14 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
         if(mp != null){
             if(mp.currentPosition == mp.duration){
                 liveMediaPlayerState.update(MediaPlayerState(STATE_END, mMediaFile))
+                stopForeground(false)
             }
             else if(mp.isLooping && mp.isPlaying){
                 liveMediaPlayerState.update(MediaPlayerState(STATE_PLAYING, mMediaFile))
             }
             else{
                 liveMediaPlayerState.update(MediaPlayerState(STATE_STOPPED, mMediaFile))
+                stopForeground(false)
                 handler.postDelayed({
                     if(mMediaFile != null && mRepeatCount < mMediaFile?.repeatCount!!){
                         mRepeatCount++
@@ -167,7 +170,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
         filter.addAction(ACTION_PREV);
         registerReceiver(playerActionHandler, filter);
 
-        startForeground(NOTIFICATION_ID,createNotification())
+//        startForeground(NOTIFICATION_ID,createNotification())
         return Service.START_NOT_STICKY
     }
 
@@ -316,6 +319,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
         else {
             audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
         }
+        startForeground(NOTIFICATION_ID,createNotification())
     }
 
     override fun stop() {
@@ -328,6 +332,7 @@ class MediaPlayerService : LifecycleService(), MediaPlayer, android.media.MediaP
         else {
             audioManager.abandonAudioFocus(this)
         }
+        stopForeground(false)
     }
 
     override fun next() {

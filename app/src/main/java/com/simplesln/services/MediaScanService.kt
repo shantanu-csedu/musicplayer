@@ -27,7 +27,7 @@ class MediaScanService : Service() {
         pref = PrefDataProvider(this)
         pref.scanRunning(true)
         Log.e(TAG,"starting scan")
-        Mp3Scanner()
+        MediaScanner()
     }
 
     override fun onDestroy() {
@@ -37,9 +37,9 @@ class MediaScanService : Service() {
         Log.e(TAG,"destroyed")
     }
 
-    inner class Mp3Scanner {
+    inner class MediaScanner {
         private val baseFiles = arrayOf(Environment.getExternalStorageDirectory())
-        private val patterns = arrayOf(".mp3")
+        private val patterns = arrayOf(".mp3","aac")
 
         init {
             scan(baseFiles.toList())
@@ -47,11 +47,11 @@ class MediaScanService : Service() {
         }
 
         fun scan(files : List<File>){
-            var nextDir = ArrayList<File>()
-            var filesToSave = ArrayList<MediaFile>()
+            val nextDir = ArrayList<File>()
+            val filesToSave = ArrayList<MediaFile>()
             for(parent in files){
                 for(path in parent.list()) {
-                    var file = File(parent.path,path)
+                    val file = File(parent.path,path)
                     if (file.isDirectory && !file.name.startsWith(".") && !file.name.startsWith("Android")) nextDir.add(file)
                     else if (!file.isDirectory && isMatchPattern(file.name)) {
                         filesToSave.add(getMediaFile(file))
@@ -83,8 +83,9 @@ class MediaScanService : Service() {
             val genre =  mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
             val year = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
             val duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            val art : String = if(mmr.embeddedPicture != null) mmr.embeddedPicture.toString() else ""
 
-            return MediaFile(file.absolutePath,file.name,duration.toInt(),artist,genre,album,folder,year)
+            return MediaFile(file.absolutePath,file.name,duration.toInt(),artist,genre,album,folder,year,art = art)
         }
     }
 }
