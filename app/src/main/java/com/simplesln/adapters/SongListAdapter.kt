@@ -32,7 +32,7 @@ class SongListAdapter(val context : Context,private val menuItemClickListener: O
         holder.musicDuration.text = formatDuration(mediaFile.duration)
 
         holder.itemView.setOnClickListener(View.OnClickListener {
-            onItemClickListener?.onItemClick(null,holder.itemView,position,0)
+            onItemClickListener?.onItemClick(null,holder.overflowMenu,position,0)
         })
         holder.overflowMenu.setOnClickListener(View.OnClickListener {
             menuItemClickListener?.onMenuClicked(holder.overflowMenu,position)

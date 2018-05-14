@@ -26,22 +26,7 @@ import kotlin.collections.ArrayList
 
 class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuItemClickListener {
     override fun onMenuClicked(anchorView: View, position: Int) {
-        val popupMenu = PopupMenu(activity!!,anchorView)
-        popupMenu.menuInflater.inflate(R.menu.menu_song_item,popupMenu.menu)
-        if(groupType == TYPE_PLAYLIST) popupMenu.menu.removeItem(R.id.menu_add_playlist)
-        popupMenu.setOnMenuItemClickListener { item ->
-            val mediaFile = mAdapter.values[position]
-            when(item?.itemId){
-                R.id.menu_play_next ->
-                    (activity as MainActivity).getDataProvider().setNext(mediaFile.id)
-                R.id.menu_add_queue ->
-                    (activity as MainActivity).getDataProvider().addNowPlaying(Arrays.asList(mediaFile.getEntity()),false)
-                R.id.menu_add_playlist ->
-                    addToPlaylist(Arrays.asList(mediaFile.getEntity()))
-            }
-            true
-        }
-        popupMenu.show()
+
     }
 
     private lateinit var mAdapter : SongListAdapter
@@ -140,7 +125,7 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
             val lastState = (activity as MainActivity).liveMediaPlayerState.lastState
             for(entity in it){
                 val mFile = com.simplesln.data.MediaFile(entity)
-                if(lastState != null && lastState.mediaFile?.link.equals(mFile.link)){
+                if(lastState.mediaFile?.link.equals(mFile.link)){
                     mFile.playing = (lastState.state == STATE_PLAYING)
                 }
                 mAdapter.values.add(mFile)
@@ -150,26 +135,44 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        val mediaFile = mAdapter.values[position]
-        if(!addedToNowPlayList) {
-            val mediaFileList = ArrayList<MediaFile>()
-            for(file in mAdapter.values){
-                mediaFileList.add(file.getEntity())
-            }
-            val nowPlayingLiveData = (activity as MainActivity).getDataProvider().addNowPlaying(mediaFileList, true)
-            nowPlayingLiveData.observe(this, object : Observer<Boolean> {
-                override fun onChanged(it: Boolean?) {
-                    if (it == true) {
-                        nowPlayingLiveData.removeObserver(this)
+        val popupMenu = PopupMenu(activity!!,view!!)
+        popupMenu.menuInflater.inflate(R.menu.menu_song_item,popupMenu.menu)
+        if(groupType == TYPE_PLAYLIST) popupMenu.menu.removeItem(R.id.menu_add_playlist)
+        popupMenu.setOnMenuItemClickListener { item ->
+            val mediaFile = mAdapter.values[position]
+            when(item?.itemId){
+                R.id.menu_play_now ->{
+                    if(!addedToNowPlayList) {
+                        val mediaFileList = ArrayList<MediaFile>()
+                        for(file in mAdapter.values){
+                            mediaFileList.add(file.getEntity())
+                        }
+                        val nowPlayingLiveData = (activity as MainActivity).getDataProvider().addNowPlaying(mediaFileList, true)
+                        nowPlayingLiveData.observe(this, object : Observer<Boolean> {
+                            override fun onChanged(it: Boolean?) {
+                                if (it == true) {
+                                    nowPlayingLiveData.removeObserver(this)
+                                    (activity as MainActivity).getDataProvider().setNowPlaying(mediaFile.id)
+                                    addedToNowPlayList = true
+                                }
+                            }
+                        })
+                    }
+                    else{
                         (activity as MainActivity).getDataProvider().setNowPlaying(mediaFile.id)
-                        addedToNowPlayList = true
                     }
                 }
-            })
+
+                R.id.menu_play_next ->
+                    (activity as MainActivity).getDataProvider().setNext(mediaFile.id)
+                R.id.menu_add_queue ->
+                    (activity as MainActivity).getDataProvider().addNowPlaying(Arrays.asList(mediaFile.getEntity()),false)
+                R.id.menu_add_playlist ->
+                    addToPlaylist(Arrays.asList(mediaFile.getEntity()))
+            }
+            true
         }
-        else{
-            (activity as MainActivity).getDataProvider().setNowPlaying(mediaFile.id)
-        }
+        popupMenu.show()
     }
 
     private fun addToPlaylist(values : List<MediaFile>){
