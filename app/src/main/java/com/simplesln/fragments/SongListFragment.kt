@@ -28,6 +28,7 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
     override fun onMenuClicked(anchorView: View, position: Int) {
         val popupMenu = PopupMenu(activity!!,anchorView)
         popupMenu.menuInflater.inflate(R.menu.menu_song_item,popupMenu.menu)
+        if(groupType == TYPE_PLAYLIST) popupMenu.menu.removeItem(R.id.menu_add_playlist)
         popupMenu.setOnMenuItemClickListener { item ->
             val mediaFile = mAdapter.values[position]
             when(item?.itemId){
@@ -71,6 +72,11 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         inflater?.inflate(R.menu.fragment_song_list_menu,menu)
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?) {
+        if(groupType == TYPE_PLAYLIST) menu?.removeItem(R.id.menu_add_playlist)
+        super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

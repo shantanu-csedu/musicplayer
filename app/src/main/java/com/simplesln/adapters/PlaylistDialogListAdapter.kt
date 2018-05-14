@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.simplesln.data.PlayList
+import com.simplesln.simpleplayer.R
 
 class PlaylistDialogListAdapter(context : Context) : ArrayAdapter<PlayList>(context,0) {
 
@@ -17,8 +18,8 @@ class PlaylistDialogListAdapter(context : Context) : ArrayAdapter<PlayList>(cont
         var holder: ViewHolder?
         var myConvertView = convertView
         if(myConvertView == null){
-            myConvertView = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_1,parent,false)
-            holder = ViewHolder(myConvertView.findViewById(android.R.id.text1))
+            myConvertView = LayoutInflater.from(context).inflate(R.layout.simple_list_item_1,parent,false)
+            holder = ViewHolder(myConvertView.findViewById(R.id.text1))
             myConvertView.tag = holder
         }
         else{

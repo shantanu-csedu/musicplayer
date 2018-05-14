@@ -7,7 +7,7 @@ import com.simplesln.data.entities.MediaFile
 @Dao
 interface LibraryDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(mediaFiles : List<MediaFile>)
+    fun insert(mediaFiles : MediaFile)
 
     @Update
     fun update(mediaFiles : List<MediaFile>)

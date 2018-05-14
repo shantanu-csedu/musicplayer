@@ -34,6 +34,6 @@ interface DataProvider {
 
     fun updateMediaFile(file : MediaFile)
     fun createPlaylist(name: String): LiveData<Long>
-    fun addToPlayList(playlistName :String,mediaFiles:List<MediaFile>)
+    fun addToPlayList(name: String ,mediaFiles:List<MediaFile>)
     fun setNext(id: Long)
 }

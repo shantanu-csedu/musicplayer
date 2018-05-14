@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN
 import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.Menu
@@ -33,7 +34,7 @@ class MainActivity : BaseActivity() {
     private lateinit var pref : PrefDataProvider
     private lateinit var dataProvider: RoomDataProvider
     private var countDownTimer: CountDownTimer? = null
-    val TABS = arrayOf(NOW_PLAYING, PLAYLIST, ALBUM, ARTIST, GENRE, SONGS)
+    val TABS = arrayOf(NOW_PLAYING, ALBUM, ARTIST, PLAYLIST, GENRE, SONGS)
     val liveMediaPlayerState : LiveMediaPlayerState = LiveMediaPlayerState()
 
     override fun onMediaPlayerConnected() {
@@ -258,6 +259,7 @@ class MainActivity : BaseActivity() {
         tabLayout.visibility = View.GONE
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportFragmentManager.beginTransaction()
+                .setTransition(TRANSIT_FRAGMENT_OPEN)
                 .replace(R.id.songListContainer,fragment)
                 .addToBackStack("")
                 .commit()

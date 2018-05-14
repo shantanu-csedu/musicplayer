@@ -200,6 +200,8 @@ class GroupListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
         }
         mAdapter = GroupListAdapter(activity!!,this)
         mAdapter.setOnItemClickListener(this)
+
+        observe()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -211,7 +213,6 @@ class GroupListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
         listView = view.findViewById(R.id.listView)
         listView.layoutManager = GridLayoutManager(activity,2)
         listView.adapter = mAdapter
-        observe()
     }
 
     private fun observe(){

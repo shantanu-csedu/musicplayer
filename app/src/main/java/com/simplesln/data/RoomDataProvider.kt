@@ -40,7 +40,9 @@ class RoomDataProvider(context : Context) : DataProvider{
 
     override fun addMedia(files: List<MediaFile>) {
         executorService.submit({
-            db?.library()?.insert(files)
+            for(file in files){
+                db?.library()?.insert(file)
+            }
         })
     }
 
@@ -178,7 +180,7 @@ class RoomDataProvider(context : Context) : DataProvider{
     override fun addToPlayList(name: String, mediaFiles: List<MediaFile>) {
         QueryExecutor(executorService,Callable<Void>{
             var playlistId = db?.playlist()?.getPlaylistId(name)
-            if(playlistId == -1L){//doesn't exits
+            if(playlistId!! <= 0L){//doesn't exits
                 playlistId = db?.playlist()?.insert(PlayList(name))
             }
             for(mediaFile in mediaFiles){
