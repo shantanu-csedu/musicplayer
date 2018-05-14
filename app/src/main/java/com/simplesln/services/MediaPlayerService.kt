@@ -115,9 +115,6 @@ class MediaPlayerService : LifecycleService(){
             else{
                 mMediaFile = it
             }
-            if(mMediaFile == null){
-                player.stop()
-            }
         })
     }
 
@@ -129,7 +126,7 @@ class MediaPlayerService : LifecycleService(){
                     startForeground(NOTIFICATION_ID,notificationHelper.createNotification(it))
                 }
                 STATE_IDLE -> {
-
+                    if(it.mediaFile == null) stopForeground(true)
                 }
                 STATE_READY -> {
 
@@ -138,7 +135,7 @@ class MediaPlayerService : LifecycleService(){
                 STATE_STOPPED ->{
                     notificationHelper.updateNotification(it)
                     audioFocusHelper.removeFocus()
-                    stopForeground(false)
+                    stopForeground(it.mediaFile == null)
                 }
 
                 STATE_END ->{

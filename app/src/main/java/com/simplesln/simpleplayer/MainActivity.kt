@@ -135,7 +135,7 @@ class MainActivity : BaseActivity() {
                 if(mediaPlayerService != null){
                     val duration = mediaPlayerService?.getPlayer()!!.duration()
                     if(duration > 0){
-                        mediaPlayerService?.getPlayer()!!.seek((progress * duration / 100))
+                        mediaPlayerService?.getPlayer()!!.seek(Math.ceil(progress * duration / 100.0).toInt())
                     }
                     if(mediaPlayerService?.getPlayer()!!.isPlaying()) startCountDownTimer(duration.toLong())
                 }

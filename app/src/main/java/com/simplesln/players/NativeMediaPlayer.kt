@@ -18,13 +18,16 @@ class NativeMediaPlayer(lifecycleOwner: LifecycleOwner, dataProvider: DataProvid
     }
 
     override fun initPlayer(mediaFile : MediaFile?) : Boolean{
+        if(player.isPlaying){
+            player.stop()
+            liveMediaPlayerState.update(STATE_STOPPED)
+        }
+        mPrepared = false
+        player.reset()
+        liveMediaPlayerState.update(MediaPlayerState(STATE_IDLE,mediaFile))
         if(mediaFile != null) {
-            if(player.isPlaying) player.stop()
-            mPrepared = false
-            player.reset()
             player.setDataSource(mediaFile.link)
             player.prepare()
-            liveMediaPlayerState.update(MediaPlayerState(STATE_IDLE,mediaFile))
             return true
         }
         return false

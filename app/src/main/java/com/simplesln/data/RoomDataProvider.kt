@@ -15,7 +15,7 @@ import kotlin.collections.ArrayList
 class RoomDataProvider(context : Context) : DataProvider{
 
 
-    private var db : MyDB? = getInstance(context)
+    private var db : MyDB? = getMyDBInstance(context)
     private var executorService : ExecutorService = Executors.newFixedThreadPool(3)
 
     override fun getNowPlay(): LiveData<MediaFile> {

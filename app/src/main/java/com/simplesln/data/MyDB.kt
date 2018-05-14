@@ -23,7 +23,7 @@ abstract class MyDB : RoomDatabase() {
     abstract fun nowPlay() : NowPlayDAO
 }
 
-fun getInstance(context : Context) : MyDB?{
+fun getMyDBInstance(context : Context) : MyDB?{
     if (instance == null) {
         instance = Room.databaseBuilder(context, MyDB::class.java, "my_db")
                 .build()
