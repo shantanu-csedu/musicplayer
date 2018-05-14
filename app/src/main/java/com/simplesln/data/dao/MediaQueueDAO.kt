@@ -27,7 +27,7 @@ interface MediaQueueDAO {
     fun getRank(id: Long): Double
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(nowPlayList : List<MediaQueue>) : List<Long>
+    fun insert(nowPlayList : MediaQueue) : Long
 
     @Update
     fun update(nowPlayList : List<MediaQueue>)

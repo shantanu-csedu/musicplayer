@@ -46,7 +46,6 @@ class RoomDataProvider(context : Context) : DataProvider{
 
     override fun addNowPlaying(files: List<MediaFile>,clear : Boolean) : LiveData<Boolean>{
         return QueryExecutor(executorService, Callable<Boolean> {
-            val nowPlayingList  = ArrayList<MediaQueue>()
             var rank = 0.0
             if(clear) {
                 db?.queue()!!.delete()
@@ -55,12 +54,9 @@ class RoomDataProvider(context : Context) : DataProvider{
                 rank = db?.queue()!!.getMaxRank() + 1
             }
             for((index,file) in files.withIndex()){
-                val nowPlayingFile = MediaQueue(file.id,rank+index)
-                nowPlayingList.add(nowPlayingFile)
+                db?.queue()?.insert(MediaQueue(file.id,rank+index))
             }
-
-            if(nowPlayingList.size > 0) return@Callable (db?.queue()?.insert(nowPlayingList)!![0] > 0)
-            false
+            true
         })
     }
 
@@ -200,13 +196,13 @@ class RoomDataProvider(context : Context) : DataProvider{
             val mediaFile = db?.queue()?.get(id)
             if(mediaFile == null){ //insert
                 if(nowPlayingItem == null){
-                    db?.queue()?.insert(Arrays.asList(MediaQueue(id,0.0)))
+                    db?.queue()?.insert(MediaQueue(id,0.0))
                 }
                 else if(nextPlayingItem == null){ //no next item
-                    db?.queue()?.insert(Arrays.asList(MediaQueue(id,db?.queue()?.getRank(nowPlayingItem.id)!! + 1)))
+                    db?.queue()?.insert(MediaQueue(id,db?.queue()?.getRank(nowPlayingItem.id)!! + 1))
                 }
                 else{
-                    db?.queue()?.insert(Arrays.asList(MediaQueue(id,db?.queue()?.getAvgRank(nowPlayingItem.id,nextPlayingItem.id)!!)))
+                    db?.queue()?.insert(MediaQueue(id,db?.queue()?.getAvgRank(nowPlayingItem.id,nextPlayingItem.id)!!))
                 }
             }
             else{ //update
