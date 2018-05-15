@@ -11,10 +11,13 @@ interface MediaQueueDAO {
     @Query("select media_library.* from media_queue  left join media_library on media_queue.media_file_id = media_library.id order by media_queue.rank")
     fun getQueue() : LiveData<List<MediaFile>>
 
-    @Query("select media_library.* from media_library  left join media_queue on media_queue.media_file_id = media_library.id where media_queue.rank > (select media_queue.rank from media_now_play left join media_queue on media_queue.id = media_now_play.nowPlayId limit 1) order by media_queue.rank limit 1")
+    @Query("select media_library.* from media_queue  left join media_library on media_queue.media_file_id = media_library.id where media_queue.rank > (select media_queue.rank from media_now_play left join media_queue on media_queue.id = media_now_play.nowPlayId limit 1) order by media_queue.rank limit 1")
     fun getNext() : MediaFile
 
-    @Query("select media_library.* from media_library  left join media_queue on media_queue.media_file_id = media_library.id where media_queue.rank < (select media_queue.rank from media_now_play left join media_queue on media_queue.id = media_now_play.nowPlayId limit 1) order by media_queue.rank desc limit 1")
+    @Query("select media_library.* from media_queue left join media_library on media_queue.media_file_id = media_library.id order by media_queue.rank limit 1")
+    fun getFirst() : MediaFile
+
+    @Query("select media_library.* from media_queue  left join media_library on media_queue.media_file_id = media_library.id where media_queue.rank < (select media_queue.rank from media_now_play left join media_queue on media_queue.id = media_now_play.nowPlayId limit 1) order by media_queue.rank desc limit 1")
     fun getPrevious() : MediaFile
 
     @Query("select id from media_queue where media_file_id = :mediaFileId")

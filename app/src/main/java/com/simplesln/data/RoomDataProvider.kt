@@ -28,7 +28,11 @@ class RoomDataProvider(context : Context) : DataProvider{
 
     override fun getNext(): LiveData<MediaFile> {
         return QueryExecutor(executorService,Callable<MediaFile>{
-            db?.queue()!!.getNext()
+            var mediaFile = db?.queue()!!.getNext()
+            if(mediaFile == null){ //end of queue or no item
+                mediaFile = db?.queue()!!.getFirst()
+            }
+            mediaFile
         })
     }
 

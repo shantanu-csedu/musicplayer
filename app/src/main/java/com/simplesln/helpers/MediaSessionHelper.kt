@@ -3,7 +3,6 @@ package com.simplesln.helpers
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.media.session.MediaSession
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.simplesln.interfaces.Player

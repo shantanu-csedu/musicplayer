@@ -3,6 +3,7 @@ package com.simplesln.fragments
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.os.Handler
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -63,7 +64,22 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
     }
 
     override fun onItemDismiss(position: Int) {
-        (activity as MainActivity).getDataProvider().removeQueue(mAdapter.values[position].id)
+
+        val item = mAdapter.values[position]
+        Snackbar.make(listView,mAdapter.values[position].name + " is removed",Snackbar.LENGTH_LONG)
+                .setAction("Undo", View.OnClickListener {
+                    mAdapter.values.add(position,item)
+                    mAdapter.notifyItemInserted(position)
+                })
+                .addCallback(object : Snackbar.Callback(){
+                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                        super.onDismissed(transientBottomBar, event)
+                        if(event ==  Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
+                            (activity as MainActivity).getDataProvider().removeQueue(item.id)
+                        }
+                    }
+                })
+                .show()
         mAdapter.onItemDismiss(position)
     }
 
