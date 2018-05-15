@@ -24,7 +24,7 @@ import com.simplesln.simpleplayer.R
 import java.util.*
 import kotlin.collections.ArrayList
 
-class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuItemClickListener {
+class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMenuItemClickListener {
     override fun onMenuClicked(anchorView: View, position: Int) {
 
     }
@@ -41,9 +41,9 @@ class SongListFragment : Fragment(), AdapterView.OnItemClickListener, OnIMenuIte
         mAdapter = SongListAdapter(activity!!,this)
         mAdapter.setOnItemClickListener(this)
         if(arguments != null) {
-            if(arguments!!.get(GROUP_TYPE) != null && arguments!!.get(GROUP_NAME) != null) {
+            if(arguments!!.get(GROUP_TYPE) != null) {
                 groupType = arguments!!.getInt(GROUP_TYPE)
-                groupName = arguments!!.getString(GROUP_NAME)
+                groupName = getTitle()
             }
         }
         observe()
@@ -257,12 +257,11 @@ const val TYPE_GENRE = 3
 const val TYPE_PLAYLIST = 4
 const val TYPE_ALL = 5
 private const val GROUP_TYPE = "group_type"
-private const val GROUP_NAME = "group_name"
 
-fun createSongListFragmentInstance(type : Int, name : String = "") : SongListFragment{
+fun createSongListFragmentInstance(title : String , type : Int) : SongListFragment{
     val bundle = Bundle()
     bundle.putInt(GROUP_TYPE,type)
-    bundle.putString(GROUP_NAME,name)
+    bundle.putString(TITLE,title)
     val songListFragment = SongListFragment()
     songListFragment.arguments = bundle
     return songListFragment

@@ -16,6 +16,7 @@ import android.content.BroadcastReceiver
 import android.content.IntentFilter
 import android.util.Log
 import com.simplesln.helpers.AudioFocusHelper
+import com.simplesln.helpers.MediaSessionHelper
 import com.simplesln.helpers.NOTIFICATION_ID
 import com.simplesln.helpers.NotificationHelper
 import com.simplesln.players.NativeMediaPlayer
@@ -41,9 +42,9 @@ class MediaPlayerService : LifecycleService(){
     override fun onCreate() {
         super.onCreate()
         instance = this
-        notificationHelper = NotificationHelper(this)
         dataProvider = RoomDataProvider(this)
         player = NativeMediaPlayer(this,dataProvider)
+        notificationHelper = NotificationHelper(this, MediaSessionHelper(this,player).mSession)
         audioFocusHelper = AudioFocusHelper(this,player)
         observeNowPlaying()
         observePlayerState()
@@ -167,6 +168,8 @@ class MediaPlayerService : LifecycleService(){
         super.onDestroy()
         if(player.isPlaying()) player.stop()
         player.release()
+        notificationHelper.mediaSession.isActive = false
+        notificationHelper.mediaSession.release()
         unregisterReceiver(playerActionHandler)
     }
 }

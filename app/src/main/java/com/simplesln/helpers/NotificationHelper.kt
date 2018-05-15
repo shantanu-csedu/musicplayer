@@ -19,28 +19,21 @@ import com.simplesln.services.ACTION_PLAY
 import com.simplesln.services.ACTION_PREV
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
+import android.media.session.MediaSession
+
+
 
 const val NOTIFICATION_ID = 982734
-class NotificationHelper(val context : Context) {
+class NotificationHelper(val context : Context,val mediaSession : MediaSessionCompat) {
     private val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private val CHANNEL_ID = "com.simplesln.simpler.player.notification"
     private val CHANNEL_NAME = "Simple Music Player"
-    private val REQUEST_MEDIA_CONTROL = 98
-
-    private var mSession: MediaSessionCompat
-
     init {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW)
             channel.setShowBadge(false)
             notificationManager.createNotificationChannel(channel)
         }
-        mSession = MediaSessionCompat(context, context.resources.getString(R.string.app_name))
-//        mSession.setCallback(MediaPlayerService.MediaSessionCallback())
-        val intent = Intent(context, MainActivity::class.java)
-        val pi = PendingIntent.getActivity(context, REQUEST_MEDIA_CONTROL,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        mSession.setSessionActivity(pi)
     }
 
     fun createNotification(playerState : MediaPlayerState): Notification? {
@@ -58,7 +51,7 @@ class NotificationHelper(val context : Context) {
         addNextAction(notificationBuilder)
         notificationBuilder
                 .setStyle(android.support.v4.media.app.NotificationCompat.MediaStyle()
-                        .setMediaSession(mSession.sessionToken))
+                        .setMediaSession(mediaSession.sessionToken))
                 .setColor(context.resources.getColor(R.color.colorPrimary))
                 .setSmallIcon(R.drawable.abc_btn_check_material)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)

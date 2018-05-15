@@ -10,11 +10,12 @@ class ViewPagerAdapter(private val tabs : Array<String>, fm: FragmentManager?) :
     override fun getItem(position: Int): Fragment? {
         return when(tabs[position]){
             NOW_PLAYING -> NowPlayingFragment()
-            ALBUM -> createGroupListFragmentInstance(TYPE_ALBUM)
-            ARTIST -> createGroupListFragmentInstance(TYPE_ARTIST)
-            GENRE -> createGroupListFragmentInstance(TYPE_GENRE)
-            PLAYLIST -> createGroupListFragmentInstance(TYPE_PLAYLIST)
-            SONGS -> createSongListFragmentInstance(TYPE_ALL)
+            ALBUM -> createGroupListFragmentInstance(ALBUM,TYPE_ALBUM)
+            ARTIST -> createGroupListFragmentInstance(ARTIST,TYPE_ARTIST)
+            GENRE -> createGroupListFragmentInstance(GENRE,TYPE_GENRE)
+            PLAYLIST -> createGroupListFragmentInstance(PLAYLIST,TYPE_PLAYLIST)
+            SONGS -> createSongListFragmentInstance(SONGS,TYPE_ALL)
+            LIBRARY -> createMusicLibrary()
             else -> null
         }
     }

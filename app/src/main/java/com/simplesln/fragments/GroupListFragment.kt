@@ -23,11 +23,11 @@ import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
 
-class GroupListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnItemClickListener {
+class GroupListFragment : TitleFragment(), OnIMenuItemClickListener, AdapterView.OnItemClickListener {
     private var groupType = TYPE_ALBUM
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         val group = mAdapter.values[position]
-        val fragment = createSongListFragmentInstance(groupType,group.name)
+        val fragment = createSongListFragmentInstance(group.name, groupType)
         (activity as MainActivity).addDetailsFragment(group.name,fragment)
     }
 
@@ -265,10 +265,11 @@ class GroupListFragment : Fragment(), OnIMenuItemClickListener, AdapterView.OnIt
 
 }
 private const val GROUP_TYPE = "group_type"
-fun createGroupListFragmentInstance(type : Int) : GroupListFragment{
+fun createGroupListFragmentInstance(title: String, type : Int) : GroupListFragment{
     val groupListFragment = GroupListFragment()
     val bundle = Bundle()
     bundle.putInt(GROUP_TYPE,type)
+    bundle.putString(TITLE,title)
     groupListFragment.arguments = bundle
     return groupListFragment
 }

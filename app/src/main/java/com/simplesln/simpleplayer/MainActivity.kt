@@ -19,6 +19,7 @@ import android.widget.Toast
 import com.simplesln.adapters.ViewPagerAdapter
 import com.simplesln.data.*
 import com.simplesln.formatDuration
+import com.simplesln.fragments.TitleFragment
 import com.simplesln.getProgress
 import com.simplesln.services.MediaScanService
 import kotlinx.android.synthetic.main.activity_main.*
@@ -29,12 +30,13 @@ const val ALBUM = "Album"
 const val ARTIST = "Artist"
 const val GENRE = "Genre"
 const val SONGS = "Songs"
+const val LIBRARY = "Library"
 class MainActivity : BaseActivity() {
 
     private lateinit var pref : PrefDataProvider
     private lateinit var dataProvider: RoomDataProvider
     private var countDownTimer: CountDownTimer? = null
-    val TABS = arrayOf(NOW_PLAYING, ALBUM, ARTIST, PLAYLIST, GENRE, SONGS)
+    val TABS = arrayOf(NOW_PLAYING, LIBRARY)//, ALBUM, ARTIST, PLAYLIST, GENRE, SONGS)
     val liveMediaPlayerState : LiveMediaPlayerState = LiveMediaPlayerState()
 
     override fun onMediaPlayerConnected() {
@@ -152,6 +154,9 @@ class MainActivity : BaseActivity() {
                 title = ""
                 tabLayout.visibility = View.VISIBLE
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
+            }
+            else if(supportFragmentManager.findFragmentById(R.id.songListContainer) is TitleFragment){
+                title = (supportFragmentManager.findFragmentById(R.id.songListContainer) as TitleFragment).getTitle()
             }
         }
 
