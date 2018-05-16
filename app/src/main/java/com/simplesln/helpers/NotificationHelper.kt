@@ -20,7 +20,8 @@ import com.simplesln.services.ACTION_PREV
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
 import android.media.session.MediaSession
-
+import android.util.Base64
+import java.io.ByteArrayInputStream
 
 
 const val NOTIFICATION_ID = 982734
@@ -38,12 +39,12 @@ class NotificationHelper(val context : Context,val mediaSession : MediaSessionCo
 
     fun createNotification(playerState : MediaPlayerState): Notification? {
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
-        var fetchArtUrl: String? = null
         var art: Bitmap? = null
-        if (playerState.mediaFile?.art != null) {
-            val artUrl = playerState.mediaFile?.art
-            fetchArtUrl = artUrl
-            art = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
+        if (playerState.mediaFile?.art!!.isEmpty()) {
+            art = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_splash)
+        }
+        else{
+            art = BitmapFactory.decodeStream(ByteArrayInputStream(Base64.decode(playerState.mediaFile?.art, Base64.DEFAULT)))
         }
 
         addPrevAction(notificationBuilder)
@@ -53,7 +54,7 @@ class NotificationHelper(val context : Context,val mediaSession : MediaSessionCo
                 .setStyle(android.support.v4.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(mediaSession.sessionToken))
                 .setColor(context.resources.getColor(R.color.colorPrimary))
-                .setSmallIcon(R.drawable.abc_btn_check_material)
+                .setSmallIcon(R.drawable.ic_stat_notification)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setContentIntent(createContentIntent()) // Create an intent that would open the UI when user clicks the notification
                 .setContentTitle(playerState.mediaFile?.name)

@@ -2,11 +2,15 @@ package com.simplesln.simpleplayer
 
 import android.arch.lifecycle.Observer
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.Menu
@@ -84,12 +88,13 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.AppTheme)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
         pref = getPref(this)
         dataProvider = getDataProvider(this)
-        if(!pref.everIndexed()){
+        if(!pref.everIndexed() && askStorageReadPermission()){
             startService(Intent(applicationContext,MediaScanService::class.java))
         }
 
@@ -203,6 +208,10 @@ class MainActivity : BaseActivity() {
 
         })
 
+        if(!pref.everIndexed()){
+            tabLayout.getTabAt(1)?.select()
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -267,5 +276,33 @@ class MainActivity : BaseActivity() {
                 .replace(R.id.songListContainer,fragment)
                 .addToBackStack("")
                 .commit()
+    }
+
+    private fun askStorageReadPermission() : Boolean {
+        val permissionCheck = ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), REQ_READ_STORAGE);
+            return false;
+        }
+        return true
+    }
+    private val REQ_READ_STORAGE = 2;
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQ_READ_STORAGE -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //success
+                if(!pref.everIndexed()){
+                    startService(Intent(applicationContext,MediaScanService::class.java))
+                }
+            }
+            else{
+                Snackbar.make(viewPager,"Storage permission is required to load music",Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Allow", View.OnClickListener {
+                            askStorageReadPermission()
+                        })
+                        .show()
+            }
+        }
     }
 }

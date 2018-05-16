@@ -1,9 +1,11 @@
 package com.simplesln.adapters
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +20,7 @@ import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.R
 import com.simplesln.simpleplayer.getDataProvider
 import com.simplesln.widgets.RepeatCounterView
+import java.io.ByteArrayInputStream
 
 class SongListAdapter(val context : Context) : RecyclerView.Adapter<SongListAdapter.ViewHolder>() {
     private val dataProvider : DataProvider = getDataProvider(context)
@@ -60,6 +63,11 @@ class SongListAdapter(val context : Context) : RecyclerView.Adapter<SongListAdap
 
         if(mediaFile.playing){
             holder.musicArt.setImageResource(R.mipmap.ic_album)
+        }
+        else if(mediaFile.art.isNotEmpty()){
+            holder.musicArt.setImageBitmap(
+                    BitmapFactory.decodeStream(ByteArrayInputStream(Base64.decode(mediaFile.art, Base64.DEFAULT)))
+            )
         }
         else{
             holder.musicArt.setImageResource(R.mipmap.ic_default_music)

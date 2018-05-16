@@ -58,7 +58,7 @@
         android:id="@+id/playerControlContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#EFEBE9"
+        android:background="#55CFCFCF"
         >
 
         <!--<View-->
