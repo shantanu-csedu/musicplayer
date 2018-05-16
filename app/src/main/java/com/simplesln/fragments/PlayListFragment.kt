@@ -12,6 +12,7 @@ import com.simplesln.adapters.PlayListAdapter
 import com.simplesln.data.PlayList
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
+import com.simplesln.simpleplayer.getDataProvider
 
 class PlayListFragment : Fragment(){
     lateinit var listView : RecyclerView
@@ -35,7 +36,7 @@ class PlayListFragment : Fragment(){
     }
 
     private fun observe(){
-        (activity as MainActivity).getDataProvider().getPlayList().observe(this, Observer {
+        getDataProvider(activity!!).getPlayList().observe(this, Observer {
             if(it != null){
                 mAdapter.values.clear()
                 for(playlist in it){

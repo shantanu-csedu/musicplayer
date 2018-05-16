@@ -13,10 +13,14 @@ import android.widget.TextView
 import com.simplesln.adapters.helper.ItemTouchHelperViewHolder
 import com.simplesln.data.MediaFile
 import com.simplesln.formatDuration
+import com.simplesln.interfaces.DataProvider
 import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.R
+import com.simplesln.simpleplayer.getDataProvider
+import com.simplesln.widgets.RepeatCounterView
 
-class SongListAdapter(val context : Context,private val menuItemClickListener: OnIMenuItemClickListener? = null) : RecyclerView.Adapter<SongListAdapter.ViewHolder>() {
+class SongListAdapter(val context : Context) : RecyclerView.Adapter<SongListAdapter.ViewHolder>() {
+    private val dataProvider : DataProvider = getDataProvider(context)
     val values = ArrayList<MediaFile>()
     var moveToIndex = -1
 
@@ -48,18 +52,23 @@ class SongListAdapter(val context : Context,private val menuItemClickListener: O
         holder.musicName.text = mediaFile.name
         holder.musicArtist.text = mediaFile.artist
         holder.musicDuration.text = formatDuration(mediaFile.duration)
+        holder.repeatCounter.setCount(mediaFile.repeatCount)
 
         holder.itemView.setOnClickListener(View.OnClickListener {
-            onItemClickListener?.onItemClick(null,holder.overflowMenu,position,0)
+            onItemClickListener?.onItemClick(null,holder.repeatCounter,position,0)
         })
-        holder.overflowMenu.setOnClickListener(View.OnClickListener {
-            menuItemClickListener?.onMenuClicked(holder.overflowMenu,position)
-        })
+
         if(mediaFile.playing){
             holder.musicArt.setImageResource(R.mipmap.ic_album)
         }
         else{
             holder.musicArt.setImageResource(R.mipmap.ic_default_music)
+        }
+
+        holder.repeatCounter.setOnClickListener {
+            holder.repeatCounter.toggle()
+            mediaFile.repeatCount = holder.repeatCounter.getCount()
+            dataProvider.updateMediaFile(mediaFile.getEntity())
         }
     }
 
@@ -87,7 +96,7 @@ class SongListAdapter(val context : Context,private val menuItemClickListener: O
         val musicName : TextView = itemView.findViewById(R.id.musicName)
         val musicArtist : TextView = itemView.findViewById(R.id.musicArtist)
         val musicDuration : TextView = itemView.findViewById(R.id.musicDuration)
-        val overflowMenu : ImageView = itemView.findViewById(R.id.menuOverflow)
+        val repeatCounter : RepeatCounterView = itemView.findViewById(R.id.repeatCounter)
         val musicArt : ImageView = itemView.findViewById(R.id.musicArt)
     }
 }

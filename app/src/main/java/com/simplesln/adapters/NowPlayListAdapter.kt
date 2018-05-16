@@ -19,12 +19,13 @@ import com.simplesln.widgets.RepeatCounterView
 import android.graphics.BitmapFactory
 import android.graphics.Bitmap
 import android.util.Base64
+import com.simplesln.simpleplayer.getDataProvider
 import java.io.ByteArrayInputStream
 import java.util.*
 
 
-class NowPlayListAdapter(val context : Context, private val dataProvider: DataProvider) : RecyclerView.Adapter<NowPlayListAdapter.ViewHolder>() {
-
+class NowPlayListAdapter(val context : Context) : RecyclerView.Adapter<NowPlayListAdapter.ViewHolder>() {
+    private val dataProvider = getDataProvider(context)
     fun onItemMove(fromPosition: Int, toPosition: Int) {
         val prev = values[fromPosition]
         values.remove(values[fromPosition])

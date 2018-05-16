@@ -7,29 +7,34 @@
     app:cardUseCompatPadding="true"
     app:cardCornerRadius="4dp"
     android:layout_marginTop="2dp"
-    app:cardElevation="2px"
+    app:cardElevation="1dp"
     >
 
     <RelativeLayout
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
-        android:padding="10dp">
-
+        >
         <com.simplesln.widgets.RepeatCounterView
+            android:layout_marginRight="8dp"
             android:id="@+id/repeatCounter"
+            android:padding="10dp"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerVertical="true"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:textSize="14sp"
+            android:textColor="#88000000"
             tools:text="1"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:padding="10dp"/>
+            android:gravity="center"/>
+
 
         <ImageView
-            android:padding="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_centerVertical="true"
+            android:padding="5dp"
             android:id="@+id/musicArt"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -42,12 +47,13 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_toRightOf="@id/musicArt"
+            android:layout_toLeftOf="@id/repeatCounter"
             android:ellipsize="marquee"
             android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="16sp"
             android:textColor="@color/lightBlack"
-            tools:text="The silence of the lambs"
-            android:layout_toLeftOf="@id/repeatCounter"/>
+            tools:text="The silence of the lambs, long song name"
+            />
 
         <TextView
             android:id="@+id/musicArtist"
@@ -56,14 +62,13 @@
             android:layout_alignLeft="@id/musicName"
             android:layout_below="@id/musicName"
             android:layout_marginTop="5dp"
-            android:textSize="12sp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             tools:text="A.R. Rahman" />
 
         <TextView
             android:id="@+id/musicDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/musicArtist"
             android:layout_alignBottom="@id/musicArtist"
             android:layout_marginLeft="8dp"
             android:layout_toRightOf="@id/musicArtist"

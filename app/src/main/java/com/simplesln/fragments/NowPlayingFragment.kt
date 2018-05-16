@@ -19,6 +19,7 @@ import com.simplesln.data.MediaPlayerState
 import com.simplesln.data.STATE_PLAYING
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
+import com.simplesln.simpleplayer.getDataProvider
 
 class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouchHelperAdapter {
     override fun onItemReleased() {
@@ -28,30 +29,30 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
             val topPosition = toPosition - 1
             val bottomPosition = toPosition + 1
             if(topPosition >= 0 && bottomPosition < mAdapter.values.size){
-                val rankLiveData = (activity as MainActivity).getDataProvider().getRank(mAdapter.values[topPosition].id,mAdapter.values[bottomPosition].id)
+                val rankLiveData = getDataProvider(activity!!).getRank(mAdapter.values[topPosition].id,mAdapter.values[bottomPosition].id)
                 rankLiveData.observe(this,object : Observer<Double>{
                     override fun onChanged(rank: Double?) {
                         rankLiveData.removeObserver(this)
-                        (activity as MainActivity).getDataProvider().updateRank(mAdapter.values[toPosition].getEntity(),rank!!)
+                        getDataProvider(activity!!).updateRank(mAdapter.values[toPosition].getEntity(),rank!!)
                     }
                 })
             }
             else if(topPosition < 0 && bottomPosition < mAdapter.values.size){
                 Log.e("bottom",mAdapter.values[bottomPosition].name)
-                val rankLiveData = (activity as MainActivity).getDataProvider().getRank(mAdapter.values[bottomPosition].id,true)
+                val rankLiveData = getDataProvider(activity!!).getRank(mAdapter.values[bottomPosition].id,true)
                 rankLiveData.observe(this,object : Observer<Double>{
                     override fun onChanged(rank: Double?) {
                         rankLiveData.removeObserver(this)
-                        (activity as MainActivity).getDataProvider().updateRank(mAdapter.values[toPosition].getEntity(),rank!!)
+                        getDataProvider(activity!!).updateRank(mAdapter.values[toPosition].getEntity(),rank!!)
                     }
                 })
             }
             else if(topPosition >=0 && bottomPosition >= mAdapter.values.size){
-                val rankLiveData = (activity as MainActivity).getDataProvider().getRank(mAdapter.values[topPosition].id,false)
+                val rankLiveData = getDataProvider(activity!!).getRank(mAdapter.values[topPosition].id,false)
                 rankLiveData.observe(this,object : Observer<Double>{
                     override fun onChanged(rank: Double?) {
                         rankLiveData.removeObserver(this)
-                        (activity as MainActivity).getDataProvider().updateRank(mAdapter.values[toPosition].getEntity(),rank!!)
+                        getDataProvider(activity!!).updateRank(mAdapter.values[toPosition].getEntity(),rank!!)
                     }
                 })
             }
@@ -75,7 +76,7 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
                     override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                         super.onDismissed(transientBottomBar, event)
                         if(event ==  Snackbar.Callback.DISMISS_EVENT_TIMEOUT || event == DISMISS_EVENT_CONSECUTIVE) {
-                            (activity as MainActivity).getDataProvider().removeQueue(item.id)
+                            getDataProvider(activity!!).removeQueue(item.id)
                         }
                     }
                 })
@@ -85,7 +86,7 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         val mediaFile = mAdapter.values[position]
-        (activity as MainActivity).getDataProvider().setNowPlaying(mediaFile.id)
+        getDataProvider(activity!!).setNowPlaying(mediaFile.id)
     }
 
     lateinit var listView : RecyclerView
@@ -96,7 +97,7 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        mAdapter = NowPlayListAdapter(activity!!,(activity as MainActivity).getDataProvider())
+        mAdapter = NowPlayListAdapter(activity!!)
         mAdapter.setOnItemClickListener(this)
         observerQueue()
         observeMediaPlayerState()
@@ -122,9 +123,9 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
     private fun shuffle(){
         val shuffledList = mAdapter.values.shuffled()
         for((index,file) in shuffledList.withIndex()){
-            (activity as MainActivity).getDataProvider().updateRank(file.getEntity(), index.toDouble())
+            getDataProvider(activity!!).updateRank(file.getEntity(), index.toDouble())
             if(index == 0){
-                (activity as MainActivity).getDataProvider().setNowPlaying(file.id)
+                getDataProvider(activity!!).setNowPlaying(file.id)
             }
         }
 
@@ -143,7 +144,7 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
     }
 
     private fun observerQueue(){
-        (activity as MainActivity).getDataProvider().getQueue().observe(this, Observer {
+        getDataProvider(activity!!).getQueue().observe(this, Observer {
             mAdapter.values.clear()
             if (it != null) {
                 val lastState = (activity as MainActivity).liveMediaPlayerState.lastState

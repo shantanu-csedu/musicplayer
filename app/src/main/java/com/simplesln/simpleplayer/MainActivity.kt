@@ -257,10 +257,6 @@ class MainActivity : BaseActivity() {
         countDownTimer = null
     }
 
-    fun getDataProvider() : DataProvider{
-        return dataProvider
-    }
-
     fun addDetailsFragment(title: String, fragment: Fragment) {
         this.title = title
         tabLayout.visibility = View.GONE

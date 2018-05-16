@@ -30,7 +30,7 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMenuItemClickListener, ItemTouchHelperAdapter {
+class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, ItemTouchHelperAdapter {
     override fun onItemMove(fromPosition: Int, toPosition: Int) {
         mAdapter.onItemMove(fromPosition,toPosition)
     }
@@ -63,10 +63,6 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMe
     override fun onItemReleased() {
     }
 
-    override fun onMenuClicked(anchorView: View, position: Int) {
-
-    }
-
     private lateinit var mAdapter : SongListAdapter
     private lateinit var listView : RecyclerView
     private var groupType = TYPE_ALBUM
@@ -76,7 +72,7 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMe
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        mAdapter = SongListAdapter(activity!!,this)
+        mAdapter = SongListAdapter(activity!!)
         mAdapter.setOnItemClickListener(this)
         if(arguments != null) {
             if(arguments!!.get(GROUP_TYPE) != null) {
