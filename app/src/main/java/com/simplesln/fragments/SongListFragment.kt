@@ -51,7 +51,11 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, ItemT
                             }
                             else {
                                 getDataProvider(activity!!).remove(item.id)
-                                File(item.link).deleteOnExit()
+                                val file  = File(item.link)
+                                if(file.exists()){
+                                    val status = file.delete()
+                                    Log.e("file delete status ","" + status)
+                                }
                             }
                         }
                     }

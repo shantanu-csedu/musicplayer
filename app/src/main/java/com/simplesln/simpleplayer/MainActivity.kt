@@ -98,7 +98,7 @@ class MainActivity : BaseActivity() {
 
         pref = getPref(this)
         dataProvider = getDataProvider(this)
-        if(!pref.everIndexed() && askStorageReadPermission()){
+        if(!pref.everIndexed() && askStorageWritePermission()){
             startService(Intent(applicationContext,MediaScanService::class.java))
         }
         actionPlay.setOnClickListener(View.OnClickListener {
@@ -227,7 +227,7 @@ class MainActivity : BaseActivity() {
             android.R.id.home -> supportFragmentManager.popBackStack()
             R.id.menu_scan -> {
                 startService(Intent(applicationContext,MediaScanService::class.java))
-                Toast.makeText(this,"Scanning library...",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,"Scanning library...",Toast.LENGTH_LONG).show()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -281,10 +281,10 @@ class MainActivity : BaseActivity() {
                 .commit()
     }
 
-    private fun askStorageReadPermission() : Boolean {
-        val permissionCheck = ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.READ_EXTERNAL_STORAGE);
+    private fun askStorageWritePermission() : Boolean {
+        val permissionCheck = ContextCompat.checkSelfPermission(applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), REQ_READ_STORAGE);
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), REQ_READ_STORAGE);
             return false;
         }
         return true
@@ -302,7 +302,7 @@ class MainActivity : BaseActivity() {
             else{
                 Snackbar.make(viewPager,"Storage permission is required to load music",Snackbar.LENGTH_INDEFINITE)
                         .setAction("Allow", View.OnClickListener {
-                            askStorageReadPermission()
+                            askStorageWritePermission()
                         })
                         .show()
             }
