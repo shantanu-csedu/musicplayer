@@ -21,6 +21,7 @@ import com.simplesln.data.*
 import com.simplesln.formatDuration
 import com.simplesln.fragments.TitleFragment
 import com.simplesln.getProgress
+import com.simplesln.interfaces.DataProvider
 import com.simplesln.services.MediaScanService
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -34,7 +35,7 @@ const val LIBRARY = "Library"
 class MainActivity : BaseActivity() {
 
     private lateinit var pref : PrefDataProvider
-    private lateinit var dataProvider: RoomDataProvider
+    private lateinit var dataProvider: DataProvider
     private var countDownTimer: CountDownTimer? = null
     val TABS = arrayOf(NOW_PLAYING, LIBRARY)//, ALBUM, ARTIST, PLAYLIST, GENRE, SONGS)
     val liveMediaPlayerState : LiveMediaPlayerState = LiveMediaPlayerState()
@@ -86,8 +87,8 @@ class MainActivity : BaseActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        pref = PrefDataProvider(this)
-        dataProvider = RoomDataProvider(applicationContext)
+        pref = getPref(this)
+        dataProvider = getDataProvider(this)
         if(!pref.everIndexed()){
             startService(Intent(applicationContext,MediaScanService::class.java))
         }
@@ -255,7 +256,7 @@ class MainActivity : BaseActivity() {
         countDownTimer = null
     }
 
-    fun getDataProvider() : RoomDataProvider{
+    fun getDataProvider() : DataProvider{
         return dataProvider
     }
 

@@ -1,16 +1,20 @@
 package com.simplesln.players
 
 import android.arch.lifecycle.LifecycleOwner
+import android.content.Context
 import android.media.MediaPlayer
+import android.support.v4.media.session.MediaSessionCompat
 import com.simplesln.data.*
 import com.simplesln.data.entities.MediaFile
+import com.simplesln.helpers.MediaSessionHelper
 import com.simplesln.interfaces.DataProvider
 
-class NativeMediaPlayer(lifecycleOwner: LifecycleOwner, dataProvider: DataProvider) : MyPlayer(lifecycleOwner,dataProvider), MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener {
+class NativeMediaPlayer(context : Context, lifecycleOwner: LifecycleOwner, dataProvider: DataProvider) : MyPlayer(lifecycleOwner,dataProvider), MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener {
 
     private val player : android.media.MediaPlayer = android.media.MediaPlayer()
     private var mPrepared: Boolean = false
     private val liveMediaPlayerState = LiveMediaPlayerState()
+    private val mediaSessionHelper = MediaSessionHelper(context,this)
 
     init {
         player.setOnCompletionListener(this)
@@ -125,5 +129,9 @@ class NativeMediaPlayer(lifecycleOwner: LifecycleOwner, dataProvider: DataProvid
 
     override fun onCompletion(mp: android.media.MediaPlayer?) {
         liveMediaPlayerState.update(STATE_END)
+    }
+
+    override fun getMediaSession(): MediaSessionCompat {
+        return mediaSessionHelper.mSession
     }
 }

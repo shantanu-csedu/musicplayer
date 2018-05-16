@@ -20,6 +20,8 @@ import com.simplesln.helpers.MediaSessionHelper
 import com.simplesln.helpers.NOTIFICATION_ID
 import com.simplesln.helpers.NotificationHelper
 import com.simplesln.players.NativeMediaPlayer
+import com.simplesln.simpleplayer.createPlayer
+import com.simplesln.simpleplayer.getDataProvider
 
 
 const val ACTION_PLAY = "action.play"
@@ -42,9 +44,9 @@ class MediaPlayerService : LifecycleService(){
     override fun onCreate() {
         super.onCreate()
         instance = this
-        dataProvider = RoomDataProvider(this)
-        player = NativeMediaPlayer(this,dataProvider)
-        notificationHelper = NotificationHelper(this, MediaSessionHelper(this,player).mSession)
+        dataProvider = getDataProvider(this)
+        player = createPlayer(this,this)
+        notificationHelper = NotificationHelper(this, player.getMediaSession())
         audioFocusHelper = AudioFocusHelper(this,player)
         observeNowPlaying()
         observePlayerState()

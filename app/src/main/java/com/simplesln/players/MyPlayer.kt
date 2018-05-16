@@ -6,7 +6,7 @@ import com.simplesln.data.entities.MediaFile
 import com.simplesln.interfaces.DataProvider
 import com.simplesln.interfaces.Player
 
-abstract class MyPlayer(val lifecycleOwner: LifecycleOwner, val dataProvider: DataProvider) : Player {
+abstract class MyPlayer(private val lifecycleOwner: LifecycleOwner, val dataProvider: DataProvider) : Player {
     override fun next() {
         val nextLiveData = dataProvider.getNext();
         val nextDataObserver = object : Observer<MediaFile> {

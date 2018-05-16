@@ -74,7 +74,7 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
                 .addCallback(object : Snackbar.Callback(){
                     override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                         super.onDismissed(transientBottomBar, event)
-                        if(event ==  Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
+                        if(event ==  Snackbar.Callback.DISMISS_EVENT_TIMEOUT || event == DISMISS_EVENT_CONSECUTIVE) {
                             (activity as MainActivity).getDataProvider().removeQueue(item.id)
                         }
                     }

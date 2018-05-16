@@ -1,5 +1,6 @@
 package com.simplesln.interfaces
 
+import android.support.v4.media.session.MediaSessionCompat
 import com.simplesln.data.LiveMediaPlayerState
 import com.simplesln.data.entities.MediaFile
 
@@ -18,5 +19,6 @@ interface Player {
     fun longForward()
     fun shortBackward()
     fun longBackward()
+    fun getMediaSession() : MediaSessionCompat
     fun getState() : LiveMediaPlayerState
 }

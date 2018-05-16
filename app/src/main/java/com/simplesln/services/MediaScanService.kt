@@ -9,11 +9,14 @@ import android.util.Log
 import com.simplesln.data.PrefDataProvider
 import com.simplesln.data.RoomDataProvider
 import com.simplesln.data.entities.MediaFile
+import com.simplesln.interfaces.DataProvider
+import com.simplesln.simpleplayer.getDataProvider
+import com.simplesln.simpleplayer.getPref
 import java.io.File
 
 class MediaScanService : Service() {
     private val TAG = "MediaScannerService"
-    private lateinit var dataProvider: RoomDataProvider
+    private lateinit var dataProvider: DataProvider
     private lateinit var pref : PrefDataProvider
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -23,8 +26,8 @@ class MediaScanService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.e(TAG,"create")
-        dataProvider = RoomDataProvider(this)
-        pref = PrefDataProvider(this)
+        dataProvider = getDataProvider(this)
+        pref = getPref(this)
         pref.scanRunning(true)
         Log.e(TAG,"starting scan")
         MediaScanner()
