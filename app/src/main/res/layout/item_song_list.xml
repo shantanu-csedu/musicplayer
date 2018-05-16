@@ -48,11 +48,15 @@
             android:layout_marginRight="8dp"
             android:layout_toRightOf="@id/musicArt"
             android:layout_toLeftOf="@id/repeatCounter"
-            android:ellipsize="marquee"
-            android:singleLine="true"
             android:textSize="16sp"
             android:textColor="@color/lightBlack"
             tools:text="The silence of the lambs, long song name"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:freezesText="true"
+            android:singleLine="true"
+            android:scrollHorizontally="true"
             />
 
         <TextView

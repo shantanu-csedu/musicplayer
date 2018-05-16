@@ -75,10 +75,14 @@ class MainActivity : BaseActivity() {
                     if(mediaPlayerState.state != STATE_PLAYING){
                         Log.e("Playing","stoping countdown timer")
                         stopCountDownTimer()
+                        songTitle.setHorizontallyScrolling(false);
+                        songTitle.isSelected = false;
                     }
                     else if(mediaPlayerState.state == STATE_PLAYING && countDownTimer == null && mediaPlayerService?.getPlayer()!!.duration() > 0){
                         Log.e("Playing","starting countdown timer")
                         startCountDownTimer(mediaPlayerService?.getPlayer()!!.duration().toLong())
+                        songTitle.setHorizontallyScrolling(true);
+                        songTitle.isSelected = true;
                     }
                     Log.e("Playing state","" + mediaPlayerState.state)
                 }
@@ -97,7 +101,6 @@ class MainActivity : BaseActivity() {
         if(!pref.everIndexed() && askStorageReadPermission()){
             startService(Intent(applicationContext,MediaScanService::class.java))
         }
-
         actionPlay.setOnClickListener(View.OnClickListener {
             if(mediaPlayerService != null){
                 if(mediaPlayerService?.getPlayer()!!.isPlaying()) {

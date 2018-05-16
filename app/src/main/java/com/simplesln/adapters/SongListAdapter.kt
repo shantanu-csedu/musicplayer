@@ -63,14 +63,20 @@ class SongListAdapter(val context : Context) : RecyclerView.Adapter<SongListAdap
 
         if(mediaFile.playing){
             holder.musicArt.setImageResource(R.mipmap.ic_album)
-        }
-        else if(mediaFile.art.isNotEmpty()){
-            holder.musicArt.setImageBitmap(
-                    BitmapFactory.decodeStream(ByteArrayInputStream(Base64.decode(mediaFile.art, Base64.DEFAULT)))
-            )
+            holder.musicName.setHorizontallyScrolling(true)
+            holder.musicName.isSelected = true
         }
         else{
-            holder.musicArt.setImageResource(R.mipmap.ic_default_music)
+            if(mediaFile.art.isNotEmpty()) {
+                holder.musicArt.setImageBitmap(
+                        BitmapFactory.decodeStream(ByteArrayInputStream(Base64.decode(mediaFile.art, Base64.DEFAULT)))
+                )
+            }
+            else {
+                holder.musicArt.setImageResource(R.mipmap.ic_default_music)
+            }
+            holder.musicName.setHorizontallyScrolling(false)
+            holder.musicName.isSelected = false
         }
 
         holder.repeatCounter.setOnClickListener {
