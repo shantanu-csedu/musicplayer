@@ -16,11 +16,13 @@
         android:title="Add to queue"
         />
 
-
-
-
     <item android:id="@+id/menu_add_playlist"
         app:showAsAction="never"
         android:title="Add to playlist"
+        />
+
+    <item android:id="@+id/menu_delete"
+        app:showAsAction="never"
+        android:title="Delete"
         />
 </menu>

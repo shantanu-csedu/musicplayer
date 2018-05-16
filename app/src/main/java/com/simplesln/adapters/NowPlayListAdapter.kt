@@ -16,6 +16,12 @@ import com.simplesln.formatDuration
 import com.simplesln.interfaces.DataProvider
 import com.simplesln.simpleplayer.R
 import com.simplesln.widgets.RepeatCounterView
+import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import android.util.Base64
+import java.io.ByteArrayInputStream
+import java.util.*
+
 
 class NowPlayListAdapter(val context : Context, private val dataProvider: DataProvider) : RecyclerView.Adapter<NowPlayListAdapter.ViewHolder>() {
 
@@ -57,6 +63,11 @@ class NowPlayListAdapter(val context : Context, private val dataProvider: DataPr
 
         if(mediaFile.playing){
             holder.musicArt.setImageResource(R.mipmap.ic_album)
+        }
+        else if(mediaFile.art.isNotEmpty()){
+            holder.musicArt.setImageBitmap(
+                    BitmapFactory.decodeStream(ByteArrayInputStream(Base64.decode(mediaFile.art,Base64.DEFAULT)))
+            )
         }
         else{
             holder.musicArt.setImageResource(R.mipmap.ic_default_music)

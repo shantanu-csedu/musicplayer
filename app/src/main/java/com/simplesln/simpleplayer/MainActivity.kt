@@ -1,6 +1,5 @@
 package com.simplesln.simpleplayer
 
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
@@ -22,6 +21,7 @@ import com.simplesln.formatDuration
 import com.simplesln.fragments.TitleFragment
 import com.simplesln.getProgress
 import com.simplesln.interfaces.DataProvider
+import com.simplesln.repositories.PrefDataProvider
 import com.simplesln.services.MediaScanService
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -154,6 +154,7 @@ class MainActivity : BaseActivity() {
             if(supportFragmentManager.backStackEntryCount == 0){
                 title = ""
                 tabLayout.visibility = View.VISIBLE
+                viewPager.visibility = View.VISIBLE
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
             }
             else if(supportFragmentManager.findFragmentById(R.id.songListContainer) is TitleFragment){
@@ -263,6 +264,7 @@ class MainActivity : BaseActivity() {
     fun addDetailsFragment(title: String, fragment: Fragment) {
         this.title = title
         tabLayout.visibility = View.GONE
+        viewPager.visibility = View.GONE
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportFragmentManager.beginTransaction()
                 .setTransition(TRANSIT_FRAGMENT_OPEN)

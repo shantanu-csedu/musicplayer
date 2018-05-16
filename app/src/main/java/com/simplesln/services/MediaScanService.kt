@@ -5,9 +5,9 @@ import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.os.Environment
 import android.os.IBinder
+import android.util.Base64
 import android.util.Log
-import com.simplesln.data.PrefDataProvider
-import com.simplesln.data.RoomDataProvider
+import com.simplesln.repositories.PrefDataProvider
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.interfaces.DataProvider
 import com.simplesln.simpleplayer.getDataProvider
@@ -86,7 +86,7 @@ class MediaScanService : Service() {
             val genre =  mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
             val year = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
             val duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            val art : String = if(mmr.embeddedPicture != null) mmr.embeddedPicture.toString() else ""
+            val art : String = if(mmr.embeddedPicture != null) Base64.encodeToString(mmr.embeddedPicture,Base64.DEFAULT) else ""
 
             return MediaFile(file.absolutePath,file.name,duration.toInt(),artist,genre,album,folder,year,art = art)
         }

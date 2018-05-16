@@ -3,10 +3,12 @@ package com.simplesln.fragments
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PopupMenu
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
@@ -14,6 +16,8 @@ import android.widget.EditText
 import android.widget.Toast
 import com.simplesln.adapters.PlaylistDialogListAdapter
 import com.simplesln.adapters.SongListAdapter
+import com.simplesln.adapters.helper.ItemTouchHelperAdapter
+import com.simplesln.adapters.helper.SimpleItemTouchHelperCallback
 import com.simplesln.data.MediaPlayerState
 import com.simplesln.data.PlayList
 import com.simplesln.data.STATE_PLAYING
@@ -21,10 +25,44 @@ import com.simplesln.data.entities.MediaFile
 import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
+import com.simplesln.simpleplayer.getDataProvider
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMenuItemClickListener {
+class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMenuItemClickListener, ItemTouchHelperAdapter {
+    override fun onItemMove(fromPosition: Int, toPosition: Int) {
+        mAdapter.onItemMove(fromPosition,toPosition)
+    }
+
+    override fun onItemDismiss(position: Int) {
+        val item = mAdapter.values[position]
+        Snackbar.make(listView,mAdapter.values[position].name + " is removed", Snackbar.LENGTH_LONG)
+                .setAction("Undo", View.OnClickListener {
+                    mAdapter.values.add(position,item)
+                    mAdapter.notifyItemInserted(position)
+                })
+                .addCallback(object : Snackbar.Callback(){
+                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                        super.onDismissed(transientBottomBar, event)
+                        if(event ==  Snackbar.Callback.DISMISS_EVENT_TIMEOUT || event == DISMISS_EVENT_CONSECUTIVE) {
+                            if(groupType == TYPE_PLAYLIST){
+                                getDataProvider(activity!!).removeFromPlaylist(item.id,groupName)
+                            }
+                            else {
+                                getDataProvider(activity!!).remove(item.id)
+                                File(item.link).deleteOnExit()
+                            }
+                        }
+                    }
+                })
+                .show()
+        mAdapter.onItemDismiss(position)
+    }
+
+    override fun onItemReleased() {
+    }
+
     override fun onMenuClicked(anchorView: View, position: Int) {
 
     }
@@ -73,11 +111,11 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMe
                     for(file in shuffledList){
                         mediaFileList.add(file.getEntity())
                     }
-                    val addNowPlayLiveData = (activity as MainActivity).getDataProvider().addNowPlaying(mediaFileList, true)
+                    val addNowPlayLiveData = getDataProvider(activity!!).addNowPlaying(mediaFileList, true)
                     addNowPlayLiveData.observe(this,object : Observer<Boolean>{
                         override fun onChanged(t: Boolean?) {
                             addNowPlayLiveData.removeObserver(this)
-                            (activity as MainActivity).getDataProvider().setNowPlaying(shuffledList[0].id)
+                            getDataProvider(activity!!).setNowPlaying(shuffledList[0].id)
                         }
                     })
                 }
@@ -87,7 +125,7 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMe
                     for(file in mAdapter.values){
                         mediaFileList.add(file.getEntity())
                     }
-                    (activity as MainActivity).getDataProvider().addNowPlaying(mediaFileList, false)
+                    getDataProvider(activity!!).addNowPlaying(mediaFileList, false)
                 }
             R.id.menu_add_playlist ->
                 if(mAdapter.values.size > 0) {
@@ -101,20 +139,25 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMe
         return super.onOptionsItemSelected(item)
     }
 
+    private lateinit var mImageTouchHelper: ItemTouchHelper
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         listView = view.findViewById(R.id.listView)
         listView.layoutManager = LinearLayoutManager(activity)
         listView.adapter = mAdapter
+        val callback = SimpleItemTouchHelperCallback(this)
+        mImageTouchHelper = ItemTouchHelper(callback)
+        mImageTouchHelper.attachToRecyclerView(listView)
     }
 
     private fun observe(){
         when(groupType){
-            TYPE_ALBUM -> (activity as MainActivity).getDataProvider().getMediaFilesByAlbum(groupName).observe(this,mediaFileObserver)
-            TYPE_ARTIST -> (activity as MainActivity).getDataProvider().getMediaFilesByArtist(groupName).observe(this,mediaFileObserver)
-            TYPE_GENRE -> (activity as MainActivity).getDataProvider().getMediaFilesByGenre(groupName).observe(this,mediaFileObserver)
-            TYPE_PLAYLIST -> (activity as MainActivity).getDataProvider().getMediaFilesByPlaylist(groupName).observe(this,mediaFileObserver)
-            TYPE_ALL -> (activity as MainActivity).getDataProvider().getMediaFiles().observe(this,mediaFileObserver)
+            TYPE_ALBUM -> getDataProvider(activity!!).getMediaFilesByAlbum(groupName).observe(this,mediaFileObserver)
+            TYPE_ARTIST -> getDataProvider(activity!!).getMediaFilesByArtist(groupName).observe(this,mediaFileObserver)
+            TYPE_GENRE -> getDataProvider(activity!!).getMediaFilesByGenre(groupName).observe(this,mediaFileObserver)
+            TYPE_PLAYLIST -> getDataProvider(activity!!).getMediaFilesByPlaylist(groupName).observe(this,mediaFileObserver)
+            TYPE_ALL -> getDataProvider(activity!!).getMediaFiles().observe(this,mediaFileObserver)
         }
     }
 
@@ -147,26 +190,26 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMe
                         for(file in mAdapter.values){
                             mediaFileList.add(file.getEntity())
                         }
-                        val nowPlayingLiveData = (activity as MainActivity).getDataProvider().addNowPlaying(mediaFileList, true)
+                        val nowPlayingLiveData = getDataProvider(activity!!).addNowPlaying(mediaFileList, true)
                         nowPlayingLiveData.observe(this, object : Observer<Boolean> {
                             override fun onChanged(it: Boolean?) {
                                 if (it == true) {
                                     nowPlayingLiveData.removeObserver(this)
-                                    (activity as MainActivity).getDataProvider().setNowPlaying(mediaFile.id)
+                                    getDataProvider(activity!!).setNowPlaying(mediaFile.id)
                                     addedToNowPlayList = true
                                 }
                             }
                         })
                     }
                     else{
-                        (activity as MainActivity).getDataProvider().setNowPlaying(mediaFile.id)
+                        getDataProvider(activity!!).setNowPlaying(mediaFile.id)
                     }
                 }
 
                 R.id.menu_play_next ->
-                    (activity as MainActivity).getDataProvider().setNext(mediaFile.id)
+                    getDataProvider(activity!!).setNext(mediaFile.id)
                 R.id.menu_add_queue ->
-                    (activity as MainActivity).getDataProvider().addNowPlaying(Arrays.asList(mediaFile.getEntity()),false)
+                    getDataProvider(activity!!).addNowPlaying(Arrays.asList(mediaFile.getEntity()),false)
                 R.id.menu_add_playlist ->
                     addToPlaylist(Arrays.asList(mediaFile.getEntity()))
             }
@@ -178,7 +221,7 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMe
     private fun addToPlaylist(values : List<MediaFile>){
         val builder = AlertDialog.Builder(activity)
         val dialogAdapter = PlaylistDialogListAdapter(activity!!)
-        val playlistLiveData = (activity as MainActivity).getDataProvider().getPlayList()
+        val playlistLiveData = getDataProvider(activity!!).getPlayList()
         playlistLiveData.observe(this@SongListFragment, Observer {
             if(it != null){
                 for(playList in it){
@@ -192,7 +235,7 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMe
             dialog, which ->
             dialog?.dismiss()
             val playlist = dialogAdapter.getItem(which)
-            (activity as MainActivity).getDataProvider().addToPlayList(playlist.name,values)
+            getDataProvider(activity!!).addToPlayList(playlist.name,values)
             Toast.makeText(activity,"added to " + playlist.name, Toast.LENGTH_SHORT).show()
         }
         builder.setPositiveButton("Create"){
@@ -207,7 +250,7 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, OnIMe
                 dialog, _ ->
                 dialog.dismiss()
                 if(editText.text.toString().isNotEmpty()) {
-                    (activity as MainActivity).getDataProvider().addToPlayList(editText.text.toString(), values)
+                    getDataProvider(activity!!).addToPlayList(editText.text.toString(), values)
                     Toast.makeText(activity, "added to " + editText.text.toString(), Toast.LENGTH_SHORT).show()
                 }
             }

@@ -17,6 +17,8 @@ interface DataProvider {
     fun remove() : LiveData<Int>
     fun remove(mediaId: Long)
     fun removeQueue(mediaId : Long)
+    fun removePlaylist(name : String)
+    fun removeFromPlaylist(mediaId: Long,playlistName : String)
 
     fun getArtistList(): LiveData<List<String>>
     fun getGenreList(): LiveData<List<String>>

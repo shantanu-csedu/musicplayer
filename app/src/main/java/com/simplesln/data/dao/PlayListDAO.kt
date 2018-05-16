@@ -25,4 +25,10 @@ interface PlayListDAO {
 
     @Query("select id from media_playlist where name=:name")
     fun getPlaylistId(name : String) : Long
+
+    @Query("delete from media_playlist where name =:name")
+    fun deletePlaylist(name : String) : Int
+
+    @Query("delete from media_playlist_data where media_file_id =:mediaId and media_playlist_id = (select id from media_playlist where name=:playlistName limit 1)")
+    fun deleteMusic(mediaId : Long, playlistName : String)
 }

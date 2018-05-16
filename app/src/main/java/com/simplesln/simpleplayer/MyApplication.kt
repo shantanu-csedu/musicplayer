@@ -3,8 +3,8 @@ package com.simplesln.simpleplayer
 import android.app.Application
 import android.arch.lifecycle.LifecycleOwner
 import android.content.Context
-import com.simplesln.data.PrefDataProvider
-import com.simplesln.data.RoomDataProvider
+import com.simplesln.repositories.PrefDataProvider
+import com.simplesln.repositories.RoomDataProvider
 import com.simplesln.interfaces.DataProvider
 import com.simplesln.interfaces.Player
 import com.simplesln.players.NativeMediaPlayer
@@ -21,7 +21,7 @@ class MyApplication : Application(){
     }
 }
 
-fun getPref(context : Context): PrefDataProvider{
+fun getPref(context : Context): PrefDataProvider {
     return (context.applicationContext as MyApplication).pref
 }
 

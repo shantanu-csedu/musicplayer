@@ -98,6 +98,8 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
         setHasOptionsMenu(true)
         mAdapter = NowPlayListAdapter(activity!!,(activity as MainActivity).getDataProvider())
         mAdapter.setOnItemClickListener(this)
+        observerQueue()
+        observeMediaPlayerState()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -138,8 +140,6 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
         mImageTouchHelper = ItemTouchHelper(callback)
         mImageTouchHelper.attachToRecyclerView(listView)
 
-        observerQueue()
-        observeMediaPlayerState()
     }
 
     private fun observerQueue(){

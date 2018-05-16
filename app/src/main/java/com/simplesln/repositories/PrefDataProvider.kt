@@ -1,4 +1,4 @@
-package com.simplesln.data
+package com.simplesln.repositories
 
 import android.content.Context
 import android.content.SharedPreferences

@@ -1,16 +1,18 @@
-package com.simplesln.data
+package com.simplesln.repositories
 
 import android.arch.lifecycle.LiveData
 import android.content.Context
+import com.simplesln.data.MyDB
+import com.simplesln.data.QueryExecutor
 import com.simplesln.data.entities.*
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.data.entities.PlayList
+import com.simplesln.data.getMyDBInstance
 import com.simplesln.interfaces.DataProvider
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.collections.ArrayList
 
 class RoomDataProvider(context : Context) : DataProvider{
 
@@ -27,9 +29,9 @@ class RoomDataProvider(context : Context) : DataProvider{
     }
 
     override fun getNext(): LiveData<MediaFile> {
-        return QueryExecutor(executorService,Callable<MediaFile>{
+        return QueryExecutor(executorService, Callable<MediaFile> {
             var mediaFile = db?.queue()!!.getNext()
-            if(mediaFile == null){ //end of queue or no item
+            if (mediaFile == null) { //end of queue or no item
                 mediaFile = db?.queue()!!.getFirst()
             }
             mediaFile
@@ -37,7 +39,7 @@ class RoomDataProvider(context : Context) : DataProvider{
     }
 
     override fun getPrev(): LiveData<MediaFile> {
-        return QueryExecutor(executorService,Callable<MediaFile>{
+        return QueryExecutor(executorService, Callable<MediaFile> {
             db?.queue()!!.getPrevious()
         })
     }
@@ -53,14 +55,13 @@ class RoomDataProvider(context : Context) : DataProvider{
     override fun addNowPlaying(files: List<MediaFile>,clear : Boolean) : LiveData<Boolean>{
         return QueryExecutor(executorService, Callable<Boolean> {
             var rank = 0.0
-            if(clear) {
+            if (clear) {
                 db?.queue()!!.delete()
-            }
-            else{
+            } else {
                 rank = db?.queue()!!.getMaxRank() + 1
             }
-            for((index,file) in files.withIndex()){
-                db?.queue()?.insert(MediaQueue(file.id,rank+index))
+            for ((index, file) in files.withIndex()) {
+                db?.queue()?.insert(MediaQueue(file.id, rank + index))
             }
             true
         })
@@ -101,7 +102,7 @@ class RoomDataProvider(context : Context) : DataProvider{
         QueryExecutor(executorService, Callable<Void> {
             db?.nowPlay()!!.reset()
             db?.nowPlay()!!.set(
-                    NowPlay(0L,db?.queue()!!.getId(mediaId)))
+                    NowPlay(0L, db?.queue()!!.getId(mediaId)))
             null
         })
     }
@@ -144,13 +145,13 @@ class RoomDataProvider(context : Context) : DataProvider{
 
     override fun getRank(fromId: Long, toId: Long): LiveData<Double> {
         return QueryExecutor(executorService, Callable<Double> {
-            db?.queue()!!.getAvgRank(fromId,toId)
+            db?.queue()!!.getAvgRank(fromId, toId)
         })
     }
 
     override fun getRank(id: Long, before: Boolean): LiveData<Double> {
-        return QueryExecutor(executorService, Callable<Double>{
-            if(before) db?.queue()!!.getRank(id) -1
+        return QueryExecutor(executorService, Callable<Double> {
+            if (before) db?.queue()!!.getRank(id) - 1
             else db?.queue()!!.getRank(id) + 1
         })
     }
@@ -159,8 +160,8 @@ class RoomDataProvider(context : Context) : DataProvider{
         QueryExecutor(executorService, Callable<Void> {
             val npid = db?.queue()?.getId(file.id)
             val nowPlayingFile = MediaQueue(file.id, rank)
-            nowPlayingFile.id = if(npid != null) npid else 0L
-            if(nowPlayingFile.id > 0) {
+            nowPlayingFile.id = if (npid != null) npid else 0L
+            if (nowPlayingFile.id > 0) {
                 db?.queue()?.update(Arrays.asList(nowPlayingFile))
             }
             null
@@ -175,19 +176,19 @@ class RoomDataProvider(context : Context) : DataProvider{
     }
 
     override fun createPlaylist(name: String): LiveData<Long> {
-        return QueryExecutor(executorService,Callable<Long>{
+        return QueryExecutor(executorService, Callable<Long> {
             val playList = PlayList(name)
-             db?.playlist()?.insert(playList)
+            db?.playlist()?.insert(playList)
         })
     }
 
     override fun addToPlayList(name: String, mediaFiles: List<MediaFile>) {
-        QueryExecutor(executorService,Callable<Void>{
+        QueryExecutor(executorService, Callable<Void> {
             var playlistId = db?.playlist()?.getPlaylistId(name)
-            if(playlistId!! <= 0L){//doesn't exits
+            if (playlistId!! <= 0L) {//doesn't exits
                 playlistId = db?.playlist()?.insert(PlayList(name))
             }
-            for(mediaFile in mediaFiles){
+            for (mediaFile in mediaFiles) {
                 val playlistData = PlayListData(mediaFile.id, playlistId!!)
                 db?.playlist()?.insertPlayListData(playlistData)
             }
@@ -196,35 +197,44 @@ class RoomDataProvider(context : Context) : DataProvider{
     }
 
     override fun setNext(id: Long) {
-        QueryExecutor(executorService,Callable<Void>{
+        QueryExecutor(executorService, Callable<Void> {
             val nowPlayingItem = db?.nowPlay()?.getSync()
             val nextPlayingItem = db?.queue()?.getNext()
             val mediaFile = db?.queue()?.get(id)
-            if(mediaFile == null){ //insert
-                if(nowPlayingItem == null){
-                    db?.queue()?.insert(MediaQueue(id,0.0))
+            if (mediaFile == null) { //insert
+                if (nowPlayingItem == null) {
+                    db?.queue()?.insert(MediaQueue(id, 0.0))
+                } else if (nextPlayingItem == null) { //no next item
+                    db?.queue()?.insert(MediaQueue(id, db?.queue()?.getRank(nowPlayingItem.id)!! + 1))
+                } else {
+                    db?.queue()?.insert(MediaQueue(id, db?.queue()?.getAvgRank(nowPlayingItem.id, nextPlayingItem.id)!!))
                 }
-                else if(nextPlayingItem == null){ //no next item
-                    db?.queue()?.insert(MediaQueue(id,db?.queue()?.getRank(nowPlayingItem.id)!! + 1))
-                }
-                else{
-                    db?.queue()?.insert(MediaQueue(id,db?.queue()?.getAvgRank(nowPlayingItem.id,nextPlayingItem.id)!!))
-                }
-            }
-            else{ //update
-                if(nowPlayingItem == null){
+            } else { //update
+                if (nowPlayingItem == null) {
                     mediaFile.rank = 0.0
                     db?.queue()?.update(Arrays.asList(mediaFile))
-                }
-                else if(nextPlayingItem == null){ //no next item
+                } else if (nextPlayingItem == null) { //no next item
                     mediaFile.rank = db?.queue()?.getRank(nowPlayingItem.id)!! + 1
                     db?.queue()?.update(Arrays.asList(mediaFile))
-                }
-                else{
-                    mediaFile.rank = db?.queue()?.getAvgRank(nowPlayingItem.id,nextPlayingItem.id)!!
+                } else {
+                    mediaFile.rank = db?.queue()?.getAvgRank(nowPlayingItem.id, nextPlayingItem.id)!!
                     db?.queue()?.update(Arrays.asList(mediaFile))
                 }
             }
+            null
+        })
+    }
+
+    override fun removeFromPlaylist(mediaId: Long, playlistName: String) {
+        QueryExecutor(executorService,Callable<Void>{
+            db?.playlist()?.deleteMusic(mediaId,playlistName)
+            null
+        })
+    }
+
+    override fun removePlaylist(name: String) {
+        QueryExecutor(executorService,Callable<Void>{
+            db?.playlist()?.deletePlaylist(name)
             null
         })
     }
