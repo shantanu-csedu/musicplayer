@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2018.  shantanu saha <shantanu.csedu@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
+ */
+
 package com.simplesln.helpers
 
 import android.app.Notification
@@ -20,6 +37,7 @@ import com.simplesln.services.ACTION_PREV
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
 import android.media.session.MediaSession
+import android.support.v4.content.ContextCompat
 import android.util.Base64
 import java.io.ByteArrayInputStream
 
@@ -39,12 +57,12 @@ class NotificationHelper(val context : Context,val mediaSession : MediaSessionCo
 
     fun createNotification(playerState : MediaPlayerState): Notification? {
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
-        var art: Bitmap? = null
+        val art: Bitmap =
         if (playerState.mediaFile?.art!!.isEmpty()) {
-            art = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_splash)
+            BitmapFactory.decodeResource(context.resources, R.mipmap.ic_splash)
         }
         else{
-            art = BitmapFactory.decodeStream(ByteArrayInputStream(Base64.decode(playerState.mediaFile?.art, Base64.DEFAULT)))
+            BitmapFactory.decodeStream(ByteArrayInputStream(Base64.decode(playerState.mediaFile?.art, Base64.DEFAULT)))
         }
 
         addPrevAction(notificationBuilder)
@@ -53,7 +71,7 @@ class NotificationHelper(val context : Context,val mediaSession : MediaSessionCo
         notificationBuilder
                 .setStyle(android.support.v4.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(mediaSession.sessionToken))
-                .setColor(context.resources.getColor(R.color.colorPrimary))
+                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setSmallIcon(R.drawable.ic_stat_notification)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setContentIntent(createContentIntent()) // Create an intent that would open the UI when user clicks the notification
@@ -82,18 +100,10 @@ class NotificationHelper(val context : Context,val mediaSession : MediaSessionCo
 
 
     private fun addPlayPauseAction(builder : NotificationCompat.Builder,playerState: MediaPlayerState) {
-        var icon =0
-        var label = ""
-        var intent : PendingIntent? = null
-        if (playerState.state == STATE_PLAYING) {
-            icon = R.mipmap.ic_pause;
-            label = "Pause"
-            intent = PendingIntent.getBroadcast(context,0, Intent(ACTION_PAUSE), PendingIntent.FLAG_UPDATE_CURRENT)
-        } else {
-            icon = R.mipmap.ic_play;
-            label = "Play"
-            intent = PendingIntent.getBroadcast(context,0, Intent(ACTION_PLAY), PendingIntent.FLAG_UPDATE_CURRENT)
-        }
+
+        val label = if(playerState.state == STATE_PLAYING) "Pause" else "Play"
+        val intent = if(playerState.state == STATE_PLAYING) PendingIntent.getBroadcast(context,0, Intent(ACTION_PAUSE), PendingIntent.FLAG_UPDATE_CURRENT) else PendingIntent.getBroadcast(context,0, Intent(ACTION_PLAY), PendingIntent.FLAG_UPDATE_CURRENT)
+        val icon = if(playerState.state == STATE_PLAYING) R.mipmap.ic_pause else R.mipmap.ic_play
         builder.addAction(NotificationCompat.Action(icon, label, intent));
     }
 
