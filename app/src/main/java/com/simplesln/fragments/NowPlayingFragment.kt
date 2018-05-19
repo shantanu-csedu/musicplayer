@@ -56,20 +56,20 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
             }
             else if(topPosition < 0 && bottomPosition < mAdapter.values.size){
                 Log.e("bottom",mAdapter.values[bottomPosition].name)
-                val rankLiveData = getDataProvider(activity!!).getRank(mAdapter.values[bottomPosition].id,true)
+                val rankLiveData = getDataProvider(activity!!).getRank(mAdapter.values[bottomPosition].id)
                 rankLiveData.observe(this,object : Observer<Double>{
                     override fun onChanged(rank: Double?) {
                         rankLiveData.removeObserver(this)
-                        getDataProvider(activity!!).updateRank(mAdapter.values[toPosition].getEntity(),rank!!)
+                        getDataProvider(activity!!).updateRank(mAdapter.values[toPosition].getEntity(),rank!!-1)
                     }
                 })
             }
             else if(topPosition >=0 && bottomPosition >= mAdapter.values.size){
-                val rankLiveData = getDataProvider(activity!!).getRank(mAdapter.values[topPosition].id,false)
+                val rankLiveData = getDataProvider(activity!!).getRank(mAdapter.values[topPosition].id)
                 rankLiveData.observe(this,object : Observer<Double>{
                     override fun onChanged(rank: Double?) {
                         rankLiveData.removeObserver(this)
-                        getDataProvider(activity!!).updateRank(mAdapter.values[toPosition].getEntity(),rank!!)
+                        getDataProvider(activity!!).updateRank(mAdapter.values[toPosition].getEntity(),rank!!+1)
                     }
                 })
             }
@@ -84,21 +84,20 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
     override fun onItemDismiss(position: Int) {
 
         val item = mAdapter.values[position]
-        Snackbar.make(listView,mAdapter.values[position].name + " is removed",Snackbar.LENGTH_LONG)
-                .setAction("Undo", View.OnClickListener {
-                    mAdapter.values.add(position,item)
-                    mAdapter.notifyItemInserted(position)
-                })
-                .addCallback(object : Snackbar.Callback(){
-                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                        super.onDismissed(transientBottomBar, event)
-                        if(event ==  Snackbar.Callback.DISMISS_EVENT_TIMEOUT || event == DISMISS_EVENT_CONSECUTIVE) {
-                            getDataProvider(activity!!).removeQueue(item.id)
-                        }
-                    }
-                })
-                .show()
-        mAdapter.onItemDismiss(position)
+        getDataProvider(activity!!).getRank(item.id).observe(this, Observer {
+            val itemRank = it!!
+            Snackbar.make(listView,mAdapter.values[position].name + " is removed",Snackbar.LENGTH_LONG)
+                    .setAction("Undo", View.OnClickListener {
+                        getDataProvider(activity!!).addQueue(item.getEntity(),itemRank)
+                    })
+                    .show()
+            mAdapter.onItemDismiss(position)
+            handler.postDelayed({
+                getDataProvider(activity!!).removeQueue(item.id)
+            },300)
+
+        })
+
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -162,8 +161,8 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
 
     private fun observerQueue(){
         getDataProvider(activity!!).getQueue().observe(this, Observer {
-            mAdapter.values.clear()
-            if (it != null) {
+            if (it != null  && !equal(mAdapter.values,it)) {
+                mAdapter.values.clear()
                 val lastState = (activity as MainActivity).liveMediaPlayerState.lastState
                 if(lastState.mediaFile != null) {
                     Log.e("last state", lastState.mediaFile?.name)
@@ -178,9 +177,17 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
                     }
                     mAdapter.values.add(mFile)
                 }
+                mAdapter.notifyDataSetChanged()
             }
-            mAdapter.notifyDataSetChanged()
         })
+    }
+
+    private fun equal(f1 : List<MediaFile>, f2 : List<com.simplesln.data.entities.MediaFile>) : Boolean{
+        if(f1.size != f2.size) return false
+        for((index,f) in f1.withIndex()){
+            if(f != f1[index]) return false
+        }
+        return true
     }
 
     private fun observeMediaPlayerState(){

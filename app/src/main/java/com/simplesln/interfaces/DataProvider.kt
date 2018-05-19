@@ -19,7 +19,6 @@ package com.simplesln.interfaces
 
 import android.arch.lifecycle.LiveData
 import com.simplesln.data.entities.MediaFile
-import com.simplesln.data.entities.MediaQueue
 import com.simplesln.data.entities.PlayList
 
 interface DataProvider {
@@ -27,12 +26,13 @@ interface DataProvider {
     fun getNowPlay() : LiveData<MediaFile>
     fun getNext() : LiveData<MediaFile>
     fun getPrev() : LiveData<MediaFile>
-    fun addNowPlaying(files : List<MediaFile>,clear : Boolean) : LiveData<Boolean>
+    fun addQueue(files : List<MediaFile>,clear : Boolean) : LiveData<Boolean>
+    fun addQueue(file : MediaFile, rank: Double) : LiveData<Boolean>
     fun addMedia(files : List<MediaFile>)
     fun setNowPlaying(mediaId: Long)
     fun getAlbumList() : LiveData<List<String>>
-    fun remove() : LiveData<Int>
-    fun remove(mediaId: Long)
+    fun removeMedia() : LiveData<Int>
+    fun removeMedia(mediaId: Long)
     fun removeQueue(mediaId : Long)
     fun removePlaylist(name : String)
     fun removeFromPlaylist(mediaId: Long,playlistName : String)
@@ -47,7 +47,7 @@ interface DataProvider {
     fun getMediaFiles(): LiveData<List<MediaFile>>
 
     fun getRank(fromId : Long, toId : Long) : LiveData<Double>
-    fun getRank(id : Long, before : Boolean) : LiveData<Double>
+    fun getRank(id: Long): LiveData<Double>
 
     fun updateRank(file : MediaFile, rank : Double)
 

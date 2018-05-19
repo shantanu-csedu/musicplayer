@@ -21,7 +21,6 @@ import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.PopupMenu
 import android.support.v7.widget.RecyclerView
@@ -94,7 +93,7 @@ class GroupListFragment : TitleFragment(), OnIMenuItemClickListener, AdapterView
                                 mediaListLiveData.removeObserver(this)
                                 if(t != null && t.size > 0) {
                                     val nowPlayMediaId = t[0].id
-                                    val addNowPlayLiveData = getDataProvider(activity!!).addNowPlaying(t, true)
+                                    val addNowPlayLiveData = getDataProvider(activity!!).addQueue(t, true)
                                     addNowPlayLiveData.observe(this@GroupListFragment,object : Observer<Boolean>{
                                         override fun onChanged(t: Boolean?) {
                                             addNowPlayLiveData.removeObserver(this)
@@ -121,7 +120,7 @@ class GroupListFragment : TitleFragment(), OnIMenuItemClickListener, AdapterView
                             override fun onChanged(t: List<MediaFile>?) {
                                 mediaListLiveData.removeObserver(this)
                                 if(t != null && t.isNotEmpty()) {
-                                    getDataProvider(activity!!).addNowPlaying(t, false)
+                                    getDataProvider(activity!!).addQueue(t, false)
                                 }
                             }
                         })
@@ -145,7 +144,7 @@ class GroupListFragment : TitleFragment(), OnIMenuItemClickListener, AdapterView
                                     if(t?.size!! > 0) {
                                         mediaListLiveData.removeObserver(this)
                                         val shuffledList = t.shuffled()
-                                        val addNowPlayLiveData = getDataProvider(activity!!).addNowPlaying(shuffledList, true)
+                                        val addNowPlayLiveData = getDataProvider(activity!!).addQueue(shuffledList, true)
                                         addNowPlayLiveData.observe(this@GroupListFragment, object : Observer<Boolean> {
                                             override fun onChanged(t: Boolean?) {
                                                 addNowPlayLiveData.removeObserver(this)

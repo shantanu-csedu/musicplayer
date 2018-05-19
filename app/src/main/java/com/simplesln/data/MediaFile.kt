@@ -36,4 +36,23 @@ class MediaFile(entity : MediaFile,playing : Boolean = false) {
     fun getEntity() : MediaFile{
         return MediaFile(link,name,duration,artist,genre,album,folder,year,repeatCount,art,id)
     }
+
+    override fun equals(otherObj : Any?): Boolean {
+        if(otherObj is MediaFile) {
+            val other: MediaFile = otherObj as MediaFile
+            if (id != other.id
+                    || link != other.link || name != other.name || duration != other.duration ||
+                    artist != other.artist || genre != other.genre || album != other.album ||
+                    folder != other.folder || year != other.year || repeatCount != other.repeatCount ||
+                    art != other.art
+
+            ) {
+                return false
+            }
+            return true
+        }
+        else{
+            return super.equals(otherObj)
+        }
+    }
 }

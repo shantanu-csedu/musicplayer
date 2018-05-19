@@ -69,7 +69,7 @@ class RoomDataProvider(context : Context) : DataProvider{
         })
     }
 
-    override fun addNowPlaying(files: List<MediaFile>,clear : Boolean) : LiveData<Boolean>{
+    override fun addQueue(files: List<MediaFile>,clear : Boolean) : LiveData<Boolean>{
         return QueryExecutor(executorService, Callable<Boolean> {
             var rank = 0.0
             if (clear) {
@@ -84,8 +84,15 @@ class RoomDataProvider(context : Context) : DataProvider{
         })
     }
 
+    override fun addQueue(file: MediaFile, rank: Double): LiveData<Boolean> {
+        return QueryExecutor(executorService, Callable<Boolean> {
+            db?.queue()?.insert(MediaQueue(file.id, rank))
+            true
+        })
+    }
 
-    override fun remove() : LiveData<Int>{
+
+    override fun removeMedia() : LiveData<Int>{
         return QueryExecutor(executorService, Callable<Int> { db?.library()?.delete()!! })
     }
 
@@ -108,7 +115,7 @@ class RoomDataProvider(context : Context) : DataProvider{
         })
     }
 
-    override fun remove(mediaId: Long){
+    override fun removeMedia(mediaId: Long){
         executorService.submit({
             db?.library()?.delete(mediaId)
         })
@@ -166,10 +173,9 @@ class RoomDataProvider(context : Context) : DataProvider{
         })
     }
 
-    override fun getRank(id: Long, before: Boolean): LiveData<Double> {
+    override fun getRank(id: Long): LiveData<Double> {
         return QueryExecutor(executorService, Callable<Double> {
-            if (before) db?.queue()!!.getRank(id) - 1
-            else db?.queue()!!.getRank(id) + 1
+            db?.queue()!!.getRank(id)
         })
     }
 

@@ -20,8 +20,8 @@ package com.simplesln.fragments
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
+import android.os.Handler
 import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.PopupMenu
 import android.support.v7.widget.RecyclerView
@@ -39,11 +39,9 @@ import com.simplesln.data.MediaPlayerState
 import com.simplesln.data.PlayList
 import com.simplesln.data.STATE_PLAYING
 import com.simplesln.data.entities.MediaFile
-import com.simplesln.interfaces.OnIMenuItemClickListener
 import com.simplesln.simpleplayer.MainActivity
 import com.simplesln.simpleplayer.R
 import com.simplesln.simpleplayer.getDataProvider
-import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -54,31 +52,15 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, ItemT
 
     override fun onItemDismiss(position: Int) {
         val item = mAdapter.values[position]
-        Snackbar.make(listView,mAdapter.values[position].name + " is removed", Snackbar.LENGTH_LONG)
+        Snackbar.make(listView,mAdapter.values[position].name + " is removed",Snackbar.LENGTH_LONG)
                 .setAction("Undo", View.OnClickListener {
-                    mAdapter.values.add(position,item)
-                    mAdapter.notifyItemInserted(position)
-                })
-                .addCallback(object : Snackbar.Callback(){
-                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                        super.onDismissed(transientBottomBar, event)
-                        if(event ==  Snackbar.Callback.DISMISS_EVENT_TIMEOUT || event == DISMISS_EVENT_CONSECUTIVE) {
-                            if(groupType == TYPE_PLAYLIST){
-                                getDataProvider(activity!!).removeFromPlaylist(item.id,groupName)
-                            }
-                            else {
-                                getDataProvider(activity!!).remove(item.id)
-                                val file  = File(item.link)
-                                if(file.exists()){
-                                    val status = file.delete()
-                                    Log.e("file delete status ","" + status)
-                                }
-                            }
-                        }
-                    }
+                    getDataProvider(activity!!).addMedia(Arrays.asList(item.getEntity()))
                 })
                 .show()
         mAdapter.onItemDismiss(position)
+        handler.postDelayed({
+            getDataProvider(activity!!).removeMedia(item.id)
+        },300)
     }
 
     override fun onItemReleased() {
@@ -89,6 +71,7 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, ItemT
     private var groupType = TYPE_ALBUM
     private var groupName = ""
     private var addedToNowPlayList = false
+    private val handler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,7 +111,7 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, ItemT
                     for(file in shuffledList){
                         mediaFileList.add(file.getEntity())
                     }
-                    val addNowPlayLiveData = getDataProvider(activity!!).addNowPlaying(mediaFileList, true)
+                    val addNowPlayLiveData = getDataProvider(activity!!).addQueue(mediaFileList, true)
                     addNowPlayLiveData.observe(this,object : Observer<Boolean>{
                         override fun onChanged(t: Boolean?) {
                             addNowPlayLiveData.removeObserver(this)
@@ -142,7 +125,7 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, ItemT
                     for(file in mAdapter.values){
                         mediaFileList.add(file.getEntity())
                     }
-                    getDataProvider(activity!!).addNowPlaying(mediaFileList, false)
+                    getDataProvider(activity!!).addQueue(mediaFileList, false)
                 }
             R.id.menu_add_playlist ->
                 if(mAdapter.values.size > 0) {
@@ -207,7 +190,7 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, ItemT
                         for(file in mAdapter.values){
                             mediaFileList.add(file.getEntity())
                         }
-                        val nowPlayingLiveData = getDataProvider(activity!!).addNowPlaying(mediaFileList, true)
+                        val nowPlayingLiveData = getDataProvider(activity!!).addQueue(mediaFileList, true)
                         nowPlayingLiveData.observe(this, object : Observer<Boolean> {
                             override fun onChanged(it: Boolean?) {
                                 if (it == true) {
@@ -226,7 +209,7 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, ItemT
                 R.id.menu_play_next ->
                     getDataProvider(activity!!).setNext(mediaFile.id)
                 R.id.menu_add_queue ->
-                    getDataProvider(activity!!).addNowPlaying(Arrays.asList(mediaFile.getEntity()),false)
+                    getDataProvider(activity!!).addQueue(Arrays.asList(mediaFile.getEntity()),false)
                 R.id.menu_add_playlist ->
                     addToPlaylist(Arrays.asList(mediaFile.getEntity()))
             }
