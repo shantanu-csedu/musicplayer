@@ -27,14 +27,14 @@ import android.arch.persistence.room.PrimaryKey
             (ForeignKey(
                 entity = MediaQueue::class,
                 parentColumns = arrayOf("id"),
-                childColumns = arrayOf("nowPlayId"),
+                childColumns = arrayOf("queueId"),
                 onDelete = ForeignKey.CASCADE
         ))
         ],
-        indices = [(Index(value = arrayOf("nowPlayId"), unique = true))]
+        indices = [(Index(value = arrayOf("queueId"), unique = true))]
 )
-class NowPlay(id: Long = 0, nowPlayId : Long) {
+class NowPlay(id: Long = 0, queueId : Long) {
     @PrimaryKey(autoGenerate = true)
     var id: Long = id
-    var nowPlayId : Long = nowPlayId
+    var queueId : Long = queueId
 }

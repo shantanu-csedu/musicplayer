@@ -34,19 +34,19 @@ class MusicLibraryFragment : Fragment(), AdapterView.OnItemClickListener {
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when(mAdapter.values[position].name){
             ALBUM->{
-                (activity as MainActivity).addDetailsFragment(ALBUM,createGroupListFragmentInstance(ALBUM,TYPE_ALBUM))
+                (activity as MainActivity).addLibraryDetailsFragment(createGroupListFragmentInstance(ALBUM,TYPE_ALBUM))
             }
             ARTIST->{
-                (activity as MainActivity).addDetailsFragment(ARTIST,createGroupListFragmentInstance(ARTIST,TYPE_ARTIST))
+                (activity as MainActivity).addLibraryDetailsFragment(createGroupListFragmentInstance(ARTIST,TYPE_ARTIST))
             }
             PLAYLIST->{
-                (activity as MainActivity).addDetailsFragment(PLAYLIST,createGroupListFragmentInstance(PLAYLIST,TYPE_PLAYLIST))
+                (activity as MainActivity).addLibraryDetailsFragment(createGroupListFragmentInstance(PLAYLIST,TYPE_PLAYLIST))
             }
             GENRE->{
-                (activity as MainActivity).addDetailsFragment(GENRE,createGroupListFragmentInstance(GENRE, TYPE_GENRE))
+                (activity as MainActivity).addLibraryDetailsFragment(createGroupListFragmentInstance(GENRE, TYPE_GENRE))
             }
             SONGS->{
-                (activity as MainActivity).addDetailsFragment(SONGS, createSongListFragmentInstance(SONGS,TYPE_ALL))
+                (activity as MainActivity).addLibraryDetailsFragment(createSongListFragmentInstance(SONGS, SONGS,TYPE_ALL))
             }
         }
     }

@@ -31,14 +31,17 @@ interface NowPlayDAO {
     fun reset() : Int
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun set(nowPlay : NowPlay)
+    fun set(nowPlay : NowPlay) : Long
 
-    @Query("select media_library.* from media_now_play left join media_queue on media_now_play.nowPlayId = media_queue.id left join media_library on media_library.id = media_queue.media_file_id order by media_now_play.id desc limit 1")
+    @Query("select media_library.* from media_now_play left join media_queue on media_now_play.queueId = media_queue.id left join media_library on media_library.id = media_queue.media_file_id order by media_now_play.id desc limit 1")
     fun get() : LiveData<MediaFile>
 
-    @Query("select media_library.* from media_now_play left join media_queue on media_now_play.nowPlayId = media_queue.id left join media_library on media_library.id = media_queue.media_file_id limit 1")
+    @Query("select * from media_now_play order by id desc limit 1")
+    fun getNowPlay() : NowPlay
+
+    @Query("select media_library.* from media_now_play left join media_queue on media_now_play.queueId = media_queue.id left join media_library on media_library.id = media_queue.media_file_id limit 1")
     fun getSync() : MediaFile
 
-    @Query("select media_queue.media_file_id from media_now_play left join media_queue on media_now_play.nowPlayId = media_queue.id limit 1")
+    @Query("select media_queue.media_file_id from media_now_play left join media_queue on media_now_play.queueId = media_queue.id limit 1")
     fun getMediaFileId() : Long
 }

@@ -81,7 +81,7 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, ItemT
         if(arguments != null) {
             if(arguments!!.get(GROUP_TYPE) != null) {
                 groupType = arguments!!.getInt(GROUP_TYPE)
-                groupName = getTitle()
+                groupName = arguments!!.getString(GROUP_NAME)
             }
         }
         observe()
@@ -300,11 +300,13 @@ const val TYPE_GENRE = 3
 const val TYPE_PLAYLIST = 4
 const val TYPE_ALL = 5
 private const val GROUP_TYPE = "group_type"
+private const val GROUP_NAME = "group_name"
 
-fun createSongListFragmentInstance(title : String , type : Int) : SongListFragment{
+fun createSongListFragmentInstance(title : String ,groupName : String, type : Int) : SongListFragment{
     val bundle = Bundle()
     bundle.putInt(GROUP_TYPE,type)
     bundle.putString(TITLE,title)
+    bundle.putString(GROUP_NAME,groupName)
     val songListFragment = SongListFragment()
     songListFragment.arguments = bundle
     return songListFragment

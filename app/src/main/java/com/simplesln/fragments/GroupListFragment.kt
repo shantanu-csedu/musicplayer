@@ -45,8 +45,8 @@ class GroupListFragment : TitleFragment(), OnIMenuItemClickListener, AdapterView
     private var groupType = TYPE_ALBUM
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         val group = mAdapter.values[position]
-        val fragment = createSongListFragmentInstance(group.name, groupType)
-        (activity as MainActivity).addDetailsFragment(group.name,fragment)
+        val fragment = createSongListFragmentInstance(getTitle() + " > " + group.name,group.name, groupType)
+        (activity as MainActivity).addLibraryDetailsFragment(fragment)
     }
 
     override fun onMenuClicked(anchorView: View,position : Int) {

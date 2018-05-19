@@ -31,7 +31,7 @@ class ViewPagerAdapter(private val tabs : Array<String>, fm: FragmentManager?) :
             ARTIST -> createGroupListFragmentInstance(ARTIST,TYPE_ARTIST)
             GENRE -> createGroupListFragmentInstance(GENRE,TYPE_GENRE)
             PLAYLIST -> createGroupListFragmentInstance(PLAYLIST,TYPE_PLAYLIST)
-            SONGS -> createSongListFragmentInstance(SONGS,TYPE_ALL)
+//            SONGS -> createSongListFragmentInstance(SONGS,TYPE_ALL)
             LIBRARY -> createMusicLibrary()
             else -> null
         }

@@ -183,6 +183,8 @@ class MainActivity : BaseActivity() {
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
             }
             else if(supportFragmentManager.findFragmentById(R.id.songListContainer) is TitleFragment){
+                tabLayout.visibility = View.GONE
+                viewPager.visibility = View.GONE
                 title = (supportFragmentManager.findFragmentById(R.id.songListContainer) as TitleFragment).getTitle()
             }
         }
@@ -286,10 +288,7 @@ class MainActivity : BaseActivity() {
         countDownTimer = null
     }
 
-    fun addDetailsFragment(title: String, fragment: Fragment) {
-        this.title = title
-        tabLayout.visibility = View.GONE
-        viewPager.visibility = View.GONE
+    fun addLibraryDetailsFragment(fragment: TitleFragment) {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportFragmentManager.beginTransaction()
                 .setTransition(TRANSIT_FRAGMENT_OPEN)
