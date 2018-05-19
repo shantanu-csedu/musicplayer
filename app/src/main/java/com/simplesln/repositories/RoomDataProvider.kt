@@ -18,7 +18,10 @@
 package com.simplesln.repositories
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MediatorLiveData
+import android.arch.lifecycle.Observer
 import android.content.Context
+import android.util.Log
 import com.simplesln.data.MyDB
 import com.simplesln.data.QueryExecutor
 import com.simplesln.data.entities.*
@@ -38,7 +41,27 @@ class RoomDataProvider(context : Context) : DataProvider{
     private var executorService : ExecutorService = Executors.newFixedThreadPool(3)
 
     override fun getNowPlay(): LiveData<MediaFile> {
-        return db?.nowPlay()!!.get()
+//        return db?.nowPlay()!!.get()
+        val nowPlayLiveData = MediatorLiveData<MediaFile>()
+        nowPlayLiveData.addSource(db?.nowPlay()!!.get(),object : Observer<MediaFile>{
+            var lastMediaFile : MediaFile? = null
+            override fun onChanged(it: MediaFile?) {
+                Log.e("Now play","called ")
+                if(it != null){
+                    Log.e("Now play","name: " + it.name)
+                }
+                else{
+                    Log.e("Now play","name: null")
+                }
+                if(lastMediaFile?.link != it?.link ) {
+                    nowPlayLiveData.value = it
+                    lastMediaFile = it
+                    Log.e("Now play","update")
+                }
+            }
+
+        })
+        return nowPlayLiveData
     }
 
     override fun getQueue(): LiveData<List<MediaFile>> {
@@ -122,11 +145,15 @@ class RoomDataProvider(context : Context) : DataProvider{
     }
 
     override fun deleteMedia(mediaId: Long) {
-
+        executorService.submit({
+            db?.library()?.delete(mediaId)
+        })
     }
 
     override fun undeleteMedia(mediaId: Long) {
-
+        executorService.submit({
+            db?.library()?.undelete(mediaId)
+        })
     }
 
 

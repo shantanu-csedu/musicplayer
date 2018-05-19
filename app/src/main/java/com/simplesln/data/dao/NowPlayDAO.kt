@@ -33,7 +33,7 @@ interface NowPlayDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun set(nowPlay : NowPlay)
 
-    @Query("select media_library.* from media_now_play left join media_queue on media_now_play.nowPlayId = media_queue.id left join media_library on media_library.id = media_queue.media_file_id limit 1")
+    @Query("select media_library.* from media_now_play left join media_queue on media_now_play.nowPlayId = media_queue.id left join media_library on media_library.id = media_queue.media_file_id order by media_now_play.id desc limit 1")
     fun get() : LiveData<MediaFile>
 
     @Query("select media_library.* from media_now_play left join media_queue on media_now_play.nowPlayId = media_queue.id left join media_library on media_library.id = media_queue.media_file_id limit 1")
