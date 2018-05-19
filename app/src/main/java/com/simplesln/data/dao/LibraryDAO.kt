@@ -30,32 +30,38 @@ interface LibraryDAO {
     fun update(mediaFiles : List<MediaFile>)
 
     @Query("delete from media_library")
-    fun delete() : Int
+    fun remove() : Int
 
     @Query("delete from media_library where id = :mediaId")
+    fun remove(mediaId : Long)
+
+    @Query("update media_library set del=1 where id = :mediaId")
     fun delete(mediaId : Long)
+
+    @Query("update media_library set del=0 where id = :mediaId")
+    fun undelete(mediaId : Long)
 
     @Query("select * from media_library LIMIT :offset,:total")
     fun get(offset : Int, total : Int) : LiveData<List<MediaFile>>
 
-    @Query("select * from media_library")
+    @Query("select * from media_library where del=0")
     fun get() : LiveData<List<MediaFile>>
 
-    @Query("select folder from media_library group by folder")
+    @Query("select folder from media_library where del=0 group by folder")
     fun getAlbum() : LiveData<List<String>>
 
-    @Query("select * from media_library where folder=:name")
+    @Query("select * from media_library where folder=:name and del=0")
     fun getMediaListByAlbum(name : String) : LiveData<List<MediaFile>>
 
-    @Query("select artist from media_library group by artist")
+    @Query("select artist from media_library where del=0 group by artist")
     fun getArtist() : LiveData<List<String>>
 
-    @Query("select genre from media_library group by genre")
+    @Query("select genre from media_library where del=0 group by genre")
     fun getGenre(): LiveData<List<String>>
 
-    @Query("select * from media_library where genre=:name")
+    @Query("select * from media_library where genre=:name and del=0")
     fun getMediaListByGenre(name: String): LiveData<List<MediaFile>>
 
-    @Query("select * from media_library where artist=:name")
+    @Query("select * from media_library where artist=:name and del=0")
     fun getMediaListByArtist(name: String): LiveData<List<MediaFile>>
 }

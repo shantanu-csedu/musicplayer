@@ -93,7 +93,7 @@ class RoomDataProvider(context : Context) : DataProvider{
 
 
     override fun removeMedia() : LiveData<Int>{
-        return QueryExecutor(executorService, Callable<Int> { db?.library()?.delete()!! })
+        return QueryExecutor(executorService, Callable<Int> { db?.library()?.remove()!! })
     }
 
     override fun removeQueue(mediaId: Long) {
@@ -117,8 +117,16 @@ class RoomDataProvider(context : Context) : DataProvider{
 
     override fun removeMedia(mediaId: Long){
         executorService.submit({
-            db?.library()?.delete(mediaId)
+            db?.library()?.remove(mediaId)
         })
+    }
+
+    override fun deleteMedia(mediaId: Long) {
+
+    }
+
+    override fun undeleteMedia(mediaId: Long) {
+
     }
 
 
