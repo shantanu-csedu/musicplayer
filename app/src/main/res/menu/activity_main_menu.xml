@@ -20,9 +20,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/menu_scan"
         app:showAsAction="never"
+        android:orderInCategory="103"
         android:title="Rescan"
         />
     <item android:id="@+id/menu_about"
         app:showAsAction="never"
+        android:orderInCategory="150"
         android:title="About"/>
 </menu>

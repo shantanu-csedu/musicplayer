@@ -21,15 +21,18 @@
     <item android:id="@+id/menu_shuffle"
         app:showAsAction="never"
         android:title="Shuffle"
+        android:orderInCategory="103"
         />
 
     <item android:id="@+id/menu_add_queue"
         app:showAsAction="never"
         android:title="Add to queue"
+        android:orderInCategory="103"
         />
 
     <item android:id="@+id/menu_add_playlist"
         app:showAsAction="never"
         android:title="Add to playlist"
+        android:orderInCategory="103"
         />
 </menu>

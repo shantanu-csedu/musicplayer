@@ -234,7 +234,6 @@ class MainActivity : BaseActivity() {
         if(!pref.everIndexed()){
             tabLayout.getTabAt(1)?.select()
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

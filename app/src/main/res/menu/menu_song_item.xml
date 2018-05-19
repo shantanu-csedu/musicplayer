@@ -21,19 +21,23 @@
     <item android:id="@+id/menu_play_now"
         app:showAsAction="never"
         android:title="Play now"
+        android:orderInCategory="103"
         />
     <item android:id="@+id/menu_play_next"
         app:showAsAction="never"
         android:title="Play next"
+        android:orderInCategory="103"
         />
 
     <item android:id="@+id/menu_add_queue"
         app:showAsAction="never"
         android:title="Add to queue"
+        android:orderInCategory="103"
         />
 
     <item android:id="@+id/menu_add_playlist"
         app:showAsAction="never"
         android:title="Add to playlist"
+        android:orderInCategory="103"
         />
 </menu>

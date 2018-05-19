@@ -16,16 +16,8 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/menu_shuffle"
-        android:orderInCategory="103"
-        app:showAsAction="never"
-        android:title="Shuffle"
-        />
-    <item android:id="@+id/menu_remove_all"
-        android:orderInCategory="103"
-        app:showAsAction="never"
-        android:title="Remove All"
-        />
-</menu>
+<resources>
+    <integer name="ga_sessionTimeout">60</integer>
+    <!--  The following value should be replaced with correct property id. -->
+    <string name="ga_trackingId">UA-103814934-1</string>
+</resources>
