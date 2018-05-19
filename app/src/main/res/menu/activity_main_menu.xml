@@ -22,8 +22,7 @@
         app:showAsAction="never"
         android:title="Rescan"
         />
-    <item android:id="@+id/menu_remove_all"
+    <item android:id="@+id/menu_about"
         app:showAsAction="never"
-        android:title="Remove All"
-        />
+        android:title="About"/>
 </menu>

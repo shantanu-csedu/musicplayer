@@ -17,4 +17,6 @@
 
 <resources>
     <string name="app_name">Music Player</string>
+    <string name="version">Version </string>
+    <string name="copyright">© 2015, Simple Solutions BD\nAll Rights Reserved</string>
 </resources>

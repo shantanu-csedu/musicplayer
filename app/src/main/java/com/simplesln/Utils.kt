@@ -17,6 +17,7 @@
 
 package com.simplesln
 
+import android.content.Context
 import java.text.DecimalFormat
 
 fun getProgress(current : Int, duration : Int) : Int {
@@ -38,4 +39,14 @@ fun formatDuration(duration : Int) : String{
     fstring.append(":")
     fstring.append(decimalFormat.format(sec))
     return fstring.toString()
+}
+
+fun appVersion(context : Context) : String{
+    try {
+        val manager = context.packageManager
+        val info = manager.getPackageInfo(context.packageName, 0)
+        return info.versionName
+    } catch (e: Exception) {
+    }
+    return "1.1.1"
 }

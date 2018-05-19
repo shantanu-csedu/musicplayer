@@ -17,7 +17,9 @@
 
 package com.simplesln.simpleplayer
 
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -30,13 +32,12 @@ import android.support.v4.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
 import android.widget.SeekBar
+import android.widget.TextView
 import android.widget.Toast
 import com.simplesln.adapters.ViewPagerAdapter
+import com.simplesln.appVersion
 import com.simplesln.data.*
 import com.simplesln.formatDuration
 import com.simplesln.fragments.TitleFragment
@@ -249,8 +250,15 @@ class MainActivity : BaseActivity() {
                 Log.e("scan","started");
                 Snackbar.make(viewPager,"Scanning library...",Snackbar.LENGTH_SHORT).show()
             }
-            R.id.menu_remove_all-> {
-                getDataProvider(this).removeAllQueue()
+            R.id.menu_about ->{
+                val builder = AlertDialog.Builder(this@MainActivity)
+                val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val v = inflater.inflate(R.layout.dialog_about, null)
+                val text = v.findViewById(R.id.about_version) as TextView
+                text.text = resources.getString(R.string.version) + " " + appVersion(this) + "\n"
+                text.append(resources.getString(R.string.copyright))
+                builder.setView(v)
+                builder.create().show()
             }
         }
         return super.onOptionsItemSelected(item)

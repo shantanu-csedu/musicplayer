@@ -103,9 +103,6 @@ class RoomDataProvider(context : Context) : DataProvider{
             for ((index, file) in files.withIndex()) {
                 db?.queue()?.insert(MediaQueue(file.id, rank + index))
             }
-            if(files.isNotEmpty() && db?.nowPlay()?.getNowPlay() == null){
-                setNowPlaying(files[0].id)
-            }
             true
         })
     }
@@ -113,9 +110,6 @@ class RoomDataProvider(context : Context) : DataProvider{
     override fun addQueue(file: MediaFile, rank: Double): LiveData<Boolean> {
         return QueryExecutor(executorService, Callable<Boolean> {
             db?.queue()?.insert(MediaQueue(file.id, rank))
-            if(db?.nowPlay()?.getNowPlay() == null){
-                setNowPlaying(file.id)
-            }
             true
         })
     }

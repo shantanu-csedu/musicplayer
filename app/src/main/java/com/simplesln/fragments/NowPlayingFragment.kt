@@ -132,6 +132,9 @@ class NowPlayingFragment : Fragment(), AdapterView.OnItemClickListener, ItemTouc
         when(item?.itemId){
             R.id.menu_shuffle->
                 shuffle()
+            R.id.menu_remove_all-> {
+                getDataProvider(activity!!).removeAllQueue()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
