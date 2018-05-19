@@ -36,6 +36,7 @@ interface DataProvider {
     fun deleteMedia(mediaId: Long)
     fun undeleteMedia(mediaId: Long)
     fun removeQueue(mediaId : Long)
+    fun removeAllQueue()
     fun removePlaylist(name : String)
     fun removeFromPlaylist(mediaId: Long,playlistName : String)
 

@@ -245,8 +245,12 @@ class MainActivity : BaseActivity() {
         when(item?.itemId){
             android.R.id.home -> supportFragmentManager.popBackStack()
             R.id.menu_scan -> {
-                startService(Intent(applicationContext,MediaScanService::class.java))
-                Toast.makeText(this,"Scanning library...",Toast.LENGTH_LONG).show()
+                startService(Intent(this,MediaScanService::class.java))
+                Log.e("scan","started");
+                Snackbar.make(viewPager,"Scanning library...",Snackbar.LENGTH_SHORT).show()
+            }
+            R.id.menu_remove_all-> {
+                getDataProvider(this).removeAllQueue()
             }
         }
         return super.onOptionsItemSelected(item)

@@ -22,4 +22,8 @@
         app:showAsAction="never"
         android:title="Rescan"
         />
+    <item android:id="@+id/menu_remove_all"
+        app:showAsAction="never"
+        android:title="Remove All"
+        />
 </menu>

@@ -70,7 +70,7 @@ class NotificationHelper(val context : Context,val mediaSession : MediaSessionCo
         addNextAction(notificationBuilder)
         notificationBuilder
                 .setStyle(android.support.v4.media.app.NotificationCompat.MediaStyle()
-                        .setMediaSession(mediaSession.sessionToken))
+                        .setMediaSession(mediaSession.sessionToken).setShowActionsInCompactView(0,1,2))
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setSmallIcon(R.drawable.ic_stat_notification)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)

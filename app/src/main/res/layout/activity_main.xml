@@ -73,9 +73,10 @@
 
     <FrameLayout
         android:id="@+id/playerControlContainer"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#55CFCFCF"
+        android:background="@color/bottomPlayerColor"
         >
 
         <!--<View-->
@@ -92,7 +93,8 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:padding="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -112,6 +114,8 @@
                     android:id="@+id/seekBar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
                     android:layout_weight="1"/>
 
                 <TextView

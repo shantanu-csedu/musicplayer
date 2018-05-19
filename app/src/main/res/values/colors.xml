@@ -23,4 +23,5 @@
     <color name="lighterBlack">#88000000</color>
     <color name="lightBlack">#AA000000</color>
     <color name="windowBackground">#E0E5EB</color>
+    <color name="bottomPlayerColor">#55CFCFCF</color>
 </resources>

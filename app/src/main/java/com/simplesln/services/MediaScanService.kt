@@ -46,8 +46,8 @@ class MediaScanService : Service() {
         dataProvider = getDataProvider(this)
         pref = getPref(this)
         pref.scanRunning(true)
-        Log.e(TAG,"starting scan")
         MediaScanner()
+        Log.e(TAG,"starting scan")
     }
 
     override fun onDestroy() {
@@ -66,7 +66,7 @@ class MediaScanService : Service() {
             stopSelf()
         }
 
-        fun scan(files : List<File>){
+        private fun scan(files : List<File>){
             val nextDir = ArrayList<File>()
             val filesToSave = ArrayList<MediaFile>()
             for(parent in files){
