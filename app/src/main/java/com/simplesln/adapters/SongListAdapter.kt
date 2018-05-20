@@ -75,7 +75,7 @@ class SongListAdapter(val context : Context) : RecyclerView.Adapter<SongListAdap
         holder.repeatCounter.setCount(mediaFile.repeatCount)
 
         holder.itemView.setOnClickListener(View.OnClickListener {
-            onItemClickListener?.onItemClick(null,holder.repeatCounter,position,0)
+            onItemClickListener?.onItemClick(null,holder.musicName,position,0)
         })
 
         if(mediaFile.playing){

@@ -19,5 +19,5 @@
 <resources>
     <integer name="ga_sessionTimeout">60</integer>
     <!--  The following value should be replaced with correct property id. -->
-    <string name="ga_trackingId">UA-103814934-1</string>
+    <string name="ga_trackingId">UA-119574750-1</string>
 </resources>

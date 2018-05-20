@@ -54,12 +54,23 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, ItemT
         val item = mAdapter.values[position]
         Snackbar.make(listView,mAdapter.values[position].name + " is removed",Snackbar.LENGTH_LONG)
                 .setAction("Undo", View.OnClickListener {
-                    getDataProvider(activity!!).undeleteMedia(item.id)
+                    if(groupType == TYPE_PLAYLIST){
+                        getDataProvider(activity!!).addToPlayList(groupName,Arrays.asList(item.getEntity()))
+                    }
+                    else {
+                        getDataProvider(activity!!).undeleteMedia(item.id)
+                    }
+
                 })
                 .show()
         mAdapter.onItemDismiss(position)
         handler.postDelayed({
-            getDataProvider(activity!!).deleteMedia(item.id)
+            if(groupType == TYPE_PLAYLIST){
+                getDataProvider(activity!!).removeFromPlaylist(item.id,groupName)
+            }
+            else {
+                getDataProvider(activity!!).deleteMedia(item.id)
+            }
         },300)
     }
 

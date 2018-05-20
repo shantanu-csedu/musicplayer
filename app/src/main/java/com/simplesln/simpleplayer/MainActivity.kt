@@ -46,6 +46,9 @@ import com.simplesln.interfaces.DataProvider
 import com.simplesln.repositories.PrefDataProvider
 import com.simplesln.services.MediaScanService
 import kotlinx.android.synthetic.main.activity_main.*
+import com.google.android.gms.analytics.HitBuilders
+
+
 
 const val NOW_PLAYING = "Now Playing"
 const val PLAYLIST = "Playlist"
@@ -233,6 +236,17 @@ class MainActivity : BaseActivity() {
 
         if(!pref.everIndexed()){
             tabLayout.getTabAt(1)?.select()
+        }
+
+        try {
+            //sending analytics
+            getDefaultTracker(this).send(HitBuilders.EventBuilder()
+                    .setCategory("Screen")
+                    .setAction("Open")
+                    .setLabel("Main activity")
+                    .build())
+        }catch (ex : Exception){
+            ex.printStackTrace()
         }
     }
 

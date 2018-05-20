@@ -33,6 +33,9 @@ interface NowPlayDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun set(nowPlay : NowPlay) : Long
 
+    @Query("update media_now_play set queueId=:queueId where id=:id")
+    fun update(id:Long, queueId:Long) : Long
+
     @Query("select media_library.* from media_now_play left join media_queue on media_now_play.queueId = media_queue.id left join media_library on media_library.id = media_queue.media_file_id order by media_now_play.id desc limit 1")
     fun get() : LiveData<MediaFile>
 
