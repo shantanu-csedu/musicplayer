@@ -33,8 +33,4 @@ import android.arch.persistence.room.PrimaryKey
         ],
         indices = [(Index(value = arrayOf("queueId"), unique = true))]
 )
-class NowPlay(id: Long = 0, queueId : Long) {
-    @PrimaryKey(autoGenerate = true)
-    var id: Long = id
-    var queueId : Long = queueId
-}
+class NowPlay(@PrimaryKey(autoGenerate = true) val id: Long = 0, val queueId: Long)

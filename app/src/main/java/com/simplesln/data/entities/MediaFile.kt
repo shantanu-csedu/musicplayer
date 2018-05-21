@@ -23,20 +23,11 @@ import android.arch.persistence.room.PrimaryKey
 
 //@Entity(tableName = "media_library")
 @Entity(tableName = "media_library",
-        indices = [Index(value = "link",unique = true)])
-class MediaFile(link: String, name: String, duration: Int, artist: String?, genre: String?, album: String?, folder: String, year: String?,repeatCount : Int = 1,art : String = "", id : Long = 0L, del : Boolean = false, favorite : Int = 0) {
-    @PrimaryKey(autoGenerate = true)
-    var id : Long = id
-    var link : String = link
-    var name : String = name
-    var duration : Int = duration
-    var artist : String = if(artist == null || artist.isEmpty()) "unknown" else artist
-    var genre : String = if(genre == null || genre.isEmpty()) "unknown" else genre
-    var album : String = if(album == null || album.isEmpty()) "unknown" else album
-    var folder : String = folder
-    var year : String = if(year == null || year.isEmpty()) "unknown" else year
-    var repeatCount : Int = repeatCount
-    var art : String = art
-    var del : Boolean = del
-    val favorite : Int = favorite //1 like, -1 dislike
+        indices = [Index(value = ["link"],unique = true)])
+class MediaFile(val link: String, val name: String, val duration: Int, artist: String?, genre: String?, album: String?, val folder: String, year: String?, val repeatCount: Int = 1, val art: String = "", @PrimaryKey(autoGenerate = true) var id: Long = 0L, val del: Boolean = false, //1 like, -1 dislike
+                val favorite: Int = 0) {
+    val artist : String = if(artist == null || artist.isEmpty()) "unknown" else artist
+    val genre : String = if(genre == null || genre.isEmpty()) "unknown" else genre
+    val album : String = if(album == null || album.isEmpty()) "unknown" else album
+    val year : String = if(year == null || year.isEmpty()) "unknown" else year
 }

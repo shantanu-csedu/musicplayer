@@ -23,8 +23,4 @@ import android.arch.persistence.room.PrimaryKey
 
 @Entity(tableName = "media_playlist",
         indices = [(Index(value = arrayOf("name"), unique = true))])
-class PlayList(name : String) {
-    @PrimaryKey(autoGenerate = true)
-    var id : Long = 0
-    var name : String = name
-}
+class PlayList(val name: String, @PrimaryKey(autoGenerate = true) val id : Long = 0)

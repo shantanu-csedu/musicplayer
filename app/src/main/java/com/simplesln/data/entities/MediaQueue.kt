@@ -33,10 +33,4 @@ import android.arch.persistence.room.PrimaryKey
         ],
         indices = [Index(value = arrayOf("media_file_id"), unique = true)]
 )
-class MediaQueue(media_file_id: Long, rank : Double) {
-    @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
-    var media_file_id: Long = media_file_id
-    var rank: Double = rank
-    var timestamp: Long = System.currentTimeMillis()
-}
+class MediaQueue(val media_file_id: Long, var rank: Double, @PrimaryKey(autoGenerate = true) var id: Long = 0, val timestamp: Long = System.currentTimeMillis())
