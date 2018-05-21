@@ -189,6 +189,11 @@ class MediaPlayerService : LifecycleService(){
         player.release()
         notificationHelper.mediaSession.isActive = false
         notificationHelper.mediaSession.release()
-        unregisterReceiver(playerActionHandler)
+        try {
+            unregisterReceiver(playerActionHandler)
+        }catch (ex : Exception){
+
+        }
+
     }
 }

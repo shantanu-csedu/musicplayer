@@ -176,12 +176,14 @@ class SongListFragment : TitleFragment(), AdapterView.OnItemClickListener, ItemT
         addedToNowPlayList = false
         mAdapter.values.clear()
         if(it != null){
+
             val lastState = (activity as MainActivity).liveMediaPlayerState.lastState
             for(entity in it){
                 val mFile = com.simplesln.data.MediaFile(entity)
                 if(lastState.mediaFile?.link.equals(mFile.link)){
                     mFile.playing = (lastState.state == STATE_PLAYING)
                 }
+                Log.e("File link ",mFile.link)
                 mAdapter.values.add(mFile)
             }
         }

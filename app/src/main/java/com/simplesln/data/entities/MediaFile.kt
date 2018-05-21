@@ -18,9 +18,12 @@
 package com.simplesln.data.entities
 
 import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Index
 import android.arch.persistence.room.PrimaryKey
 
-@Entity(tableName = "media_library")
+//@Entity(tableName = "media_library")
+@Entity(tableName = "media_library",
+        indices = [Index(value = "link",unique = true)])
 class MediaFile(link: String, name: String, duration: Int, artist: String?, genre: String?, album: String?, folder: String, year: String?,repeatCount : Int = 1,art : String = "", id : Long = 0L, del : Boolean = false, favorite : Int = 0) {
     @PrimaryKey(autoGenerate = true)
     var id : Long = id

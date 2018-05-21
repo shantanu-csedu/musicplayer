@@ -18,6 +18,8 @@
 package com.simplesln.services
 
 import android.app.Service
+import android.arch.lifecycle.LifecycleService
+import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.os.Environment
@@ -30,15 +32,16 @@ import com.simplesln.interfaces.DataProvider
 import com.simplesln.simpleplayer.getDataProvider
 import com.simplesln.simpleplayer.getPref
 import java.io.File
+import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-class MediaScanService : Service() {
+class MediaScanService : LifecycleService() {
     private val TAG = "MediaScannerService"
     private lateinit var dataProvider: DataProvider
     private lateinit var pref : PrefDataProvider
+    private val executorService : ExecutorService = Executors.newFixedThreadPool(1)
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
 
     override fun onCreate() {
         super.onCreate()
@@ -46,7 +49,7 @@ class MediaScanService : Service() {
         dataProvider = getDataProvider(this)
         pref = getPref(this)
         pref.scanRunning(true)
-        MediaScanner()
+        executorService.submit(MediaScanner())
         Log.e(TAG,"starting scan")
     }
 
@@ -54,17 +57,20 @@ class MediaScanService : Service() {
         super.onDestroy()
         pref.everIndexed(true)
         pref.scanRunning(false)
+        executorService.shutdown()
         Log.e(TAG,"destroyed")
     }
 
-    inner class MediaScanner {
-        private val baseFiles = arrayOf(Environment.getExternalStorageDirectory())
-        private val patterns = arrayOf(".mp3","aac")
-
-        init {
+    inner class MediaScanner : Runnable {
+        override fun run() {
+            deleteInvalid()
             scan(baseFiles.toList())
             stopSelf()
         }
+
+        private val baseFiles = arrayOf(Environment.getExternalStorageDirectory())
+        private val patterns = arrayOf(".mp3","aac","flac")
+
 
         private fun scan(files : List<File>){
             val nextDir = ArrayList<File>()
@@ -83,6 +89,22 @@ class MediaScanService : Service() {
                 Log.e("base path ", nextDir[0].path)
                 scan(nextDir)
             }
+        }
+
+        private fun deleteInvalid(){
+            val liveData = dataProvider.getMediaFiles()
+            liveData.observe(this@MediaScanService ,object :Observer<List<MediaFile>>{
+                override fun onChanged(it: List<MediaFile>?) {
+                    liveData.removeObserver(this)
+                    if(it != null) {
+                        for (file in it) {
+                            if(!File(file.link).exists()){
+                                dataProvider.removeMedia(file.id)
+                            }
+                        }
+                    }
+                }
+            })
         }
 
         private fun isMatchPattern(name : String) : Boolean{

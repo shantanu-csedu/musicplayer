@@ -25,6 +25,7 @@ import com.simplesln.data.*
 import com.simplesln.data.entities.MediaFile
 import com.simplesln.helpers.MediaSessionHelper
 import com.simplesln.interfaces.DataProvider
+import java.io.File
 
 class NativeMediaPlayer(context : Context, lifecycleOwner: LifecycleOwner, dataProvider: DataProvider) : MyPlayer(lifecycleOwner,dataProvider), MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener {
 
@@ -46,7 +47,7 @@ class NativeMediaPlayer(context : Context, lifecycleOwner: LifecycleOwner, dataP
         mPrepared = false
         player.reset()
         liveMediaPlayerState.update(MediaPlayerState(STATE_IDLE,mediaFile))
-        if(mediaFile != null) {
+        if(mediaFile != null && File(mediaFile.link).exists()) {
             player.setDataSource(mediaFile.link)
             player.prepare()
             return true
