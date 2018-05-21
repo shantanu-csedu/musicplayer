@@ -32,6 +32,7 @@ import com.simplesln.interfaces.Player
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
 import android.util.Log
+import com.google.android.gms.analytics.HitBuilders
 import com.simplesln.helpers.AudioFocusHelper
 import com.simplesln.helpers.MediaSessionHelper
 import com.simplesln.helpers.NOTIFICATION_ID
@@ -39,6 +40,7 @@ import com.simplesln.helpers.NotificationHelper
 import com.simplesln.players.NativeMediaPlayer
 import com.simplesln.simpleplayer.createPlayer
 import com.simplesln.simpleplayer.getDataProvider
+import com.simplesln.simpleplayer.getDefaultTracker
 
 
 const val ACTION_PLAY = "action.play"
@@ -91,14 +93,58 @@ class MediaPlayerService : LifecycleService(){
     private val playerActionHandler = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when(intent?.action){
-                ACTION_NEXT ->
-                        player.next()
-                ACTION_PAUSE ->
-                        player.stop()
-                ACTION_PLAY ->
-                        player.play()
-                ACTION_PREV ->
-                        player.prev()
+                ACTION_NEXT -> {
+                    try {
+                        //sending analytics
+                        getDefaultTracker(this@MediaPlayerService).send(HitBuilders.EventBuilder()
+                                .setCategory("Notification")
+                                .setAction("Click")
+                                .setLabel("next")
+                                .build())
+                    }catch (ex : Exception){
+                        ex.printStackTrace()
+                    }
+                    player.next()
+                }
+                ACTION_PAUSE -> {
+                    try {
+                        //sending analytics
+                        getDefaultTracker(this@MediaPlayerService).send(HitBuilders.EventBuilder()
+                                .setCategory("Notification")
+                                .setAction("Click")
+                                .setLabel("stop")
+                                .build())
+                    }catch (ex : Exception){
+                        ex.printStackTrace()
+                    }
+                    player.stop()
+                }
+                ACTION_PLAY -> {
+                    try {
+                        //sending analytics
+                        getDefaultTracker(this@MediaPlayerService).send(HitBuilders.EventBuilder()
+                                .setCategory("Notification")
+                                .setAction("Click")
+                                .setLabel("play")
+                                .build())
+                    }catch (ex : Exception){
+                        ex.printStackTrace()
+                    }
+                    player.play()
+                }
+                ACTION_PREV -> {
+                    try {
+                        //sending analytics
+                        getDefaultTracker(this@MediaPlayerService).send(HitBuilders.EventBuilder()
+                                .setCategory("Notification")
+                                .setAction("Click")
+                                .setLabel("previous")
+                                .build())
+                    }catch (ex : Exception){
+                        ex.printStackTrace()
+                    }
+                    player.prev()
+                }
             }
         }
     }
@@ -130,6 +176,17 @@ class MediaPlayerService : LifecycleService(){
                         player.play()
                     }
                     mInit = true
+
+                    try {
+                        //sending analytics
+                        getDefaultTracker(this@MediaPlayerService).send(HitBuilders.EventBuilder()
+                                .setCategory("Playing")
+                                .setAction("Change")
+                                .setLabel("music")
+                                .build())
+                    }catch (ex : Exception){
+                        ex.printStackTrace()
+                    }
                 }
             }
             else{

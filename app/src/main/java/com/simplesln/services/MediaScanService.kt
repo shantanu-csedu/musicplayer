@@ -24,6 +24,7 @@ import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.os.Environment
 import android.os.IBinder
+import android.support.v4.content.ContextCompat
 import android.util.Base64
 import android.util.Log
 import com.simplesln.repositories.PrefDataProvider
@@ -35,6 +36,7 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
 
 class MediaScanService : LifecycleService() {
     private val TAG = "MediaScannerService"
@@ -64,14 +66,21 @@ class MediaScanService : LifecycleService() {
     inner class MediaScanner : Runnable {
         override fun run() {
             deleteInvalid()
-            scan(baseFiles.toList())
+            scan(getBaseFiles(ContextCompat.getExternalFilesDirs(this@MediaScanService, null)))
             stopSelf()
         }
 
-        private val baseFiles = arrayOf(Environment.getExternalStorageDirectory())
+//        private val baseFiles = ContextCompat.getExternalFilesDirs(this@MediaScanService, null)
         private val patterns = arrayOf(".mp3","aac","flac")
 
-
+        private fun getBaseFiles(files : Array<File>) : List<File>{
+            val suffix = "/Android/data/com.simplesln.simpleplayer"
+            val baseFiles = ArrayList<File>()
+            for(file in files){
+                baseFiles.add(File(file.absolutePath.substring(0,file.absolutePath.indexOf(suffix))))
+            }
+            return baseFiles
+        }
         private fun scan(files : List<File>){
             val nextDir = ArrayList<File>()
             val filesToSave = ArrayList<MediaFile>()
